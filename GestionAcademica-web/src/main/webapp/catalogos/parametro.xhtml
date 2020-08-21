@@ -1,0 +1,102 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <style>
+                    .etiquetaParametro{
+                        width: 190px;
+                    }
+                </style>                
+
+                <center>
+
+                    <h:panelGrid id="panelPrincipal" style="width: 95%">
+                        <p:panel>
+                            <f:facet name="header">
+                                <center>
+                                    <h:panelGrid columnClasses="centrado">
+                                        <h:outputLabel value="#{msg.parametrosSistema}" class="titulo"/>
+                                        <h:panelGrid columns="3" cellpadding="0" cellspacing="0">
+                                            <p:commandButton icon="fa fa-save" value="#{msg.grabar}" action="#{parametroBean.grabar()}" update="panelPrincipal" 
+                                                             onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"/>
+                                            <p:commandButton icon="fa fa-reply"  value="#{msg.cancelar}" action="#{parametroBean.cancelar()}" immediate="false" process="@this" update="panelPrincipal"
+                                                             onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()">
+                                            </p:commandButton>
+                                        </h:panelGrid>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                        <p:messages closable="true"/>
+
+                        <h:panelGrid id="panelParametrizacion" columnClasses="etiqueta etiquetaParametro" columns="2">
+                                <p:outputLabel value="#{msg.nombre}:" id="lblNombre" for="selNombre"/>
+                                <h:panelGrid columns="2">
+                                    <p:selectOneMenu id="selNombre" value="#{parametroBean.parametro}"
+                                                     style="width: 330px"
+                                                     converter="omnifaces.SelectItemsConverter" required="true">
+                                        <f:selectItems value="#{parametroBean.parametroList}" var="par" itemLabel="#{par.nombre}" itemValue="#{par}"/>
+                                        <p:ajax update="panelParametrizacion"/>
+                                    </p:selectOneMenu>
+                                    <p:message for="selNombre"/>
+                                </h:panelGrid>
+
+
+                                <p:outputLabel value="#{msg.valor}:" id="lblValor" for="txtValor" rendered="#{parametroBean.parametro.id != 5}"/>
+                                <h:panelGrid columns="2" id="panelValor" rendered="#{parametroBean.parametro.id != 5}">
+                                    <p:inputText id="txtValor" value="#{parametroBean.parametro.valor}" required="true" 
+                                                 maxlength="50" size="50">
+                                        <p:ajax event="keyup" update="lblValor, msgNombre"/>
+                                        <p:ajax event="change" update="@this"/>
+                                    </p:inputText>
+                                    <p:message id="msgNombre" for="txtValor"/>
+                                </h:panelGrid>
+
+                                <p:outputLabel value="#{msg.password}:" id="lblPassword" for="pwd1" rendered="#{parametroBean.parametro.id == 5}"/>
+                                <h:panelGrid columns="2" id="panelPassword" rendered="#{parametroBean.parametro.id == 5}">
+                                    <p:password id="pwd1" 
+                                                value="#{parametroBean.parametro.valor}" 
+                                                match="pwd2" 
+                                                autocomplete="new-password"
+                                                required="true"
+                                                redisplay="true"
+                                                maxlength="30"
+                                                size="50"
+                                                validatorMessage="Error: Las contraseñas no coinciden.">
+                                    </p:password>  
+                                    <p:message id="msgPassword" for="pwd1"/>
+                                </h:panelGrid>
+
+                                <p:outputLabel value="#{msg.confirmarPassword}:" id="lblPassword2" for="pwd2" rendered="#{parametroBean.parametro.id == 5}"/>
+                                <h:panelGrid columns="2" id="panelPassword2" rendered="#{parametroBean.parametro.id == 5}">
+                                    <p:password id="pwd2" 
+                                                value="#{parametroBean.parametro.valor}" 
+                                                size="50"
+                                                redisplay="true"
+                                                maxlength="30"
+                                                autocomplete="new-password"
+                                                required="true" />  
+                                    <p:message id="msgPassword2" for="pwd2"/>
+                                </h:panelGrid>
+
+                            </h:panelGrid>
+
+                        </p:panel>
+
+                    </h:panelGrid>
+                </center>
+
+
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

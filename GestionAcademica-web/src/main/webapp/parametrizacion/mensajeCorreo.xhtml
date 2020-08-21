@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <style>
+                    .etiqueta2{
+                        width: 170px;
+                    }
+                </style>
+                
+                <center>
+
+                    <h:panelGrid id="panelPrincipal" style="width: 95%">
+
+                        <p:panel rendered="#{mensajeCorreoBean.mensajeCorreo==null}">
+                            <f:facet name="header">
+                                <center class="titulo">
+                                        <h:outputLabel value="#{msg.listadoMensajesCorreo}"/>
+                                </center>
+                            </f:facet>
+                        <p:messages closable="true"/>
+                            <p:dataTable id="dtMensajesCorreo" value="#{mensajeCorreoBean.mensajeCorreoList}" var="men" paginator="true" rows="10" emptyMessage="#{msg.noExistenDatos}">
+                                <p:column headerText="#{msg.acciones}" width="100" style="text-align: center">
+                                    <p:commandButton icon="fa fa-pencil" title="#{msg.editar}" action="#{mensajeCorreoBean.seleccionar(men)}" update="formPrincipal:panelPrincipal" resetValues="true"/>
+                                </p:column>
+                                <p:column headerText="#{msg.tipoMensaje}" width="200">
+                                    <h:outputLabel value="#{men.tipo}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.asunto}" width="300">
+                                    <h:outputLabel value="#{men.asunto}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.mensaje}">
+                                    <h:outputLabel value="#{men.mensaje}"/>
+                                </p:column>
+                            </p:dataTable>
+
+                        </p:panel>
+                        <p:panel rendered="#{mensajeCorreoBean.mensajeCorreo!=null}">
+                            <f:facet name="header">
+                                <center class="titulo">
+                                    <h:outputLabel value="#{msg.edicionMensajeCorreo}"/>
+                                    <h:panelGrid columns="3" cellpadding="0" cellspacing="0">
+                                        <p:commandButton icon="fa fa-save" value="#{msg.grabar}" action="#{mensajeCorreoBean.grabar()}" update="panelPrincipal"/>
+                                        <p:commandButton icon="fa fa-reply"  value="#{msg.cancelar}" action="#{mensajeCorreoBean.cancelar()}" immediate="false" process="@this" update="panelPrincipal"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                        <p:messages closable="true"/>
+                            <h:panelGrid columns="2" columnClasses="etiqueta etiqueta2" cellpadding="6" cellspacing="2"> 
+                                <p:outputLabel value="#{msg.tipoMensaje}:"/>
+                                <h:panelGrid columns="2" cellpadding="0" cellspacing="0">
+                                    <p:outputLabel value="#{mensajeCorreoBean.mensajeCorreo.tipo}"/>
+                                </h:panelGrid>
+                                
+                                <p:outputLabel for="txtAsunto" value="#{msg.asunto}:"/>
+                                <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                    <p:inputTextarea id="txtAsunto" value="#{mensajeCorreoBean.mensajeCorreo.asunto}" required="true" 
+                                                     maxlength="50"  cols="80" rows="2"/>
+                                    <p:message for="txtAsunto"/>
+                                </h:panelGrid>
+                                
+                                <p:outputLabel for="txtMensaje" value="#{msg.mensaje}:"/>
+                                <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                    <p:inputTextarea id="txtMensaje" value="#{mensajeCorreoBean.mensajeCorreo.mensaje}" required="true" 
+                                                     maxlength="500" cols="80" rows="6"/>
+                                    <p:message for="txtMensaje"/>
+                                </h:panelGrid>
+                            </h:panelGrid>
+
+                        </p:panel>
+
+
+                    </h:panelGrid>
+                </center>
+
+
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

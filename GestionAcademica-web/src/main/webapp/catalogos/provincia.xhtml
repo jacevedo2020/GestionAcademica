@@ -1,0 +1,331 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <style>
+                    .etiqueta{
+                        background: #d4dee2;
+                        width: 150px;
+                        font-weight: bold;
+                        opacity: 0.95;
+                    }
+                </style>                
+
+                <center>
+                    <h:panelGrid style="width: 95%">
+
+                        <p:tabView id="tab" >
+                            <p:ajax event="tabChange" listener="#{provinciaBean.onTabChange}" update="formPrincipal:tab "/>
+                            <p:tab title="#{msg.provincias}">
+
+                                <h:panelGrid id="panelPrincipalProv" style="width: 100%">
+                                    <p:panel rendered="#{provinciaBean.provincia==null}">
+                                        <f:facet name="header">
+                                            <center>
+                                                <h:panelGrid style="text-align: center">
+                                                    <h:outputLabel value="#{msg.listadoProvincias}" class="titulo"/>
+                                                    <p:commandButton icon="fa fa-plus-circle" value="#{msg.nuevo}" action="#{provinciaBean.nuevo()}" update="formPrincipal:tab:panelPrincipalProv" resetValues="true" process="@this"/>
+                                                </h:panelGrid>
+                                            </center>
+                                        </f:facet>
+                                        <p:messages id="msgProv1"/>
+                                        <p:dataTable id="dtProvincias" widgetVar="dtProvincias" value="#{provinciaBean.provinciaList}" var="prov" paginator="true" rows="10" emptyMessage="#{msg.noExistenDatos}">
+                                            <p:column headerText="#{msg.acciones}" width="100" style="text-align: center">
+                                                <p:commandButton icon="fa fa-pencil" title="#{msg.editar}" action="#{provinciaBean.seleccionar(prov)}" update="formPrincipal:tab:panelPrincipalProv" process="@this"/>
+                                                <p:commandButton icon="fa fa-trash-o" title="#{msg.eliminar}" action="#{provinciaBean.eliminar(prov)}" update="dtProvincias, formPrincipal:tab:dtCantones, formPrincipal:tab:dtParroquias, formPrincipal:tab:panelPrincipalProv" process="@this" 
+                                                                 oncomplete="PF('dtProvincias').filter();">
+                                                    <p:confirm header="#{msg.confirmacionTitulo}" message="#{msg.confirmacionMensaje}" />
+                                                </p:commandButton>
+                                            </p:column>
+                                            <p:column headerText="#{msg.cod} #{msg.provincia}" width="100" style="text-align: center" sortBy="#{prov.codigo}">
+                                                <h:outputLabel value="#{prov.codigo}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg.provincia}" sortBy="#{prov.nombre}" filterBy="#{prov.nombre}" filterMatchMode="contains">
+                                                <h:outputLabel value="#{prov.nombre}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg.estado}" width="100" style="text-align: center">
+                                                <h:outputLabel value="#{prov.estado=='A'?'Activo':'Inactivo'}"/>
+                                            </p:column>
+                                        </p:dataTable>
+
+                                    </p:panel>
+                                    <p:panel rendered="#{provinciaBean.provincia!=null}">
+                                        <f:facet name="header">
+                                            <center>
+                                                <h:outputLabel value="#{provinciaBean.provincia.id==null?msg.creacionProvincia:msg.edicionProvincia}" class="titulo"/>
+                                                <h:panelGrid columns="3" cellpadding="0" cellspacing="0">
+                                                    <p:commandButton icon="fa fa-save" value="#{msg.grabar}" action="#{provinciaBean.grabar()}" update="panelPrincipalProv"/>
+                                                    <p:commandButton icon="fa fa-reply"  value="#{msg.cancelar}" action="#{provinciaBean.cancelar()}" immediate="true" update="panelPrincipalProv"/>
+                                                </h:panelGrid>
+                                            </center>
+                                        </f:facet>
+                                        <p:messages id="msgProv2"/>
+
+                                        <h:panelGrid columns="2" columnClasses="etiqueta" cellpadding="6" cellspacing="2">
+                                            <p:outputLabel for="txtCodigo" value="#{msg.codigo}:"/>
+                                            <h:panelGrid columns="2" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtCodigo" value="#{provinciaBean.provincia.codigo}" 
+                                                             required="true" maxlength="2" size="5"/>
+                                                <p:message for="txtCodigo" />
+                                            </h:panelGrid>
+
+                                            <p:outputLabel for="txtNombre" value="#{msg.nombre}:"/>
+                                            <h:panelGrid columns="2" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtNombre" value="#{provinciaBean.provincia.nombre}" required="true" 
+                                                             maxlength="30" size="50" />
+                                                <p:message for="txtNombre"/>
+                                            </h:panelGrid>
+
+                                            <p:outputLabel for="selEstado" value="#{msg.estado}:"/>
+                                            <h:panelGrid columns="2" cellpadding="0" cellspacing="0">
+                                                <p:selectOneRadio id="selEstado" value="#{provinciaBean.provincia.estado}" required="true">
+                                                    <f:selectItem itemLabel="Activo" itemValue="A"/>
+                                                    <f:selectItem itemLabel="Inactivo" itemValue="I"/>
+                                                </p:selectOneRadio>
+                                                <p:message for="selEstado"/>
+                                            </h:panelGrid>
+
+                                        </h:panelGrid>
+
+                                    </p:panel>
+
+                                </h:panelGrid>
+                            </p:tab>
+                            <p:tab title="#{msg.cantones}">
+                                <h:panelGrid id="panelPrincipalCan" style="width: 100%">
+                                    <p:panel rendered="#{provinciaBean.canton==null}">
+                                        <f:facet name="header">
+                                            <center>
+                                                <h:panelGrid style="text-align: center">
+                                                    <h:outputLabel value="#{msg.listadoCantones}" class="titulo"/>
+                                                    <p:commandButton icon="fa fa-plus-circle" value="#{msg.nuevo}" action="#{provinciaBean.nuevoCanton()}" update="formPrincipal:tab:panelPrincipalCan" resetValues="true" process="@this"/>
+                                                </h:panelGrid>
+                                            </center>
+                                        </f:facet>
+                                        <p:messages id="msgCan1"/>
+                                        <p:dataTable id="dtCantones" widgetVar="dtCantones" value="#{provinciaBean.cantonList}" var="can" paginator="true" rows="10" emptyMessage="#{msg.noExistenDatos}"
+                                                     multiViewState="true">
+                                            <p:column headerText="#{msg.acciones}" width="100" style="text-align: center">
+                                                <p:commandButton icon="fa fa-pencil" title="#{msg.editar}" action="#{provinciaBean.seleccionarCanton(can)}" update="formPrincipal:tab:panelPrincipalCan" process="@this"/>
+                                                <p:commandButton icon="fa fa-trash-o" title="#{msg.eliminar}" action="#{provinciaBean.eliminarCanton(can)}" update="dtCantones, formPrincipal:tab:dtParroquias, formPrincipal:tab:panelPrincipalCan" process="@this" oncomplete="PF('dtCantones').filter();">
+                                                    <p:confirm header="#{msg.confirmacionTitulo}" message="#{msg.confirmacionMensaje}" />
+                                                </p:commandButton>
+                                            </p:column>
+                                            <p:column headerText="#{msg.cod} #{msg.provincia}" width="100" style="text-align: center" sortBy="#{can.provincia.codigo}">
+                                                <h:outputLabel value="#{can.provincia.codigo}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg.provincia}" sortBy="#{can.provincia.nombre}" filterBy="#{can.provincia.nombre}" filterMatchMode="contains">
+                                                <h:outputLabel value="#{can.provincia.nombre}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg.cod} #{msg.canton}" width="100" style="text-align: center" sortBy="#{can.codigo}">
+                                                <h:outputLabel value="#{can.codigo}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg.canton}" sortBy="#{can.nombre}" filterBy="#{can.nombre}" filterMatchMode="contains">
+                                                <h:outputLabel value="#{can.nombre}"/>
+                                            </p:column>
+                                            <p:column headerText="Cabecera Cantonal" sortBy="#{can.cabeceraCantonal}" filterBy="#{can.cabeceraCantonal}" filterMatchMode="contains">
+                                                <h:outputLabel value="#{can.cabeceraCantonal}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg.estado}" width="100" style="text-align: center">
+                                                <h:outputLabel value="#{can.estado=='A'?'Activo':'Inactivo'}"/>
+                                            </p:column>
+                                        </p:dataTable>
+
+                                    </p:panel>
+                                    <p:panel rendered="#{provinciaBean.canton!=null}">
+                                        <f:facet name="header">
+                                            <center>
+                                                <h:outputLabel value="#{provinciaBean.canton.id==null?msg.creacionCanton:msg.edicionCanton}" class="titulo"/>
+                                                <h:panelGrid columns="3" cellpadding="0" cellspacing="0">
+                                                    <p:commandButton icon="fa fa-save" value="#{msg.grabar}" action="#{provinciaBean.grabarCanton()}" update="panelPrincipalCan"/>
+                                                    <p:commandButton icon="fa fa-reply"  value="#{msg.cancelar}" action="#{provinciaBean.cancelarCanton()}" immediate="true" update="panelPrincipalCan"/>
+                                                </h:panelGrid>
+                                            </center>
+                                        </f:facet>
+                                        <p:messages id="msgCan2"/>
+                                        <h:panelGrid columns="2" columnClasses="etiqueta" cellpadding="6" cellspacing="2">
+                                            <p:outputLabel for="selProvinciaCan" value="#{msg.provincia}:"/>
+                                            <h:panelGrid columns="2" cellpadding="0" cellspacing="0">
+                                                <p:selectOneMenu value="#{provinciaBean.canton.provincia}" 
+                                                                 id="selProvinciaCan"
+                                                                 required="true"
+                                                                 style="width: 330px "
+                                                                 converter="omnifaces.SelectItemsConverter">
+                                                    <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption=""/>
+                                                    <f:selectItems value="#{provinciaBean.provinciaList}" var="p" itemLabel="#{p.nombre}" itemValue="#{p}"/>
+                                                </p:selectOneMenu>
+                                                <p:message for="selProvinciaCan" />
+                                            </h:panelGrid>
+
+                                            <p:outputLabel for="txtCodigoCan" value="#{msg.codigo}:"/>
+                                            <h:panelGrid columns="2" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtCodigoCan" value="#{provinciaBean.canton.codigo}" 
+                                                             required="true" maxlength="2" size="5"/>
+                                                <p:message for="txtCodigoCan" />
+                                            </h:panelGrid>
+
+                                            <p:outputLabel for="txtNombreCan" value="#{msg.nombre}:"/>
+                                            <h:panelGrid columns="2" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtNombreCan" value="#{provinciaBean.canton.nombre}" required="true" 
+                                                             maxlength="30" size="50" />
+                                                <p:message for="txtNombreCan"/>
+                                            </h:panelGrid>
+
+                                            <p:outputLabel for="txtNombreCanCabecera" value="Cabecera Cantonal:"/>
+                                            <h:panelGrid columns="2" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtNombreCanCabecera" value="#{provinciaBean.canton.cabeceraCantonal}" required="true" 
+                                                             maxlength="30" size="50" />
+                                                <p:message for="txtNombreCanCabecera"/>
+                                            </h:panelGrid>
+
+
+                                            <p:outputLabel for="selEstadoCan" value="#{msg.estado}:"/>
+                                            <h:panelGrid columns="2" cellpadding="0" cellspacing="0">
+                                                <p:selectOneRadio id="selEstadoCan" value="#{provinciaBean.canton.estado}" required="true">
+                                                    <f:selectItem itemLabel="Activo" itemValue="A"/>
+                                                    <f:selectItem itemLabel="Inactivo" itemValue="I"/>
+                                                </p:selectOneRadio>
+                                                <p:message for="selEstadoCan"/>
+                                            </h:panelGrid>
+
+                                        </h:panelGrid>
+
+                                    </p:panel>
+
+                                </h:panelGrid>
+                            </p:tab>
+                            <p:tab title="#{msg.parroquias}">
+                                <h:panelGrid id="panelPrincipalParr" style="width: 100%">
+                                    <p:panel rendered="#{provinciaBean.parroquia==null}">
+                                        <f:facet name="header">
+                                            <center>
+                                                <h:panelGrid style="text-align: center">
+                                                    <h:outputLabel value="#{msg.listadoParroquias}" class="titulo"/>
+                                                    <p:commandButton icon="fa fa-plus-circle" value="#{msg.nuevo}" action="#{provinciaBean.nuevoParoquia()}" update="formPrincipal:tab:panelPrincipalParr" resetValues="true" process="@this"/>
+                                                </h:panelGrid>
+                                            </center>
+                                        </f:facet>
+                                    <p:messages id="msgParr1"/>
+                                        <p:dataTable id="dtParroquias" widgetVar="dtParroquias" value="#{provinciaBean.parroquiaList}" var="parr" paginator="true" rows="10" emptyMessage="#{msg.noExistenDatos}" multiViewState="true">
+                                            <p:column headerText="#{msg.acciones}" width="100" style="text-align: center">
+                                                <p:commandButton icon="fa fa-pencil" title="#{msg.editar}" action="#{provinciaBean.seleccionarParroquia(parr)}" update="formPrincipal:tab:panelPrincipalParr" process="@this"/>
+                                                <p:commandButton icon="fa fa-trash-o" title="#{msg.eliminar}" action="#{provinciaBean.eliminarParroquia(parr)}" update="dtParroquias, formPrincipal:tab:panelPrincipalParr" process="@this" oncomplete="PF('dtParroquias').filter();">
+                                                    <p:confirm header="#{msg.confirmacionTitulo}" message="#{msg.confirmacionMensaje}" />
+                                                </p:commandButton>
+                                            </p:column>
+                                            <p:column headerText="#{msg.cod} #{msg.provincia}" width="100" style="text-align: center" sortBy="#{parr.canton.provincia.codigo}">
+                                                <h:outputLabel value="#{parr.canton.provincia.codigo}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg.provincia}" sortBy="#{parr.canton.provincia.nombre}" filterBy="#{parr.canton.provincia.nombre}" filterMatchMode="contains">
+                                                <h:outputLabel value="#{parr.canton.provincia.nombre}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg.cod} #{msg.canton}" width="100" style="text-align: center" sortBy="#{parr.canton.codigo}">
+                                                <h:outputLabel value="#{parr.canton.codigo}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg.canton}" sortBy="#{parr.canton.nombre}" filterBy="#{parr.canton.nombre}" filterMatchMode="contains">
+                                                <h:outputLabel value="#{parr.canton.nombre}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg.cod} #{msg.parroquia}" width="100" style="text-align: center" sortBy="#{parr.codigo}">
+                                                <h:outputLabel value="#{parr.codigo}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg.parroquia}" sortBy="#{parr.nombre}" filterBy="#{parr.nombre}" filterMatchMode="contains">
+                                                <h:outputLabel value="#{parr.nombre}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg.estado}" width="100" style="text-align: center">
+                                                <h:outputLabel value="#{parr.estado=='A'?'Activo':'Inactivo'}"/>
+                                            </p:column>
+                                        </p:dataTable>
+
+                                    </p:panel>
+                                    <p:panel rendered="#{provinciaBean.parroquia!=null}">
+                                        <f:facet name="header">
+                                            <center>
+                                                <h:outputLabel value="#{provinciaBean.parroquia.id==null?msg.creacionParroquia:msg.edicionParroquia}" class="titulo"/>
+                                                <h:panelGrid columns="3" cellpadding="0" cellspacing="0">
+                                                    <p:commandButton icon="fa fa-save" value="#{msg.grabar}" action="#{provinciaBean.grabarParroquia()}" update="panelPrincipalParr" process="panelPrincipalParr"/>
+                                                    <p:commandButton icon="fa fa-reply"  value="#{msg.cancelar}" action="#{provinciaBean.cancelarParroquia()}" immediate="true" update="panelPrincipalParr"/>
+                                                </h:panelGrid>
+                                            </center>
+                                        </f:facet>
+                                    <p:messages id="msgParr2"/>
+                                        <h:panelGrid columns="2" columnClasses="etiqueta" cellpadding="6" cellspacing="2">
+                                            <p:outputLabel for="selProvinciaParr" value="#{msg.provincia}:"/>
+                                            <h:panelGrid columns="2" cellpadding="0" cellspacing="0">
+                                                <p:selectOneMenu value="#{provinciaBean.provincia}" 
+                                                                 style="width: 330px"
+                                                                 id="selProvinciaParr"
+                                                                 required="true"
+                                                                 converter="omnifaces.SelectItemsConverter">
+                                                    <p:ajax update="selCantonParr"/>
+                                                    <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption=""/>
+                                                    <f:selectItems value="#{provinciaBean.provinciaList}" var="p2" itemLabel="#{p2.nombre}" itemValue="#{p2}"/>
+                                                </p:selectOneMenu>
+                                                <p:message for="selProvinciaParr" />
+                                            </h:panelGrid>
+
+                                            <p:outputLabel for="selCantonParr" value="#{msg.canton}:"/>
+                                            <h:panelGrid columns="2" cellpadding="0" cellspacing="0">
+                                                <p:selectOneMenu value="#{provinciaBean.parroquia.canton}" 
+                                                                 id="selCantonParr"
+                                                                 style="width: 330px"
+                                                                 required="true"
+                                                                 converter="omnifaces.SelectItemsConverter">
+                                                    <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption=""/>
+                                                    <f:selectItems value="#{provinciaBean.provincia.cantonList}" var="c2" itemLabel="#{c2.nombre}" itemValue="#{c2}"/>
+                                                </p:selectOneMenu>
+                                                <p:message for="selCantonParr" />
+                                            </h:panelGrid>
+
+                                            <p:outputLabel for="txtCodigoParr" value="#{msg.codigo}:"/>
+                                            <h:panelGrid columns="2" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtCodigoParr" value="#{provinciaBean.parroquia.codigo}" 
+                                                             required="true" maxlength="2" size="5"/>
+                                                <p:message for="txtCodigoParr" />
+                                            </h:panelGrid>
+
+                                            <p:outputLabel for="txtNombreParr" value="#{msg.nombre}:"/>
+                                            <h:panelGrid columns="2" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtNombreParr" value="#{provinciaBean.parroquia.nombre}" required="true" 
+                                                             maxlength="30" size="50" />
+                                                <p:message for="txtNombreParr"/>
+                                            </h:panelGrid>
+
+                                            <p:outputLabel for="selEstadoParr" value="#{msg.estado}:"/>
+                                            <h:panelGrid columns="2" cellpadding="0" cellspacing="0">
+                                                <p:selectOneRadio id="selEstadoParr" value="#{provinciaBean.parroquia.estado}" required="true">
+                                                    <f:selectItem itemLabel="Activo" itemValue="A"/>
+                                                    <f:selectItem itemLabel="Inactivo" itemValue="I"/>
+                                                </p:selectOneRadio>
+                                                <p:message for="selEstadoParr"/>
+                                            </h:panelGrid>
+
+                                        </h:panelGrid>
+
+                                    </p:panel>
+
+                                </h:panelGrid>
+
+                            </p:tab>
+
+                        </p:tabView>
+
+                    </h:panelGrid>
+
+
+
+
+                </center>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

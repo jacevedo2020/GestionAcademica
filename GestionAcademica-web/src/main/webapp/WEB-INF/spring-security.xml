@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:util="http://www.springframework.org/schema/util"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+        http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security-4.2.xsd
+http://www.springframework.org/schema/util
+                        http://www.springframework.org/schema/util/spring-util-4.3.xsd">    
+ 
+
+    <http auto-config="true" use-expressions="true" disable-url-rewriting="false">
+        <access-denied-handler error-page="/accesoDenegado.xhtml"/>
+        <intercept-url pattern="/login" access="permitAll"/>
+        <!-- Page level Spring Security : Enable Primefaces -->
+        <intercept-url pattern="/javax.faces.resource/**" access="permitAll"/>
+        <form-login login-page="/login.xhtml"
+                    authentication-success-handler-ref="authenticationSuccessRedirecthandler"  
+                    authentication-failure-url="/login.xhtml?auth=fail"
+                    authentication-failure-handler-ref="securityExceptionTranslationHandler"
+                    username-parameter="username"
+                    password-parameter="password"/>
+        <csrf disabled="true"/>
+        <headers>
+            <frame-options policy="SAMEORIGIN"/>
+        </headers>
+        <logout logout-success-url="/login.xhtml" />
+        <logout invalidate-session="true"
+                delete-cookies="JSESSIONID,SPRING_SECURITY_REMEMBER_ME_COOKIE"
+                logout-success-url="/login.xhtml" />
+        <custom-filter ref="filter" before="FILTER_SECURITY_INTERCEPTOR" />
+
+    </http>
+    
+    <beans:bean id="daoAuthenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+        <beans:property name="userDetailsService" ref="UserDetailsService"/>
+    </beans:bean>    
+    
+    <beans:bean id="authenticationManager" class="org.springframework.security.authentication.ProviderManager">
+        <beans:constructor-arg>
+            <beans:list>
+                <beans:ref bean="daoAuthenticationProvider"/>
+            </beans:list>
+        </beans:constructor-arg>
+    </beans:bean>
+
+    <!-- Authentication-manager Bean -->	
+    <!-- Set customUserDetailsService class as the authentication Manager for Spring Security-->
+    <authentication-manager id="authenticationManager">
+        <authentication-provider user-service-ref="UserDetailsService">
+            <password-encoder hash="bcrypt"></password-encoder>
+        </authentication-provider>
+    </authentication-manager>   
+     
+    <beans:bean id ="authenticationFilter" class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
+        <beans:property name ="authenticationManager" ref="authenticationManager"/>
+        <beans:property name="filterProcessesUrl" value="/login"/>
+        <beans:property name="usernameParameter" value="username"/>
+        <beans:property name="passwordParameter" value="password"/>
+    </beans:bean>     
+    <beans:bean class="com.jvc.medisys.security.UserDetailsServiceImpl" id="UserDetailsService"></beans:bean>
+
+    <beans:bean class="com.jvc.medisys.security.CustomAuthenticationHandler" id="authenticationSuccessRedirecthandler"></beans:bean>
+    
+    <beans:bean id="filter" class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
+        <beans:property name="accessDecisionManager" ref="accessDecisionManager"/>
+        <beans:property name="securityMetadataSource" ref="dbFilterInvocationSecurityMetadataSource"/>
+    </beans:bean>
+    <beans:bean id="accessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+        <beans:constructor-arg>
+            <util:list>
+                <beans:bean class="org.springframework.security.access.vote.RoleVoter">
+                    <beans:property name="rolePrefix" value="" />
+                </beans:bean>
+            </util:list>
+        </beans:constructor-arg>
+    </beans:bean>
+
+    <beans:bean id="securityExceptionTranslationHandler" class="org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler">
+        <beans:property name="exceptionMappings">
+            <beans:props>
+                <beans:prop key="org.springframework.security.authentication.CredentialsExpiredException">/changePassword.xhtml</beans:prop>
+                <beans:prop key="org.springframework.security.authentication.DisabledException">/login.xhtml?auth=fail2</beans:prop>
+                <beans:prop key="org.springframework.security.authentication.LockedException">/login.xhtml?auth=fail3</beans:prop>
+                <beans:prop key="org.springframework.security.authentication.BadCredentialsException">/login.xhtml?auth=fail</beans:prop>
+
+            </beans:props>
+        </beans:property>
+        <beans:property name="defaultFailureUrl" value="/error.xhtml"/>
+    </beans:bean>
+    
+    
+</beans:beans>

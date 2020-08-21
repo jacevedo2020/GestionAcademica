@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <center>
+                    <h:panelGrid id="panelPrincipal" style="width: 95%">
+                        <p:messages>
+                            <p:autoUpdate/>
+                        </p:messages>
+                        <p:panel id="panelDatos">
+                            <h:panelGrid columns="2">
+                                <p:commandButton value="Grabar" action="#{pruebaBean.grabar()}" update="formPrincipal:panelDatos"/>
+                                <p:commandButton value="Cancelar" process="@this" action="#{pruebaBean.cancelar()}" update="formPrincipal:panelDatos"/>
+                            </h:panelGrid>
+                            <p:tabView>
+                                <p:ajax event="tabChange" listener="#{pruebaBean.onTabChange}" update="formPrincipal:panelDatos"/>
+                                <p:tab id="tab1" title="tab1">
+                                    <h:panelGrid columns="3">
+                                        <p:outputLabel for="cedula" value="Cedula:"/>
+                                        <p:inputText id="cedula" value="#{pruebaBean.cedula}" required="true" transient="true">
+                                            <p:ajax event="change" update="@this"/>
+                                        </p:inputText>
+                                        <p:message for="cedula"/>
+
+                                        <p:outputLabel for="nombres" value="Nombres:"/>
+                                        <p:inputText id="nombres" value="#{pruebaBean.nombres}" required="true"/>
+                                        <p:message for="nombres"/>
+
+                                        <p:outputLabel for="apellidos" value="Apellidos:"/>
+                                        <p:inputText id="apellidos" value="#{pruebaBean.apellidos}"/>
+                                        <p:message for="apellidos"/>
+                                    </h:panelGrid>
+
+                                </p:tab>
+                                <p:tab id="tab2" title="tab2">
+                                    <p:outputLabel for="direccion" value="Direccion:"/>
+                                    <p:inputText id="direccion" value="#{pruebaBean.direccion}" required="true"/>
+                                    <p:message for="direccion"/>
+
+                                    <p:outputLabel for="contacto" value="Contacto:"/>
+                                    <p:inputText id="contacto" value="#{pruebaBean.contacto}" required="true"/>
+                                    <p:message for="contacto"/>
+                                </p:tab>
+                                <p:tab id="tab3" title="tab3">
+                                    <p:outputLabel for="telefono" value="Telefono:"/>
+                                    <p:inputText id="telefono" value="#{pruebaBean.telefono}" required="true"/>
+                                    <p:message for="telefono"/>
+
+                                    <p:outputLabel for="celular" value="Celular:"/>
+                                    <p:inputText id="celular" value="#{pruebaBean.celular}" required="true"/>
+                                    <p:message for="celular"/>
+
+                                </p:tab>
+
+                            </p:tabView>
+
+                        </p:panel>
+
+                    </h:panelGrid>
+                </center>
+            </ui:define>
+        </ui:composition>
+
+    </h:body>
+</html>
+

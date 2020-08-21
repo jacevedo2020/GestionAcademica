@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <center>
+
+                    <h:panelGrid id="panelPrincipal" style="width: 95%">
+                        <p:messages/>
+                        <p:panel rendered="#{entregaCertificadoBean2.pantalla==1}">
+                            <h:outputLabel value="PANTALLA 1"/>
+                            <p:commandButton value="Aceptar1" action="#{entregaCertificadoBean2.aceptar1()}"
+                                             update="panelPrincipal" resetValues="true"/>
+                            <p:commandButton value="Aceptar11" action="#{entregaCertificadoBean2.aceptar11()}"
+                                             update="panelPrincipal" resetValues="true"/>
+                            
+                        </p:panel>
+
+                        <p:panel rendered="#{entregaCertificadoBean2.pantalla==2}" transient="false">
+                            <h:outputLabel value="PANTALLA 2"/>
+                            <h:panelGrid columns="3">
+                                <p:outputLabel value="Apellidos" for="txtApellido2"/>
+                                <p:inputText id="txtApellido2" value="#{entregaCertificadoBean2.apellidos2}" required="true"/>
+                                <p:messages for="txtApellido2"/>
+
+                                <p:outputLabel value="Nombres" for="txtNombres2"/>
+                                <p:inputText id="txtNombres2" value="#{entregaCertificadoBean2.nombres2}" required="true"/>
+                                <p:messages for="txtNombres2"/>
+                                
+                            </h:panelGrid>
+                            <p:commandButton value="Aceptar2" action="#{entregaCertificadoBean2.aceptar2()}"
+                                             update="panelPrincipal"/>                            
+                            <p:commandButton value="Cancelar2" action="#{entregaCertificadoBean2.cancelar2()}"
+                                             update="panelPrincipal" process="@this"/>                            
+                        </p:panel>
+
+
+                    </h:panelGrid>
+                </center>
+            </ui:define>
+        </ui:composition>
+
+    </h:body>
+</html>
+

@@ -1,0 +1,257 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <f:metadata>
+            <f:viewParam name="opc" value="#{menuBar.opcion}"></f:viewParam>
+        </f:metadata>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <style>
+                    .etiquetaInscripcion{
+                        width: 180px;
+                    }
+                    .etiquetaDireccionGrupo{
+                        width: 100px;
+                    }
+                    .etiquetaEmpresaGrupo{
+                        width: 170px;
+                    }
+                    .top20{
+                        vertical-align: top;
+                        width: 20%;
+                    }
+                    .top25{
+                        vertical-align: top;
+                        width: 25%;
+                    }
+                    .top30{
+                        vertical-align: top;
+                        width: 30%;
+                    }
+                    .top33{
+                        vertical-align: top;
+                        width: 33%;
+                    }
+                    .top40{
+                        vertical-align: top;
+                        width: 40%;
+                    }
+                    .top50{
+                        vertical-align: top;
+                        width: 50%;
+                    }
+                    .top60{
+                        vertical-align: top;
+                        width: 60%;
+                    }
+                </style>
+                <center>
+
+                    <h:panelGrid id="panelPrincipal" style="width: 95%">
+                        <p:messages>
+                            <p:autoUpdate/>
+                        </p:messages>
+                        <p:panel rendered="#{misInscripcionesBean.inscripcion == null}">
+                            <f:facet name="header">
+                                <center class="titulo">
+                                    <h:panelGrid style="text-align: center">
+                                        <h:outputLabel value="#{msg.estudiante}: #{menuBar.usuario.persona.nombresCompletos}"
+                                                       rendered="#{!menuBar.usuario.verificarRolAdministrador()}"/>
+                                        <h:outputLabel value="Mis Cursos"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:dataTable id="dtInscripciones" value="#{menuBar.usuario.inscripcionList}" var="insc" paginator="true" rows="10" emptyMessage="#{msg.noExistenDatos}">
+                                <p:column headerText="Ver detalle" width="80" style="text-align: center">
+                                    <p:commandButton icon="ui-icon-arrowreturnthick-1-e" title="Ver detalle" action="#{misInscripcionesBean.setInscripcion(insc)}" update="formPrincipal:panelPrincipal" resetValues="true"/>
+                                </p:column>
+                                <p:column headerText="#{msg.curso}">
+                                    <h:outputLabel value="#{insc.cursoCentroCapacitacion.curso.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.tipoCurso}" width="100" style="text-align: center">
+                                    <h:outputLabel value="Continuo" rendered="#{insc.cursoCentroCapacitacion.cursoContinuo}"/>
+                                    <h:outputLabel value="Corporativo" rendered="#{insc.cursoCentroCapacitacion.cursoCorporativo}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.modalidad}" width="100" style="text-align: center">
+                                    <h:outputLabel value="#{insc.cursoCentroCapacitacion.modalidadDescripcion}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.fechaInicio}" width="80" style="text-align: center">
+                                    <h:outputLabel value="#{insc.cursoCentroCapacitacion.fechaInicio}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                    </h:outputLabel>
+                                </p:column>
+                                <p:column headerText="#{msg.fechaFin}" width="70" style="text-align: center">
+                                    <h:outputLabel value="#{insc.cursoCentroCapacitacion.fechaFin}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                    </h:outputLabel>
+                                </p:column>
+                                <p:column headerText="#{msg.nroHoras}" width="70" style="text-align: center">
+                                    <h:outputLabel value="#{insc.cursoCentroCapacitacion.nroHoras}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.estadoMatricula}" width="150" style="text-align: center">
+                                    <h:outputLabel value="Pendiente Aprobación" rendered="#{insc.estadoMatriculaRegistrada}"/>
+                                    <h:outputLabel value="Aprobada" rendered="#{insc.estadoMatriculaAprobada}"/>
+                                    <h:outputLabel value="Anulada" rendered="#{insc.estadoMatriculaAnulada}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </p:panel>
+
+                        <p:panel rendered="#{misInscripcionesBean.inscripcion != null}">
+                            <f:facet name="header">
+                                <center class="titulo">
+                                    <h:panelGrid style="text-align: center">
+                                        <h:outputLabel value="Detalle del Curso"/>
+                                        <p:commandButton icon="ui-icon-arrowreturn-1-w"  value="Regresar" action="#{misInscripcionesBean.setInscripcion(null)}" immediate="false" process="@this" update="panelPrincipal"/>
+
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <h:panelGrid columns="1" style="width: 95%" id="panelInscripcion" cellpadding="10">
+                                <p:fieldset legend="#{msg.datosCurso}">
+                                    <h:panelGrid columns="2" columnClasses="top60, top40" style="width: 100%">
+                                        <h:panelGrid columns="2" cellpadding="6" cellspacing="2" columnClasses="etiqueta etiquetaInscripcion">
+                                            <p:outputLabel value="#{msg.curso}:"/>
+                                            <p:outputLabel value="#{misInscripcionesBean.inscripcion.cursoCentroCapacitacion.curso.nombre}"/>
+
+                                            <p:outputLabel value="#{msg.areaConocimiento}:" rendered="#{misInscripcionesBean.inscripcion.cursoCentroCapacitacion.cursoContinuo}"/>
+                                            <p:outputLabel value="#{misInscripcionesBean.inscripcion.cursoCentroCapacitacion.curso.programa.nombre}" rendered="#{misInscripcionesBean.inscripcion.cursoCentroCapacitacion.cursoContinuo}"/>
+
+                                            <p:outputLabel value="#{msg.tipoCurso}:"/>
+                                            <p:outputLabel value="Continuo" rendered="#{misInscripcionesBean.inscripcion.cursoCentroCapacitacion.cursoContinuo}"/>
+                                            <p:outputLabel value="Corporativo" rendered="#{misInscripcionesBean.inscripcion.cursoCentroCapacitacion.cursoCorporativo}"/>
+
+                                            <p:outputLabel value="#{msg.modalidad}:"/>
+                                            <p:outputLabel value="#{misInscripcionesBean.inscripcion.cursoCentroCapacitacion.modalidadDescripcion}"/>
+
+
+                                            <p:outputLabel value="#{msg.centroCapacitacion}:"/>
+                                            <p:outputLabel value="#{misInscripcionesBean.inscripcion.cursoCentroCapacitacion.centroCapacitacion.nombre}"/>
+
+
+                                            <p:outputLabel value="#{msg.instructor}:"/>
+                                            <p:outputLabel value="#{misInscripcionesBean.inscripcion.cursoCentroCapacitacion.instructor.persona.nombresCompletos}"/>
+
+                                        </h:panelGrid>
+
+                                        <h:panelGrid columns="2" cellpadding="6" cellspacing="2" columnClasses="etiqueta etiquetaInscripcion">
+                                            <p:outputLabel value="Tipo Certificado:"/>
+                                            <p:outputLabel value="#{misInscripcionesBean.inscripcion.cursoCentroCapacitacion.tipoCertificacionDescripcion}"/>
+
+                                            <p:outputLabel value="#{msg.nroHoras}:"/>
+                                            <p:outputLabel value="#{misInscripcionesBean.inscripcion.cursoCentroCapacitacion.nroHoras}"/>
+
+
+                                            <p:outputLabel value="#{msg.fechaInicio}:"/>
+                                            <p:outputLabel value="#{misInscripcionesBean.inscripcion.cursoCentroCapacitacion.fechaInicio}">
+                                                <f:convertDateTime pattern="dd-MMM-yyyy"/>
+                                            </p:outputLabel>
+
+
+                                            <p:outputLabel value="#{msg.fechaFin}:"/>
+                                            <p:outputLabel value="#{misInscripcionesBean.inscripcion.cursoCentroCapacitacion.fechaFin}">
+                                                <f:convertDateTime pattern="dd-MMM-yyyy"/>
+                                            </p:outputLabel>
+
+                                            <p:outputLabel value="#{msg.precio}:" rendered="#{misInscripcionesBean.inscripcion.cursoCentroCapacitacion.cursoContinuo}"/>
+                                            <p:outputLabel value="#{misInscripcionesBean.inscripcion.cursoCentroCapacitacion.precio}" rendered="#{misInscripcionesBean.inscripcion.cursoCentroCapacitacion.cursoContinuo}"/>
+
+
+
+                                        </h:panelGrid>
+
+                                    </h:panelGrid>
+                                </p:fieldset>
+                                <p:fieldset legend="#{msg.informacionPago}">
+                                    <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInscripcion" cellpadding="4" cellspacing="2"
+                                                 id="panelInformacionPago">
+
+                                        <p:outputLabel value="#{msg.aplicaCredito}:"/>
+                                        <p:outputLabel value="Si" rendered="#{misInscripcionesBean.inscripcion.creditoSi}"/>
+                                        <p:outputLabel value="No" rendered="#{not misInscripcionesBean.inscripcion.creditoSi}"/>
+
+
+
+                                        <p:outputLabel value="#{msg.realizaAbono}:"
+                                                       rendered="#{misInscripcionesBean.inscripcion.creditoSi}"/>
+                                        <p:outputLabel value="Si" rendered="#{misInscripcionesBean.inscripcion.creditoSi and misInscripcionesBean.inscripcion.abonoSi}"/>
+                                        <p:outputLabel value="No" rendered="#{misInscripcionesBean.inscripcion.creditoSi and not misInscripcionesBean.inscripcion.abonoSi}"/>
+
+
+                                        <p:outputLabel value="#{msg.pagaEmpresa}:"
+                                                       rendered="#{misInscripcionesBean.inscripcion.abonoNo}"/>
+                                        <p:outputLabel value="Si" rendered="#{misInscripcionesBean.inscripcion.creditoSi and misInscripcionesBean.inscripcion.pagaEmpresaSi}"/>
+                                        <p:outputLabel value="No" rendered="#{misInscripcionesBean.inscripcion.creditoSi and not misInscripcionesBean.inscripcion.pagaEmpresaSi}"/>
+
+                                        <p:outputLabel value="#{msg.formaPago}:" rendered="#{misInscripcionesBean.inscripcion.abonoSi}"/>
+                                        <p:outputLabel value="#{misInscripcionesBean.inscripcion.formaPagoDesc}:" rendered="#{misInscripcionesBean.inscripcion.abonoSi}"/>
+
+
+                                        <p:outputLabel value="#{msg.comprobantePago}:" rendered="#{misInscripcionesBean.inscripcion.abonoSi}"/>
+                                        <h:panelGrid rendered="#{misInscripcionesBean.inscripcion.abonoSi}">
+                                                <a style="color: #0246af" target="_blank" href="#{request.contextPath}#{misInscripcionesBean.inscripcion.documentoPagoUrlCompleto}">#{misInscripcionesBean.inscripcion.documentoPagoNombre}</a>
+                                        </h:panelGrid>
+
+                                    </h:panelGrid>                                        
+
+                                </p:fieldset>
+
+                                <p:fieldset legend="Estado de Matrícula">
+                                    <h:panelGrid columns="2" cellpadding="6" cellspacing="2" columnClasses="etiqueta etiquetaInscripcion">
+                                        <p:outputLabel value="Estado:"  style="font-weight: bold"/>
+                                        <h:outputLabel value="Pendiente Aprobación" rendered="#{insc.estadoMatriculaRegistrada}"/>
+                                        <h:outputLabel value="Aprobada" rendered="#{insc.estadoMatriculaAprobada}"/>
+                                        <h:outputLabel value="Anulada" rendered="#{insc.estadoMatriculaAnulada}"/>
+
+                                    </h:panelGrid>
+
+                                </p:fieldset>
+                                <p:fieldset legend="Puntaje Final" rendered="true">
+                                    <h:panelGrid columns="2" cellpadding="6" cellspacing="2" columnClasses="etiqueta etiquetaInscripcion">
+                                        <p:outputLabel value="Puntaje / 10:"  style="font-weight: bold"
+                                                       rendered="#{misInscripcionesBean.inscripcion.cursoCentroCapacitacion.tipoCertificado == 'P'}"/>
+                                        <p:outputLabel value="#{misInscripcionesBean.inscripcion.puntaje}"
+                                                       rendered="#{misInscripcionesBean.inscripcion.evaluacionEstadoAprobado and misInscripcionesBean.inscripcion.cursoCentroCapacitacion.tipoCertificado == 'P'}">
+                                            <f:convertNumber pattern="0.00"/>
+                                        </p:outputLabel>
+                                        <p:outputLabel value="Pendiente de registrar"
+                                                       rendered="#{not misInscripcionesBean.inscripcion.evaluacionEstadoAprobado and misInscripcionesBean.inscripcion.cursoCentroCapacitacion.tipoCertificado == 'P'}"/>
+                                        <p:outputLabel value="% Asistencia:" style="font-weight: bold"/>
+                                        <p:outputLabel value="#{misInscripcionesBean.inscripcion.asistencia}"
+                                                       rendered="#{misInscripcionesBean.inscripcion.evaluacionEstadoAprobado}">
+                                            <f:convertNumber pattern="0.00"/>
+                                        </p:outputLabel>
+                                        <p:outputLabel value="Pendiente de registrar"
+                                                       rendered="#{not misInscripcionesBean.inscripcion.evaluacionEstadoAprobado}"/>
+
+                                        <p:outputLabel value="Estado:" style="font-weight: bold"/>
+                                        <p:outputLabel value="#{misInscripcionesBean.inscripcion.estadoAprobacionCurso}"/>
+
+
+                                    </h:panelGrid>
+
+                                </p:fieldset>
+
+
+                            </h:panelGrid>
+
+
+                        </p:panel>
+
+
+
+                    </h:panelGrid>
+                </center>
+            </ui:define>
+        </ui:composition>
+
+    </h:body>
+</html>
+

@@ -1,0 +1,363 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:o="http://omnifaces.org/ui">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <style>
+                    .etiqueta{
+                        background: #d4dee2;
+                        width: 180px;
+                        font-weight: bold;
+                        opacity: 0.95;
+                    }
+                    .col_1{
+                        vertical-align: top;
+                        width: 50%;
+                    }
+                    .col_2{
+                        vertical-align: top;
+                        width: 50%;
+                    }
+                </style>
+
+
+                <center>
+                    <h:panelGrid id="panelError" style="width: 95%"
+                                 rendered="#{menuBar.usuario.verificarRolAdministradorCentro() and menuBar.usuario.centroCapacitacionAdministracionActual == null}">
+                        <p:panel>
+                            <center style="color: red; font-size: 18px">
+                                <h:panelGrid >
+                                    <p:spacer height="20"/>
+                                    <p:outputLabel value="Ud. tiene el rol de Administrador de Centro de Capacitación, pero no se le ha asignado a un Centro."/>
+                                </h:panelGrid>
+                                <h:panelGrid>
+                                    <p:outputLabel value="Por favor consulte con el Administrador del Sistema."/>
+                                    <p:spacer height="50"/>
+                                </h:panelGrid>
+                            </center>
+                        </p:panel>
+                    </h:panelGrid>
+                    <h:panelGrid id="panelPrincipal" style="width: 95%"
+                                 rendered="#{menuBar.usuario.verificarRolAnalista() or (menuBar.usuario.verificarRolAdministradorCentro() and menuBar.usuario.centroCapacitacionAdministracionActual != null)}">
+                        <p:messages/>
+                        <p:panel rendered="#{cursoCentroCapacitacionBean.cursoCentro==null}">
+                            <f:facet name="header">
+                                <center>
+                                    <h:panelGrid  style="text-align: center" class="titulo">
+                                        <h:outputLabel value="#{msg.centroCapacitacion}: #{menuBar.usuario.centroCapacitacionAdministracionActual.centroCapacitacion.nombre}"
+                                                       rendered="#{!menuBar.usuario.verificarRolAnalista()}"/>
+                                        <h:outputLabel value="#{msg.cursosContinuosCentro}"
+                                                       rendered="#{menuBar.usuario.verificarRolAnalista()}"/>
+                                        <h:outputLabel value="#{msg.listadoCursosContinuos}"
+                                                       rendered="#{!menuBar.usuario.verificarRolAnalista()}"/>
+                                        <p:commandButton icon="fa fa-plus-circle" value="#{msg.nuevo}" action="#{cursoCentroCapacitacionBean.nuevo()}" update="formPrincipal:panelPrincipal" resetValues="true"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:dataTable id="dtCursos" value="#{cursoCentroCapacitacionBean.cursoCentroList}" var="cursoCentro" paginator="true" rows="10" emptyMessage="#{msg.noExistenDatos}">
+                                <p:column headerText="#{msg.acciones}" width="60" style="text-align: center">
+                                    <p:commandButton icon="fa fa-pencil" title="#{msg.editar}" action="#{cursoCentroCapacitacionBean.seleccionar(cursoCentro)}" update="formPrincipal:panelPrincipal" resetValues="true"/>
+                                    <p:commandButton icon="fa fa-trash" title="#{msg.eliminar}" action="#{cursoCentroCapacitacionBean.eliminar(cursoCentro)}" update="formPrincipal:panelPrincipal">
+                                        <p:confirm header="#{msg.confirmacionTitulo}" message="#{msg.confirmacionMensaje}" />
+                                    </p:commandButton>
+                                </p:column>
+                                <p:column headerText="#{msg.centroCapacitacion}"
+                                          rendered="#{menuBar.usuario.verificarRolAnalista()}">
+                                    <h:outputLabel value="#{cursoCentro.centroCapacitacion.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.proyecto}">
+                                    <h:outputLabel value="#{cursoCentro.proyecto.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.curso}">
+                                    <h:outputLabel value="#{cursoCentro.curso.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.modalidad}" width="75" style="text-align: center">
+                                    <h:outputLabel value="#{cursoCentro.modalidadDescripcion}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.nroHoras}" width="60">
+                                    <h:outputLabel value="#{cursoCentro.nroHoras}" style="float: right"/>
+                                </p:column>
+                                <p:column headerText="#{msg.precio}" width="50">
+                                    <h:outputLabel value="#{cursoCentro.precio}" style="float: right"/>
+                                </p:column>
+                                <p:column headerText="#{msg.fechaInicio}" width="70" style="text-align: center">
+                                    <h:outputLabel value="#{cursoCentro.fechaInicio}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                    </h:outputLabel>
+                                </p:column>
+                                <p:column headerText="#{msg.fechaFin}" width="70" style="text-align: center">
+                                    <h:outputLabel value="#{cursoCentro.fechaFin}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                    </h:outputLabel>
+                                </p:column>
+                                <p:column headerText="#{msg.instructor}" width="100">
+                                    <h:outputLabel value="#{cursoCentro.instructor.persona.nombresCompletos}"/>
+                                </p:column>
+                            </p:dataTable>
+
+                        </p:panel>
+                        <p:panel rendered="#{cursoCentroCapacitacionBean.cursoCentro!=null}">
+                            <p:focus/>
+                            <f:facet name="header">
+                                <center>
+                                    <h:panelGrid  style="text-align: center" class="titulo">
+                                        <h:outputLabel value="#{msg.centroCapacitacion}: #{menuBar.usuario.centroCapacitacionAdministracionActual.centroCapacitacion.nombre}"
+                                                       rendered="#{!menuBar.usuario.verificarRolAnalista()}"/>
+                                        <h:outputLabel value="#{cursoCentroCapacitacionBean.cursoCentro.id==null?msg.creacionCursoContinuo:msg.edicionCursoContinuo}"/>
+
+                                    </h:panelGrid>
+
+                                    <h:panelGrid columns="3" cellpadding="0" cellspacing="0">
+                                        <p:commandButton icon="fa fa-save" value="#{msg.grabar}" action="#{cursoCentroCapacitacionBean.grabar()}" update="panelPrincipal"/>
+                                        <p:commandButton icon="fa fa-reply"  value="#{msg.cancelar}" action="#{cursoCentroCapacitacionBean.cancelar()}" immediate="false" process="@this" update="panelPrincipal">
+                                        </p:commandButton>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <h:panelGrid columns="2" id="panelEdicion" columnClasses="top, top" style="width: 100%">
+                                <h:panelGrid columns="2" columnClasses="etiqueta" cellpadding="6" cellspacing="2">
+
+                                    <p:outputLabel id="lblCentro" for="selCentro" value="#{msg.centroCapacitacion}:"
+                                                   rendered="#{menuBar.usuario.verificarRolAnalista()}"/>
+                                    <h:panelGrid id="panelCentro" columns="1" cellpadding="0" cellspacing="0"
+                                                 rendered="#{menuBar.usuario.verificarRolAnalista()}">
+                                        <p:selectOneMenu id="selCentro" value="#{cursoCentroCapacitacionBean.cursoCentro.centroCapacitacion}" required="true"
+                                                         converter="omnifaces.SelectItemsConverter" style="width: 300px">
+                                            <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption=""/>
+                                            <f:selectItems value="#{centroCapacitacionBean.centroCapacitacionList}" var="centro" itemLabel="#{centro.nombre}" itemValue="#{centro}"/>
+                                            <p:ajax update="panelCentro, lblCentro"/>
+                                        </p:selectOneMenu>
+                                        <p:message for="selCentro"/>
+                                    </h:panelGrid>
+
+
+
+                                    <p:outputLabel for="selCurso" value="#{msg.curso}:"/>
+                                    <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                        <p:selectOneMenu id="selCurso" value="#{cursoCentroCapacitacionBean.cursoCentro.curso}" required="true"
+                                                         converter="omnifaces.SelectItemsConverter" style="width: 300px">
+                                            <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption=""/>
+                                            <f:selectItems value="#{cursoBean.cursoList}" var="curso" itemLabel="#{curso.nombre}" itemValue="#{curso}"/>
+                                            <p:ajax listener="#{cursoCentroCapacitacionBean.seleccionarCurso()}" update="panelEdicion"/>
+                                        </p:selectOneMenu>
+                                        <p:message for="selCurso"/>
+                                    </h:panelGrid>
+
+
+                                    <p:outputLabel for="selProyecto" value="#{msg.proyecto}:"/>
+                                    <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                        <p:selectOneMenu id="selProyecto" value="#{cursoCentroCapacitacionBean.cursoCentro.proyecto}" required="true"
+                                                         converter="omnifaces.SelectItemsConverter" style="width: 300px">
+                                            <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption=""/>
+                                            <f:selectItems value="#{proyectoBean.proyectoActivoList}" var="proy" itemLabel="#{proy.nombre}" itemValue="#{proy}"/>
+                                        </p:selectOneMenu>
+                                        <p:message for="selProyecto"/>
+                                    </h:panelGrid>
+
+                                    <p:outputLabel for="selModalidad" value="#{msg.modalidad}:"/>
+                                    <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                        <p:selectOneRadio id="selModalidad" value="#{cursoCentroCapacitacionBean.cursoCentro.modalidad}" required="true">
+                                            <f:selectItem itemLabel="Presencial" itemValue="P"/>
+                                            <f:selectItem itemLabel="Semipresencial" itemValue="S"/>
+                                            <f:selectItem itemLabel="Virtual" itemValue="V"/>
+                                            <f:selectItem itemLabel="Online" itemValue="O"/>
+                                        </p:selectOneRadio>
+                                        <p:message for="selModalidad"/>
+                                    </h:panelGrid>
+
+                                    <p:outputLabel for="selTipoCertificado" value="#{msg.tipoCertificado}:"/>
+                                    <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                        <p:selectOneRadio id="selTipoCertificado" value="#{cursoCentroCapacitacionBean.cursoCentro.tipoCertificado}" required="true">
+                                            <f:selectItem itemLabel="Asistencia" itemValue="A"/>
+                                            <f:selectItem itemLabel="Aprobación" itemValue="P"/>
+                                        </p:selectOneRadio>
+                                        <p:message for="selTipoCertificado"/>
+                                    </h:panelGrid>
+
+                                    <p:outputLabel for="selCertificadoPor" value="#{msg.certificadoEmitidoPor}:"/>
+                                    <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                        <p:selectOneRadio id="selCertificadoPor" value="#{cursoCentroCapacitacionBean.cursoCentro.certificadoEmitidoPor}" required="true">
+                                            <f:selectItem itemLabel="Innovativa" itemValue="I"/>
+                                            <f:selectItem itemLabel="Ministerio de Trabajo - SETEC" itemValue="S"/>
+                                        </p:selectOneRadio>
+                                        <p:message for="selCertificadoPor"/>
+                                    </h:panelGrid>
+
+                                    <p:outputLabel for="selInstructor" value="#{msg.instructor}:"/>
+                                    <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                        <p:selectOneMenu id="selInstructor" value="#{cursoCentroCapacitacionBean.cursoCentro.instructor}" required="true"
+                                                         converter="omnifaces.SelectItemsConverter" style="width: 300px">
+                                            <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption=""/>
+                                            <f:selectItems value="#{usuarioBean.usuarioInstructorList}" var="instructor" itemLabel="#{instructor.persona.nombresCompletos}" itemValue="#{instructor}"/>
+                                        </p:selectOneMenu>
+                                        <p:message for="selInstructor"/>
+                                    </h:panelGrid>
+
+
+
+                                </h:panelGrid>
+
+                                <h:panelGrid columns="2" columnClasses="etiqueta" cellpadding="6" cellspacing="2">
+
+                                    <p:outputLabel for="txtHoras" value="#{msg.nroHoras}:"/>
+                                    <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                        <p:inputNumber id="txtHoras" value="#{cursoCentroCapacitacionBean.cursoCentro.nroHoras}" required="true" 
+                                                       maxlength="100" size="10"  decimalPlaces="0" maxValue="1000"/>
+                                        <p:message for="txtHoras"/>
+                                    </h:panelGrid>
+
+                                    <p:outputLabel for="txtPrecio" value="#{msg.precio}:"/>
+                                    <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                        <p:inputNumber id="txtPrecio" value="#{cursoCentroCapacitacionBean.cursoCentro.precio}" required="true" 
+                                                       maxlength="100" size="10"  decimalPlaces="2" maxValue="10000"/>
+                                        <p:message for="txtPrecio"/>
+                                    </h:panelGrid>
+
+                                    <p:outputLabel for="txtFechaInicio" value="#{msg.fechaInicio}:"/>
+                                    <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                        <p:calendar id="txtFechaInicio" value="#{cursoCentroCapacitacionBean.cursoCentro.fechaInicio}" required="true" 
+                                                    size="10" pattern="dd/MM/yyyy"/>
+                                        <p:message for="txtFechaInicio"/>
+                                    </h:panelGrid>
+
+                                    <p:outputLabel for="txtFechaFin" value="#{msg.fechaFin}:"/>
+                                    <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                        <p:calendar id="txtFechaFin" value="#{cursoCentroCapacitacionBean.cursoCentro.fechaFin}" required="true" 
+                                                    size="10" pattern="dd/MM/yyyy"/>
+                                        <p:message for="txtFechaFin"/>
+                                    </h:panelGrid>
+
+
+                                    <p:outputLabel for="txtFechaInicioInscripcion" value="#{msg.fechaInicioInscripcion}:"/>
+                                    <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                        <p:calendar id="txtFechaInicioInscripcion" value="#{cursoCentroCapacitacionBean.cursoCentro.fechaInicioInscripcion}" required="true" 
+                                                    size="10" pattern="dd/MM/yyyy"/>
+                                        <p:message for="txtFechaInicioInscripcion"/>
+                                    </h:panelGrid>
+
+                                    <p:outputLabel for="txtFechaFinInscripcion" value="#{msg.fechaFinInscripcion}:"/>
+                                    <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                        <p:calendar id="txtFechaFinInscripcion" value="#{cursoCentroCapacitacionBean.cursoCentro.fechaFinInscripcion}" required="true" 
+                                                    size="10" pattern="dd/MM/yyyy"/>
+                                        <p:message for="txtFechaFinInscripcion"/>
+                                    </h:panelGrid>
+
+                                    <p:outputLabel for="selCiclo" value="#{msg.ciclo}:"/>
+                                    <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                        <p:selectOneMenu id="selCiclo" value="#{cursoCentroCapacitacionBean.cursoCentro.ciclo}"
+                                                         style="width: 85px">
+                                            <f:selectItem itemLabel="1" itemValue="1"/>
+                                            <f:selectItem itemLabel="2" itemValue="2"/>
+                                            <f:selectItem itemLabel="3" itemValue="3"/>
+                                            <f:selectItem itemLabel="4" itemValue="4"/>
+                                            <f:selectItem itemLabel="5" itemValue="5"/>
+                                        </p:selectOneMenu>
+                                        <p:message for="selCiclo"/>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+                            </h:panelGrid>
+                            <h:panelGrid columns="2" columnClasses="etiqueta" cellpadding="6" cellspacing="2">
+
+                                <p:outputLabel value="#{msg.horario}:"/>
+                                <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                    <h:panelGrid columns="4" style="text-align: center">
+                                        <p:outputLabel value="#{msg.dia}"  style="font-weight: bold"/>
+                                        <p:outputLabel value="#{msg.horaInicio}" style="font-weight: bold"/>
+                                        <p:outputLabel value="#{msg.horaFin}" style="font-weight: bold"/>
+                                        <p:spacer/>
+
+                                        <p:outputLabel value="#{msg.lunes}"  style="float: right"/>
+                                        <p:calendar id="calLunes01" pattern="HH:mm" timeOnly="true" size="8" value="#{cursoCentroCapacitacionBean.cursoCentro.horarioList[0].horaDesde}" timeControlType="select" mask="true" maskAutoClear="false"/>
+                                        <p:calendar id="calLunes02" pattern="HH:mm" timeOnly="true" size="8" value="#{cursoCentroCapacitacionBean.cursoCentro.horarioList[0].horaHasta}" timeControlType="select" mask="true" maskAutoClear="false"/>
+                                        <h:panelGrid>
+                                            <o:validateMultiple id="valLunes" components="calLunes01 calLunes02" validator="#{cursoCentroCapacitacionBean.validarHora}" message="Lunes:#{msg.errorHorario}" />
+                                            <p:message for="valLunes" />
+                                            <p:message for="calLunes01" />
+                                            <p:message for="calLunes02" />
+                                        </h:panelGrid>
+
+                                        <p:outputLabel value="#{msg.martes}"  style="float: right"/>
+                                        <p:calendar id="calMartes01" pattern="HH:mm" timeOnly="true" size="8" value="#{cursoCentroCapacitacionBean.cursoCentro.horarioList[1].horaDesde}" timeControlType="select" mask="true" maskAutoClear="false"/>
+                                        <p:calendar id="calMartes02" pattern="HH:mm" timeOnly="true" size="8" value="#{cursoCentroCapacitacionBean.cursoCentro.horarioList[1].horaHasta}" timeControlType="select" mask="true" maskAutoClear="false"/>
+                                        <h:panelGrid>
+                                            <o:validateMultiple id="valMartes" components="calMartes01 calMartes02" validator="#{cursoCentroCapacitacionBean.validarHora}"  message="Martes:#{msg.errorHorario}"/>
+                                            <p:message for="valMartes" />
+                                            <p:message for="calMartes01" />
+                                            <p:message for="calMartes02" />
+                                        </h:panelGrid>
+
+                                        <p:outputLabel value="#{msg.miercoles}"  style="float: right"/>
+                                        <p:calendar id="calMiercoles01" pattern="HH:mm" timeOnly="true" size="8" value="#{cursoCentroCapacitacionBean.cursoCentro.horarioList[2].horaDesde}" timeControlType="select" mask="true" maskAutoClear="false"/>
+                                        <p:calendar id="calMiercoles02" pattern="HH:mm" timeOnly="true" size="8" value="#{cursoCentroCapacitacionBean.cursoCentro.horarioList[2].horaHasta}" timeControlType="select" mask="true" maskAutoClear="false"/>
+                                        <h:panelGrid>
+                                            <o:validateMultiple id="valMiercoles" components="calMiercoles01 calMiercoles02" validator="#{cursoCentroCapacitacionBean.validarHora}" message="Miércoles:#{msg.errorHorario}"/>
+                                            <p:message for="valMiercoles" />
+                                            <p:message for="calMiercoles01" />
+                                            <p:message for="calMiercoles02" />
+                                        </h:panelGrid>
+
+                                        <p:outputLabel value="#{msg.jueves}"  style="float: right"/>
+                                        <p:calendar id="calJueves01" pattern="HH:mm" timeOnly="true" size="8" value="#{cursoCentroCapacitacionBean.cursoCentro.horarioList[3].horaDesde}" timeControlType="select" mask="true" maskAutoClear="false"/>
+                                        <p:calendar id="calJueves02" pattern="HH:mm" timeOnly="true" size="8" value="#{cursoCentroCapacitacionBean.cursoCentro.horarioList[3].horaHasta}" timeControlType="select" mask="true" maskAutoClear="false"/>
+                                        <h:panelGrid>
+                                            <o:validateMultiple id="valJueves" components="calJueves01 calJueves02" validator="#{cursoCentroCapacitacionBean.validarHora}" message="Jueves:#{msg.errorHorario}"/>
+                                            <p:message for="valJueves" />
+                                            <p:message for="calJueves01" />
+                                            <p:message for="calJueves02" />
+                                        </h:panelGrid>
+
+                                        <p:outputLabel value="#{msg.viernes}"  style="float: right"/>
+                                        <p:calendar id="calViernes01" pattern="HH:mm" timeOnly="true" size="8" value="#{cursoCentroCapacitacionBean.cursoCentro.horarioList[4].horaDesde}" timeControlType="select" mask="true" maskAutoClear="false"/>
+                                        <p:calendar id="calViernes02" pattern="HH:mm" timeOnly="true" size="8" value="#{cursoCentroCapacitacionBean.cursoCentro.horarioList[4].horaHasta}" timeControlType="select" mask="true" maskAutoClear="false"/>
+                                        <h:panelGrid>
+                                            <o:validateMultiple id="valViernes" components="calViernes01 calViernes02" validator="#{cursoCentroCapacitacionBean.validarHora}"  message="Viernes:#{msg.errorHorario}"/>
+                                            <p:message for="valViernes" />
+                                            <p:message for="calViernes01" />
+                                            <p:message for="calViernes02" />
+                                        </h:panelGrid>
+
+                                        <p:outputLabel value="#{msg.sabado}"  style="float: right"/>
+                                        <p:calendar id="calSabado01" pattern="HH:mm" timeOnly="true" size="8" value="#{cursoCentroCapacitacionBean.cursoCentro.horarioList[5].horaDesde}" timeControlType="select" mask="true" maskAutoClear="false"/>
+                                        <p:calendar id="calSabado02" pattern="HH:mm" timeOnly="true" size="8" value="#{cursoCentroCapacitacionBean.cursoCentro.horarioList[5].horaHasta}" timeControlType="select" mask="true" maskAutoClear="false"/>
+                                        <h:panelGrid>
+                                            <o:validateMultiple id="valSabado" components="calSabado01 calSabado02" validator="#{cursoCentroCapacitacionBean.validarHora}"  message="Sábado:#{msg.errorHorario}"/>
+                                            <p:message for="valSabado" />
+                                            <p:message for="calSabado01" />
+                                            <p:message for="calSabado02" />
+                                        </h:panelGrid>
+
+                                        <p:outputLabel value="#{msg.domingo}"  style="float: right"/>
+                                        <p:calendar id="calDomingo01" pattern="HH:mm" timeOnly="true" size="8" value="#{cursoCentroCapacitacionBean.cursoCentro.horarioList[6].horaDesde}" timeControlType="select" mask="true" maskAutoClear="false"/>
+                                        <p:calendar id="calDomingo02" pattern="HH:mm" timeOnly="true" size="8" value="#{cursoCentroCapacitacionBean.cursoCentro.horarioList[6].horaHasta}" timeControlType="select" mask="true" maskAutoClear="false"/>
+                                        <h:panelGrid>
+                                            <o:validateMultiple id="valDomingo" components="calDomingo01 calDomingo02" validator="#{cursoCentroCapacitacionBean.validarHora}" message="Domingo:#{msg.errorHorario}"/>
+                                            <p:message for="valDomingo" />
+                                            <p:message for="calDomingo01" />
+                                            <p:message for="calDomingo02" />
+                                        </h:panelGrid>
+
+                                    </h:panelGrid>
+
+                                </h:panelGrid>
+
+                            </h:panelGrid>
+
+                        </p:panel>
+                    </h:panelGrid>
+                </center>
+
+
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

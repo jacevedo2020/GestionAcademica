@@ -1,0 +1,112 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <style>
+                    .etiqueta{
+                        background: #d4dee2;
+                        width: 80px;
+                        font-weight: bold;
+                        opacity: 0.95;
+                    }
+                </style>
+                <center>
+
+                    <h:panelGrid id="panelPrincipal" style="width: 95%">
+
+                        <p:panel rendered="#{programaBean.programa==null}">
+                            <f:facet name="header">
+                                <center class="titulo">
+                                    <h:panelGrid style="text-align: center">
+                                        <h:outputLabel value="#{msg.listadoAreaConocimiento}"/>
+                                        <p:commandButton icon="fa fa-plus-circle" value="#{msg.nuevo}" action="#{programaBean.nuevo()}" update="formPrincipal:panelPrincipal" resetValues="true"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                        <p:messages closable="true"/>
+                            <p:dataTable id="dtProgramas" widgetVar="dtProgramas" value="#{programaBean.programaList}" var="prog" paginator="true" rows="10" 
+                                         sortBy="#{prog.nombre}"
+                                         emptyMessage="#{msg.noExistenDatos}">
+                                <p:column headerText="#{msg.acciones}" width="100" style="text-align: center">
+                                    <p:commandButton icon="fa fa-pencil" title="#{msg.editar}" action="#{programaBean.seleccionar(prog)}" update="formPrincipal:panelPrincipal" resetValues="true"/>
+                                    <p:commandButton icon="fa fa-trash-o" title="#{msg.eliminar}" action="#{programaBean.eliminar(prog)}" update="formPrincipal:panelPrincipal" oncomplete="PF('dtProgramas').filter();">
+                                        <p:confirm header="#{msg.confirmacionTitulo}" message="#{msg.confirmacionMensaje}" />
+                                    </p:commandButton>
+                                </p:column>
+                                <p:column headerText="#{msg.codigo}" width="80" sortBy="#{prog.codigo}" filterBy="#{prog.codigo}">
+                                    <h:outputLabel value="#{prog.codigo}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.nombre}" sortBy="#{prog.nombre}" filterBy="#{prog.nombre}" filterMatchMode="contains">
+                                    <h:outputLabel value="#{prog.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.estado}" width="130" style="text-align: center" sortBy="#{prog.estado}" filterBy="#{prog.estado}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtProgramas').filter()" style="width: 90%">
+                                            <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItem itemLabel="#{msg.activo}" itemValue="A"/>
+                                            <f:selectItem itemLabel="#{msg.inactivo}" itemValue="I"/>
+                                        </p:selectOneMenu>
+                                    </f:facet> 
+                                    <h:outputLabel value="#{prog.estado=='A'?'Activo':'Inactivo'}"/>
+                                </p:column>
+                            </p:dataTable>
+
+                        </p:panel>
+                        <p:panel rendered="#{programaBean.programa!=null}">
+                            <f:facet name="header">
+                                <center class="titulo">
+                                    <h:outputLabel value="#{programaBean.programa.id==null?msg.creacionAreaConocimiento:msg.edicionAreaConocimiento}"/>
+                                    <h:panelGrid columns="3" cellpadding="0" cellspacing="0">
+                                        <p:commandButton icon="fa fa-save" value="#{msg.grabar}" action="#{programaBean.grabar()}" update="panelPrincipal"/>
+                                        <p:commandButton icon="fa fa-reply"  value="#{msg.cancelar}" action="#{programaBean.cancelar()}" immediate="false" process="@this" update="panelPrincipal">
+                                        </p:commandButton>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                        <p:messages closable="true"/>
+                            <h:panelGrid columns="2" columnClasses="etiqueta" cellpadding="6" cellspacing="2">
+                                <p:outputLabel for="txtCodigo" value="#{msg.codigo}:"/>
+                                <h:panelGrid columns="2" cellpadding="0" cellspacing="0">
+                                    <p:inputText id="txtCodigo" value="#{programaBean.programa.codigo}" required="true" 
+                                                 maxlength="3" size="2" style="text-transform: uppercase;"/>
+                                    <p:message for="txtCodigo"/>
+                                </h:panelGrid>
+
+
+                                <p:outputLabel for="txtNombre" value="#{msg.nombre}:"/>
+                                <h:panelGrid columns="2" cellpadding="0" cellspacing="0">
+                                    <p:inputText id="txtNombre" value="#{programaBean.programa.nombre}" required="true" 
+                                                 maxlength="50" size="50" style="text-transform: uppercase;"/>
+                                    <p:message for="txtNombre"/>
+                                </h:panelGrid>
+                                <p:outputLabel for="selEstado" value="#{msg.estado}:"/>
+                                <h:panelGrid columns="2" cellpadding="0" cellspacing="0">
+                                    <p:selectOneRadio id="selEstado" value="#{programaBean.programa.estado}" required="true">
+                                        <f:selectItem itemLabel="Activo" itemValue="A"/>
+                                        <f:selectItem itemLabel="Inactivo" itemValue="I"/>
+                                    </p:selectOneRadio>
+                                    <p:message for="selEstado"/>
+                                </h:panelGrid>
+                            </h:panelGrid>
+
+                        </p:panel>
+
+
+                    </h:panelGrid>
+                </center>
+
+
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

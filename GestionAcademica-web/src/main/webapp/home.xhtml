@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <style>
+                    .etiqueta{
+                        background: #d4dee2;
+                        width: 100px;
+                        font-weight: bold;
+                        opacity: 0.95;
+                    }
+                </style>                
+
+                <center>
+                    <h:panelGrid style="text-align: center">
+                        <p:spacer width="1" height="50"></p:spacer>
+                        <p:outputLabel value="Bienvenido al Sistema de Gestión Académica" style="color: #007ad9; font-size: 20px"/> 
+                        <p:outputLabel value="Seleccione una opción del menú superior" style="color: #007ad9;font-size: 20px"/>
+                        <p:spacer width="1" height="50"></p:spacer>
+                    </h:panelGrid>
+                    
+                </center>
+
+
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

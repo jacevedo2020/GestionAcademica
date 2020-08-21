@@ -1,0 +1,410 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <style>
+                    .etiquetaTipoCurso{
+                        width: 190px;
+                    }
+                    .etiquetaInfoCurso{
+                        width: 100px;
+                    }
+                    .etiquetaVistaPrevia{
+                        width: 160px;
+                    }
+                </style>                
+
+                <center>
+
+                    <h:panelGrid id="panelPrincipal" style="width: 95%">
+                        <p:panel rendered="#{generarCertificadoBean.cursoCentro == null}">
+                            <f:facet name="header">
+                                <center>
+                                    <h:panelGrid style="text-align: center" class="titulo">
+                                        <h:outputLabel value="#{msg.cursosDictados}"/>
+                                        <h:outputLabel value="#{msg.generarSubirCertificados}"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages closable="true"/>
+                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaTipoCurso">
+                                <p:outputLabel value="Seleccione el Tipo de Curso:" style="font-weight: bold"/>
+                                <p:selectOneMenu value="#{generarCertificadoBean.tipoCurso}" style="width: 150px">
+                                    <f:selectItem itemLabel="Continuo" itemValue="C"/>
+                                    <f:selectItem itemLabel="Corporativo" itemValue="O"/>
+                                    <p:ajax listener="#{generarCertificadoBean.tipoCursoChange()}" update="dtCursosCentro"/>
+                                </p:selectOneMenu>
+                            </h:panelGrid>
+
+                            <p:dataTable id="dtCursosCentro" widgetVar="dtCursosCentro" transient="true" 
+                                         value="#{generarCertificadoBean.cursoCentroList}" var="cursoCentro" paginator="true" rows="10" emptyMessage="#{msg.noExistenDatos}">
+                                <p:column headerText="#{msg.generarCertificados}" width="90" style="text-align: center">
+                                    <p:commandButton icon="fa fa-pencil" title="#{msg.seleccionar}" 
+                                                     action="#{generarCertificadoBean.seleccionarCursoCentro(cursoCentro)}" 
+                                                     update="formPrincipal:panelPrincipal" resetValues="true" process="@this"
+                                                     onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"/>
+                                </p:column>
+                                <p:column headerText="#{msg.areaConocimiento}" rendered="#{generarCertificadoBean.tipoCurso=='C'}" 
+                                          sortBy="#{cursoCentro.curso.programa.nombre}"
+                                          filterBy="#{cursoCentro.curso.programa.nombre}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtCursosCentro').filter()" style="width: 90%">
+                                            <f:selectItem itemLabel="#{msg.seleccione}" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{generarCertificadoBean.programaFiltroList}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputLabel value="#{cursoCentro.curso.programa.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.empresa}" rendered="#{generarCertificadoBean.tipoCurso=='O'}"
+                                          sortBy="#{cursoCentro.inscripcionEmpresa.estudiante.persona.nombresCompletos}">
+                                    <h:outputLabel value="#{cursoCentro.inscripcionEmpresa.estudiante.persona.nombresCompletos}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.curso}" sortBy="#{cursoCentro.curso.nombre}"
+                                          filterBy="#{cursoCentro.curso.nombre}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtCursosCentro').filter()" style="width: 90%">
+                                            <f:selectItem itemLabel="#{msg.seleccione}" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{generarCertificadoBean.cursoFiltroList}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputLabel value="#{cursoCentro.curso.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.centroCapacitacion}" rendered="#{generarCertificadoBean.tipoCurso=='C'}" 
+                                          sortBy="#{cursoCentro.centroCapacitacion.nombre}"
+                                          filterBy="#{cursoCentro.centroCapacitacion.nombre}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtCursosCentro').filter()" style="width: 90%">
+                                            <f:selectItem itemLabel="#{msg.seleccione}" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{generarCertificadoBean.centroCapacitacionFiltroList}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputLabel value="#{cursoCentro.centroCapacitacion.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.instructor}"
+                                          sortBy="#{cursoCentro.instructor.persona.nombresCompletos}">
+                                    <h:outputLabel value="#{cursoCentro.instructor.persona.nombresCompletos}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.modalidad}" width="80" style="text-align: center"
+                                          sortBy="#{cursoCentro.modalidadDescripcion}"
+                                          rendered="false">
+                                    <h:outputLabel value="#{cursoCentro.modalidadDescripcion}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.fechaInicio}" width="90" style="text-align: center"
+                                          sortBy="#{cursoCentro.fechaInicio}">
+                                    <h:outputLabel value="#{cursoCentro.fechaInicio}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                    </h:outputLabel>
+                                </p:column>
+                                <p:column headerText="#{msg.fechaFin}" width="80" style="text-align: center"
+                                          sortBy="#{cursoCentro.fechaFin}">
+                                    <h:outputLabel value="#{cursoCentro.fechaFin}" >
+                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                    </h:outputLabel>
+                                </p:column>
+                                <p:column headerText="#{msg.pendientesGenerarCertificado}" width="80" style="text-align: center"
+                                          sortBy="#{cursoCentro.inscripcionCertificadoGeneracionPendienteList.size()}">
+                                    <h:outputLabel value="#{cursoCentro.inscripcionCertificadoGeneracionPendienteList.size()}" >
+                                    </h:outputLabel>
+                                </p:column>
+                            </p:dataTable>
+                        </p:panel>
+
+                        <p:panel rendered="#{generarCertificadoBean.cursoCentro != null}">
+                            <f:facet name="header">
+                                <center>
+                                    <h:panelGrid style="text-align: center" class="titulo" columnClasses="centrado">
+                                        <h:outputLabel value="#{msg.generarCertificados}"
+                                                       rendered="#{generarCertificadoBean.cursoCentro.certificadoEmitidoPorInnovativa}"/>
+                                        <h:outputLabel value="#{msg.subirCertificados}"
+                                                       rendered="#{generarCertificadoBean.cursoCentro.certificadoEmitidoPorSenescyt}"/>
+                                        <h:panelGrid columns="2" cellpadding="0" cellspacing="0" >
+                                            <p:commandButton icon="fa fa-reply"  value="#{msg.retornar}" action="#{generarCertificadoBean.init()}" process="@this" update="panelPrincipal"/>
+                                            <p:commandButton icon="fa fa-cogs"  value="#{msg.generarCertificados}" action="#{generarCertificadoBean.abrirGenerarCertificados()}" process="@this, dtCalificaciones" update="panelPrincipal"
+                                                             rendered="#{generarCertificadoBean.cursoCentro.certificadoEmitidoPor == 'I'}"/>
+                                        </h:panelGrid>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages closable="true"/>
+
+                            <h:panelGrid id="panelInfoCurso" columnClasses="etiqueta etiquetaInfoCurso, , ,etiqueta etiquetaInfoCurso, , ,etiqueta etiquetaInfoCurso, , ,etiqueta etiquetaInfoCurso" columns="12">
+                                <p:outputLabel value="#{msg.curso}:"/>
+                                <p:outputLabel value="#{generarCertificadoBean.cursoCentro.curso.nombre}"/>
+                                <p:spacer height="1" width="40"/>
+
+                                <p:outputLabel value="#{msg.fechaInicio}:"/>
+                                <p:outputLabel value="#{generarCertificadoBean.cursoCentro.fechaInicio}" style="text-transform: uppercase">
+                                    <f:convertDateTime pattern="dd-MMM-yyyy"/>
+                                </p:outputLabel>
+                                <p:spacer height="1" width="40"/>
+
+                                <p:outputLabel value="#{msg.fechaFin}:"/>
+                                <p:outputLabel value="#{generarCertificadoBean.cursoCentro.fechaFin}" style="text-transform: uppercase">
+                                    <f:convertDateTime pattern="dd-MMM-yyyy"/>
+                                </p:outputLabel>
+                                <p:spacer height="1" width="40"/>
+
+                                <p:outputLabel value="#{msg.instructor}:"/>
+                                <p:outputLabel value="#{generarCertificadoBean.cursoCentro.instructor.persona.nombresCompletos}"/>
+
+
+                            </h:panelGrid>
+
+                            <p:dataTable id="dtCalificaciones" 
+                                         value="#{generarCertificadoBean.cursoCentro.inscripcionHabilitadaParaGenerarCertificadoList}" 
+                                         var="insc"
+                                         style="margin-top: 8px"
+                                         rowKey="#{insc}">
+                                <p:column width="70" style="text-align: center"
+                                          rendered="#{generarCertificadoBean.cursoCentro.certificadoEmitidoPor == 'I'}">
+                                    <f:facet name="header">
+                                        <p:outputLabel value="#{msg.seleccionar}" style="font-weight: bold"/>
+                                        <p:selectBooleanCheckbox id="selSeleccionarTodos" value="#{generarCertificadoBean.seleccionarTodos}">
+                                            <p:ajax listener="#{generarCertificadoBean.seleccionarTodosChange()}" update="dtCalificaciones"/>
+                                        </p:selectBooleanCheckbox>
+
+                                    </f:facet>
+                                    <p:selectBooleanCheckbox value="#{insc.seleccionado}"
+                                                             rendered="#{insc.alumnoApruebaCursoConfirmado}">
+                                        <p:ajax listener="#{generarCertificadoBean.seleccionarChange()}" update="dtCalificaciones"/>
+                                    </p:selectBooleanCheckbox>
+                                </p:column>
+                                <p:column headerText="#{msg.subirCertificado}" width="70" style="text-align: center"
+                                          rendered="#{generarCertificadoBean.cursoCentro.certificadoEmitidoPor == 'S'}">
+                                    <p:commandButton icon="fa fa-upload" action="#{generarCertificadoBean.abrirSubirCertificado(insc)}"
+                                                     update="formPrincipal:dlgSubirCertificado"/>
+                                </p:column>
+                                <p:column headerText="#{msg.identificacion}" width="120" style="text-align: center"
+                                          rendered="false">
+                                    <h:outputLabel value="#{insc.estudiante.persona.identificacion}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.nombres}" rendered="false">
+                                    <h:outputLabel value="#{insc.estudiante.persona.nombres}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.estudiante}">
+                                    <h:outputLabel value="#{insc.estudiante.persona.cedulaMasNombresCompletos}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.estadoEvaluacion}" width="90" style="text-align: center">
+                                    <h:outputLabel value="PENDIENTE INGRESO" rendered="#{insc.estadoEvaluacion == 'P'}"/>
+                                    <h:outputLabel value="PENDIENTE APROBACION" rendered="#{insc.estadoEvaluacion == 'E'}"/>
+                                    <h:outputLabel value="SOLICITADO RECALIFICACION" rendered="#{insc.estadoEvaluacion == 'R'}"/>
+                                    <h:outputLabel value="APROBADO" rendered="#{insc.estadoEvaluacion == 'A'}"/>
+                                </p:column>
+                                <p:column headerText="Puntaje/10" width="70" style="text-align: center"
+                                          rendered="#{generarCertificadoBean.cursoCentro.tipoCertificado=='P'}">
+                                    <p:outputLabel value="#{insc.puntaje}"  style="float: right">
+                                        <f:convertNumber pattern="0.00"/>
+                                    </p:outputLabel>
+                                </p:column>
+                                <p:column width="80" style="text-align: right; ">
+                                    <f:facet name="header">
+                                        <center>
+                                            <h:outputLabel value="% Asistencia" style="font-weight: bold"/>
+                                        </center>
+                                    </f:facet>
+                                    <p:outputLabel value="#{insc.asistencia}" style="float: right">
+                                        <f:convertNumber pattern="0.00"/>
+                                    </p:outputLabel>
+                                </p:column>
+                                <p:column headerText="#{msg.apruebaCurso}" width="70" style="text-align: center">
+                                    <p:graphicImage url="../resources/images/si03.png" width="20" rendered="#{insc.alumnoApruebaCursoConfirmado}" title="Sí aprueba el curso"/>
+                                    <p:graphicImage url="../resources/images/no03.png" width="20" rendered="#{not insc.alumnoApruebaCursoConfirmado}" title="No aprueba el curso"/>
+                                </p:column>
+                                <p:column headerText="#{generarCertificadoBean.cursoCentro.certificadoEmitidoPor=='I'?msg.certificadoGenerado:msg.certificadoSubido}" width="70" style="text-align: center">
+                                    <p:graphicImage url="../resources/images/si03.png" width="20" rendered="#{insc.alumnoApruebaCursoConfirmado and insc.certificadoGeneracionOk}" title="Certificado generado"/>
+                                    <p:graphicImage url="../resources/images/no03.png" width="20" rendered="#{insc.alumnoApruebaCursoConfirmado and insc.certificadoGeneracionPendiente}" title="Certificado aún no generado"/>
+                                </p:column>
+                                <p:column headerText="#{msg.descargarCertificado}" width="140">
+                                    <h:panelGroup rendered="#{insc.certificadoGeneracionOk}">
+                                        <a style="color: #0246af" target="_blank" href="#{request.contextPath}#{insc.ultimoCertificado.documentoUrlCompleto}">#{insc.ultimoCertificado.documentoNombre}</a>
+                                    </h:panelGroup>
+                                </p:column>
+
+                            </p:dataTable>
+
+                        </p:panel>
+
+
+
+
+                        <p:dialog id="dlgGenerarCertificados"
+                                  widgetVar="dlgGenerarCertificados"
+                                  header="#{msg.generarCertificados}"
+                                  closeOnEscape="true"
+                                  position="center top"
+                                  dynamic="true"
+                                  resizable="false"
+                                  width="800"
+                                  modal="true"
+                                  appendTo="@(body)"
+                                  >
+                            <h:form  id="formGenerarCertificados">
+                                <p:outputPanel style="height:400px;overflow:auto">
+                                    <h:panelGrid columns="2" columnClasses="etiqueta etiquetaVistaPrevia">
+                                        <p:outputLabel value="#{msg.seleccionePlantilla}:" for="selPlantilla"/>
+                                        <h:panelGrid>
+                                            <p:selectOneMenu id="selPlantilla" value="#{generarCertificadoBean.plantilla}"
+                                                             converter="omnifaces.SelectItemsConverter"
+                                                             required="true"
+                                                             label="Plantilla"
+                                                             >
+                                                <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption="true"/>
+                                                <f:selectItems value="#{plantillaCertificadoBean.plantillaActivaList}" var="plantilla" itemLabel="#{plantilla.nombre}" itemValue="#{plantilla}"/>
+                                            </p:selectOneMenu>
+                                            <p:message for="selPlantilla"/>
+
+                                        </h:panelGrid>
+
+
+                                        <p:outputLabel id="lblFechaParaImpresion" value="#{msg.fechaParaImpresion}:" for="txtFechaParaImpresion"/>
+                                        <h:panelGrid>
+                                            <p:calendar id="txtFechaParaImpresion" value="#{generarCertificadoBean.fechaParaImpresion}" required="true" 
+                                                        size="10" pattern="dd/MM/yyyy" 
+                                                        mindate="01/01/2020"
+                                                        showOtherMonths="true" navigator="true"
+                                                        validatorMessage="Fecha para impresión:* Formato de fecha incorrecto."
+                                                        yearRange="c-120:c+300">
+                                                <p:ajax event="dateSelect" update="@this,lblFechaParaImpresion, msgFechaParaImpresion"/>
+                                                <p:ajax event="keyup" update="lblFechaParaImpresion, msgFechaParaImpresion"/>
+                                                <p:ajax event="change" update="@this"/>                                                
+                                            </p:calendar>
+                                            <p:message id="msgFechaParaImpresion" for="txtFechaParaImpresion"/>
+
+                                        </h:panelGrid>
+
+
+                                        <h:panelGrid columnClasses="etiqueta etiquetaVistaPrevia">
+                                            <p:outputLabel value="Vista Previa:"/>
+                                        </h:panelGrid>
+
+                                        <p:commandButton value="#{msg.generarVistaPrevia}" 
+                                                         icon="fa fa-share-square-o"
+                                                         action="#{generarCertificadoBean.generarVistaPrevia()}"
+                                                         process="formGenerarCertificados"
+                                                         update="formGenerarCertificados"
+                                                         onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"
+                                                         />
+
+
+                                    </h:panelGrid>
+                                    <pe:documentViewer height="350" style="width: 100%"
+                                                       rendered="false"
+                                                       url="#{generarCertificadoBean.urlCertificadoPreview}"/>
+                                    <h:panelGrid id="docPlantilla">
+                                        <p:outputPanel style="width: 750px; height: 500px; border: 12px solid #cbcbcb"
+                                                       rendered="#{generarCertificadoBean.urlCertificadoPreview==null}">
+                                        </p:outputPanel>
+
+                                        <p:graphicImage 
+                                            url="#{generarCertificadoBean.urlCertificadoPreview}"
+                                            width="750" style="border: 12px solid #cbcbcb"
+                                            rendered="#{generarCertificadoBean.urlCertificadoPreview != null}"/>
+
+                                    </h:panelGrid>
+                                </p:outputPanel>
+                                <p:outputPanel style="background-color: #c2c3c5">
+                                    <center>
+                                        <h:panelGrid columns="2" cellspacing="6">
+                                            <p:commandButton value="#{msg.generarCertificados}" 
+                                                             icon="fa fa-save"
+                                                             action="#{generarCertificadoBean.generar()}"
+                                                             process="formGenerarCertificados"
+                                                             update="formGenerarCertificados"
+                                                             onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"
+                                                             />
+                                            <p:commandButton value="#{msg.cancelar}"
+                                                             icon="fa fa-close"
+                                                             onclick="PF('dlgGenerarCertificados').hide();"
+                                                             />
+                                        </h:panelGrid>
+                                    </center>
+                                </p:outputPanel>
+
+                            </h:form>
+                        </p:dialog>
+
+
+                        <p:dialog id="dlgSubirCertificado"
+                                  widgetVar="dlgSubirCertificado"
+                                  header="#{msg.subirCertificado}"
+                                  closeOnEscape="true"
+                                  position="center top"
+                                  dynamic="true"
+                                  resizable="false"
+                                  width="800"
+                                  modal="true"
+                                  appendTo="@(body)"
+                                  >
+                            <h:form  id="formSubirCertificado" enctype = "multipart/form-data">
+                                <p:outputPanel style="height:400px;overflow:auto">
+                                    <h:panelGrid columns="2" columnClasses="etiqueta etiquetaVistaPrevia">
+                                        <p:outputLabel value="#{msg.seleccioneDocumento}:" for="hidNombreDocumento"/>
+                                        <h:panelGrid columns="1" id="panelDocumento" cellpadding="0">
+                                            <p:fileUpload id="fileDocumento" 
+                                                          fileUploadListener="#{generarCertificadoBean.subirDocumentoCertificado}" 
+                                                          mode="advanced"
+                                                          style="width: 580px"
+                                                          label="#{msg.seleccionar}"
+                                                          update="formPrincipal:formSubirCertificado" 
+                                                          auto="true">
+                                                <a style="color: #0246af" target="_blank" href="#{request.contextPath}#{generarCertificadoBean.certificado.documentoUrlCompleto}">#{generarCertificadoBean.certificado.documentoNombre}</a>
+                                            </p:fileUpload>
+
+
+                                            <p:message for="hidNombreDocumento"></p:message>
+                                            <h:inputHidden id="hidNombreDocumento" value="#{generarCertificadoBean.certificado.documentoNombre}"
+                                                           required="true" requiredMessage="Documento:* Campo obligatorio.">
+                                            </h:inputHidden> 
+                                        </h:panelGrid>
+                                    </h:panelGrid>
+                                    <h:panelGrid columnClasses="etiqueta etiquetaVistaPrevia">
+                                        <p:outputLabel value="Vista Previa:"/>
+                                    </h:panelGrid>
+                                    <p:outputPanel style="width: 750px; height: 500px; border: 12px solid #cbcbcb"
+                                                   rendered="#{generarCertificadoBean.certificado.documentoNombre==null}">
+                                    </p:outputPanel>
+                                    <p:graphicImage url="#{generarCertificadoBean.certificado.documentoUrlCompleto}"
+                                                    width="750" style="border: 12px solid #cbcbcb"
+                                                    rendered="#{generarCertificadoBean.certificado.documentoNombre!=null}"/>
+
+
+                                </p:outputPanel>
+                                <p:outputPanel style="background-color: #c2c3c5">
+                                    <center>
+                                        <h:panelGrid columns="2" cellspacing="6">
+                                            <p:commandButton value="#{msg.grabar}" 
+                                                             icon="fa fa-save"
+                                                             action="#{generarCertificadoBean.grabarSubirCertificado()}"
+                                                             process="formSubirCertificado"
+                                                             update="formSubirCertificado"
+                                                             onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"
+                                                             />
+                                            <p:commandButton value="#{msg.cancelar}"
+                                                             icon="fa fa-close"
+                                                             onclick="PF('dlgSubirCertificado').hide();"
+                                                             />
+                                        </h:panelGrid>
+                                    </center>
+                                </p:outputPanel>
+
+                            </h:form>
+                        </p:dialog>
+
+                    </h:panelGrid>
+                </center>
+            </ui:define>
+        </ui:composition>
+
+    </h:body>
+</html>
+

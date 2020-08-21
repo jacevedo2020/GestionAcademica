@@ -1,0 +1,798 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <style>
+                    .etiquetaTipoCurso{
+                        width: 190px;
+                    }
+                    .etiquetaInfoCurso{
+                        width: 100px;
+                    }
+                    .etiquetaInfoEnvio{
+                        width: 190px;
+                    }
+                    .etiquetaInfoInscripcion{
+                        width: 150px;
+                    }
+                    .top1{
+                        vertical-align: top;
+                        width: 33%;
+                    }
+                    .top2{
+                        vertical-align: top;
+                        width: 50%;
+                    }
+                </style>                
+
+                <center>
+
+                    <h:panelGrid id="panelPrincipal" style="width: 95%">
+
+
+                        <!--Panel de seleccion de curso para envio de certificados -->
+                        <p:panel rendered="#{entregaCertificadoBean.cursoCentro == null}" transient="true">
+                            <f:facet name="header">
+                                <center>
+                                    <h:panelGrid style="text-align: center" class="titulo">
+                                        <h:outputLabel value="#{msg.cursosDictados}"/>
+                                        <h:outputLabel value="#{msg.entregaEnvioCertificado}"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages closable="true"/>
+                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaTipoCurso">
+                                <p:outputLabel value="Seleccione el Tipo de Curso:" style="font-weight: bold"/>
+                                <p:selectOneMenu value="#{entregaCertificadoBean.tipoCurso}" style="width: 150px">
+                                    <f:selectItem itemLabel="Continuo" itemValue="C"/>
+                                    <f:selectItem itemLabel="Corporativo" itemValue="O"/>
+                                    <p:ajax listener="#{entregaCertificadoBean.tipoCursoChange()}" update="dtCursosCentro"/>
+                                </p:selectOneMenu>
+                            </h:panelGrid>
+
+                            <p:dataTable id="dtCursosCentro" widgetVar="dtCursosCentro" transient="true" 
+                                         value="#{entregaCertificadoBean.cursoCentroList}" var="cursoCentro" paginator="true" rows="10" emptyMessage="#{msg.noExistenDatos}">
+                                <p:column headerText="#{msg.entregarEnviarCertificado}" width="90" style="text-align: center">
+                                    <p:commandButton icon="fa fa-pencil" title="#{msg.seleccionar}" 
+                                                     action="#{entregaCertificadoBean.seleccionarCursoCentro(cursoCentro)}" 
+                                                     update="formPrincipal:panelPrincipal" resetValues="true" process="@this"
+                                                     onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"/>
+                                </p:column>
+                                <p:column headerText="#{msg.areaConocimiento}" rendered="#{entregaCertificadoBean.tipoCurso=='C'}" 
+                                          sortBy="#{cursoCentro.curso.programa.nombre}"
+                                          filterBy="#{cursoCentro.curso.programa.nombre}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtCursosCentro').filter()" style="width: 90%">
+                                            <f:selectItem itemLabel="#{msg.seleccione}" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{entregaCertificadoBean.programaFiltroList}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputLabel value="#{cursoCentro.curso.programa.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.empresa}" rendered="#{entregaCertificadoBean.tipoCurso=='O'}"
+                                          sortBy="#{cursoCentro.inscripcionEmpresa.estudiante.persona.nombresCompletos}">
+                                    <h:outputLabel value="#{cursoCentro.inscripcionEmpresa.estudiante.persona.nombresCompletos}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.curso}" sortBy="#{cursoCentro.curso.nombre}"
+                                          filterBy="#{cursoCentro.curso.nombre}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtCursosCentro').filter()" style="width: 90%">
+                                            <f:selectItem itemLabel="#{msg.seleccione}" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{entregaCertificadoBean.cursoFiltroList}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputLabel value="#{cursoCentro.curso.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.centroCapacitacion}" rendered="#{entregaCertificadoBean.tipoCurso=='C'}" 
+                                          sortBy="#{cursoCentro.centroCapacitacion.nombre}"
+                                          filterBy="#{cursoCentro.centroCapacitacion.nombre}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtCursosCentro').filter()" style="width: 90%">
+                                            <f:selectItem itemLabel="#{msg.seleccione}" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{entregaCertificadoBean.centroCapacitacionFiltroList}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputLabel value="#{cursoCentro.centroCapacitacion.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.instructor}"
+                                          sortBy="#{cursoCentro.instructor.persona.nombresCompletos}">
+                                    <h:outputLabel value="#{cursoCentro.instructor.persona.nombresCompletos}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.modalidad}" width="80" style="text-align: center"
+                                          sortBy="#{cursoCentro.modalidadDescripcion}"
+                                          rendered="false">
+                                    <h:outputLabel value="#{cursoCentro.modalidadDescripcion}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.fechaInicio}" width="90" style="text-align: center"
+                                          sortBy="#{cursoCentro.fechaInicio}">
+                                    <h:outputLabel value="#{cursoCentro.fechaInicio}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                    </h:outputLabel>
+                                </p:column>
+                                <p:column headerText="#{msg.fechaFin}" width="80" style="text-align: center"
+                                          sortBy="#{cursoCentro.fechaFin}">
+                                    <h:outputLabel value="#{cursoCentro.fechaFin}" >
+                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                    </h:outputLabel>
+                                </p:column>
+                                <p:column headerText="#{msg.pendientesEntregaCertificado}" width="80" style="text-align: center"
+                                          sortBy="#{cursoCentro.inscripcionCertificadoEntregaEnvioPendienteList.size()}">
+                                    <h:outputLabel value="#{cursoCentro.inscripcionCertificadoEntregaEnvioPendienteList.size()}" >
+                                    </h:outputLabel>
+                                </p:column>
+                            </p:dataTable>
+                        </p:panel>
+
+
+
+
+
+                        <!--Panel de seleccion de estudiantes para envio de certificados -->
+                        <p:panel rendered="#{entregaCertificadoBean.cursoCentro != null and not entregaCertificadoBean.formularioConfirmacionEnvio}">
+                            <f:facet name="header">
+                                <center>
+                                    <h:panelGrid style="text-align: center" class="titulo" columnClasses="centrado">
+                                        <h:outputLabel value="#{msg.entregaEnvioCertificado}"/>
+                                        <h:panelGrid id="panelBotones" columns="3" cellpadding="0" cellspacing="0" >
+                                            <p:commandButton icon="fa fa-reply"  value="#{msg.retornar}" action="#{entregaCertificadoBean.init()}" process="@this" update="panelPrincipal"/>
+
+                                            <p:commandButton icon="fa fa-share-square-o"  value="#{msg.entregarEnviar}"  
+                                                             process="@this, dtCalificaciones, dtCalificacionesSel" update="panelPrincipal"
+                                                             resetValues="true"
+                                                             rendered="#{entregaCertificadoBean.existenSeleccionados}"
+                                                             action="#{entregaCertificadoBean.iniciarConfirmacionEnvio()}"/>
+                                            <p:commandButton icon="fa fa-share-square-o"  value="#{msg.entregarEnviar}" action="#{entregaCertificadoBean.mostrarMensajeErrorEnvio()}" process="@this" update="msg2"
+                                                             rendered="#{not entregaCertificadoBean.existenSeleccionados}"/>
+
+                                            <p:commandButton icon="fa fa-undo"  value="#{msg.devolver}"  
+                                                             process="@this, dtCalificaciones, dtCalificacionesSel" update="panelPrincipal"
+                                                             action="#{entregaCertificadoBean.iniciarConfirmacionDevolucion()}"
+                                                             resetValues="true"
+                                                             rendered="#{entregaCertificadoBean.existenSeleccionados2}"/>
+                                            <p:commandButton icon="fa fa-undo"  value="#{msg.devolver}" action="#{entregaCertificadoBean.mostrarMensajeErrorEnvio2()}" process="@this" update="msg2"
+                                                             rendered="#{not entregaCertificadoBean.existenSeleccionados2}"/>
+                                        </h:panelGrid>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages closable="true" id="msg2"/>
+
+                            <h:panelGrid id="panelInfoCurso" columnClasses="etiqueta etiquetaInfoCurso, , ,etiqueta etiquetaInfoCurso, , ,etiqueta etiquetaInfoCurso, , ,etiqueta etiquetaInfoCurso" columns="12">
+                                <p:outputLabel value="#{msg.curso}:"/>
+                                <p:outputLabel value="#{entregaCertificadoBean.cursoCentro.curso.nombre}"/>
+                                <p:spacer height="1" width="40"/>
+
+                                <p:outputLabel value="#{msg.fechaInicio}:"/>
+                                <p:outputLabel value="#{entregaCertificadoBean.cursoCentro.fechaInicio}" style="text-transform: uppercase">
+                                    <f:convertDateTime pattern="dd-MMM-yyyy"/>
+                                </p:outputLabel>
+                                <p:spacer height="1" width="40"/>
+
+                                <p:outputLabel value="#{msg.fechaFin}:"/>
+                                <p:outputLabel value="#{entregaCertificadoBean.cursoCentro.fechaFin}" style="text-transform: uppercase">
+                                    <f:convertDateTime pattern="dd-MMM-yyyy"/>
+                                </p:outputLabel>
+                                <p:spacer height="1" width="40"/>
+
+                                <p:outputLabel value="#{msg.instructor}:"/>
+                                <p:outputLabel value="#{entregaCertificadoBean.cursoCentro.instructor.persona.nombresCompletos}"/>
+
+
+                            </h:panelGrid>
+
+                            <p:dataTable id="dtCalificaciones" 
+                                         value="#{entregaCertificadoBean.cursoCentro.inscripcionCertificadoImpresionOkList}" 
+                                         var="insc"
+                                         style="margin-top: 8px"
+                                         rowKey="#{insc}">
+                                <p:column width="100" style="text-align: center">
+                                    <f:facet name="header">
+                                        <p:outputLabel value="#{msg.seleccionarEntregaEnvio}" style="font-weight: bold"/>
+                                        <br/>
+                                        <p:selectBooleanCheckbox id="selSeleccionarTodos" value="#{entregaCertificadoBean.seleccionarTodos}">
+                                            <p:ajax listener="#{entregaCertificadoBean.seleccionarTodosChange()}" update="dtCalificaciones, formPrincipal:panelBotones"/>
+                                        </p:selectBooleanCheckbox>
+
+                                    </f:facet>
+                                    <p:selectBooleanCheckbox value="#{insc.seleccionado}"
+                                                             rendered="#{insc.certificadoEntregaEnvioPendiente}">
+                                        <p:ajax listener="#{entregaCertificadoBean.seleccionarChange()}" update="dtCalificaciones, formPrincipal:panelBotones"/>
+                                    </p:selectBooleanCheckbox>
+                                </p:column>
+                                <p:column width="100" style="text-align: center">
+                                    <f:facet name="header">
+                                        <p:outputLabel value="#{msg.seleccionarDevolucion}" style="font-weight: bold"/>
+                                        <br/>
+                                        <p:selectBooleanCheckbox id="selSeleccionarTodos2" value="#{entregaCertificadoBean.seleccionarTodos2}">
+                                            <p:ajax listener="#{entregaCertificadoBean.seleccionarTodos2Change()}" update="dtCalificaciones, formPrincipal:panelBotones"/>
+                                        </p:selectBooleanCheckbox>
+
+                                    </f:facet>
+                                    <p:selectBooleanCheckbox value="#{insc.seleccionado2}"
+                                                             rendered="#{insc.certificadoEnvioOk}">
+                                        <p:ajax listener="#{entregaCertificadoBean.seleccionar2Change()}" update="dtCalificaciones, formPrincipal:panelBotones"/>
+                                    </p:selectBooleanCheckbox>
+                                </p:column>
+                                <p:column headerText="#{msg.identificacion}" width="120" style="text-align: center"
+                                          rendered="false">
+                                    <h:outputLabel value="#{insc.estudiante.persona.identificacion}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.nombres}" rendered="false">
+                                    <h:outputLabel value="#{insc.estudiante.persona.nombres}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.estudiante}">
+                                    <h:outputLabel value="#{insc.estudiante.persona.cedulaMasNombresCompletos}"/>
+                                </p:column>
+                                <p:column headerText="Puntaje/10" width="70" style="text-align: center"
+                                          rendered="#{entregaCertificadoBean.cursoCentro.tipoCertificado=='P'}">
+                                    <p:outputLabel value="#{insc.puntaje}"  style="float: right">
+                                        <f:convertNumber pattern="0.00"/>
+                                    </p:outputLabel>
+                                </p:column>
+                                <p:column width="80" style="text-align: right; ">
+                                    <f:facet name="header">
+                                        <center>
+                                            <h:outputLabel value="% Asistencia" style="font-weight: bold"/>
+                                        </center>
+                                    </f:facet>
+                                    <p:outputLabel value="#{insc.asistencia}" style="float: right">
+                                        <f:convertNumber pattern="0.00"/>
+                                    </p:outputLabel>
+                                </p:column>
+                                <p:column rendered="false" headerText="#{msg.apruebaCurso}" width="70" style="text-align: center">
+                                    <p:graphicImage url="../resources/images/si03.png" width="20" rendered="#{insc.alumnoApruebaCursoConfirmado}" title="Sí aprueba el curso"/>
+                                    <p:graphicImage url="../resources/images/no03.png" width="20" rendered="#{not insc.alumnoApruebaCursoConfirmado}" title="No aprueba el curso"/>
+                                </p:column>
+                                <p:column rendered="false" headerText="#{msg.certificadoGenerado}" width="70" style="text-align: center">
+                                    <p:graphicImage url="../resources/images/si03.png" width="20" rendered="#{insc.alumnoApruebaCursoConfirmado and insc.certificadoGeneracionOk}" title="Certificado ya generado"/>
+                                    <p:graphicImage url="../resources/images/no03.png" width="20" rendered="#{insc.alumnoApruebaCursoConfirmado and insc.certificadoGeneracionPendiente}" title="Certificado aún no generado"/>
+                                </p:column>
+                                <p:column headerText="#{msg.descargarCertificado}" width="140">
+                                    <h:panelGroup rendered="#{insc.certificadoGeneracionOk}">
+                                        <a style="color: #0246af" target="_blank" href="#{request.contextPath}#{insc.ultimoCertificado.documentoUrlCompleto}">#{insc.ultimoCertificado.documentoNombre}</a>
+                                    </h:panelGroup>
+                                </p:column>
+                                <p:column headerText="#{msg.certificadoImpreso}" width="70" style="text-align: center">
+                                    <p:graphicImage url="../resources/images/si03.png" width="20" rendered="#{insc.certificadoImpresionOk}" title="Certificado Impreso"/>
+                                    <p:graphicImage url="../resources/images/no03.png" width="20" rendered="#{insc.certificadoImpresionPendiente}" title="Certificado aún no impreso"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg.certificadoEnviadoEntregado}" width="120" style="text-align: center">
+                                    <p:graphicImage url="../resources/images/si03.png" width="20" rendered="#{insc.certificadoEntregaEnvioOk}" title="Certificado entregado/enviado"/>
+                                    <p:graphicImage url="../resources/images/no03.png" width="20" rendered="#{insc.certificadoEntregaEnvioPendiente}" title="Certificado pendiente entregar/enviar"/>
+                                </p:column>
+                                <p:column headerText="#{msg.detalleEnvioEntrega}" width="80" style="text-align: center">
+                                    <p:commandButton icon="fa fa-external-link" action="#{entregaCertificadoBean.setInscripcion(insc)}"
+                                                     process="@this"
+                                                     title="Ver detalle de entrega/envío"
+                                                     onsuccess="PF('dlgInfoEntrega').show();" update="formPrincipal:dlgInfoEntrega"/>                                    
+                                </p:column>
+
+                            </p:dataTable>
+
+                        </p:panel>
+
+
+
+
+
+
+
+                        <!--Panel de confirmacion de envio de certificados -->
+                        <p:panel rendered="#{entregaCertificadoBean.cursoCentro != null and entregaCertificadoBean.formularioConfirmacionEnvio}">
+                            <f:facet name="header">
+                                <center>
+                                    <h:panelGrid style="text-align: center" class="titulo" columnClasses="centrado">
+                                        <h:outputLabel value="#{msg.entregaEnvioCertificado}"/>
+                                        <h:panelGrid id="panelBotonesSel" columns="2" cellpadding="0" cellspacing="0" >
+                                            <p:commandButton icon="fa fa-reply"  value="#{msg.cancelar}" action="#{entregaCertificadoBean.cancelarConfirmacionEnvio()}" process="@this" update="panelPrincipal"/>
+                                            <p:commandButton icon="fa fa-check"  value="#{msg.confirmarEntregaEnvio}"  
+                                                             rendered="#{not entregaCertificadoBean.envioCertificado.tipoRegistroDevolucion}"
+                                                             action="#{entregaCertificadoBean.confirmarEnvio()}" 
+                                                             process="@this, panelInfoEnvio" update="panelPrincipal">
+                                                <p:confirm header="Confirmación" message="Confirma que desea registrar la entrega/envío de certificado para los estudiantes seleccionados ?"/>
+                                            </p:commandButton>
+                                            <p:commandButton icon="fa fa-check"  value="#{msg.confirmarDevolucion}"  
+                                                             rendered="#{entregaCertificadoBean.envioCertificado.tipoRegistroDevolucion}"
+                                                             action="#{entregaCertificadoBean.confirmarDevolucion()}" 
+                                                             process="@this, panelInfoEnvio" update="panelPrincipal">
+                                                <p:confirm header="Confirmación" message="Confirma que desea registrar la devolución de certificado para los estudiantes seleccionados ?"/>
+                                            </p:commandButton>                                            
+                                        </h:panelGrid>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages closable="true"/>
+                            <h:panelGrid id="panelInfoEnvio">
+                                <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInfoEnvio">
+                                    <p:outputLabel value="#{msg.accionRegistrar}:"/>
+                                    <h:panelGrid rendered="#{not entregaCertificadoBean.envioCertificado.tipoRegistroDevolucion}">
+                                        <p:selectOneMenu value="#{entregaCertificadoBean.envioCertificado.tipoRegistro}"
+                                                         style="width: 230px">
+                                            <f:selectItem itemLabel="#{msg.entrega}" itemValue="E"/>
+                                            <f:selectItem itemLabel="#{msg.envio}" itemValue="V"/>
+                                            <p:ajax update="panelInfoEnvio, panelCertificadosEntregar"
+                                                    listener="#{entregaCertificadoBean.tipoRegistroChange()}"
+                                                    resetValues="true"
+                                                    onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"/>
+                                        </p:selectOneMenu>
+                                    </h:panelGrid>
+
+                                    <h:panelGrid rendered="#{entregaCertificadoBean.envioCertificado.tipoRegistroDevolucion}">
+                                        <p:selectOneMenu value="#{entregaCertificadoBean.envioCertificado.tipoRegistro}"
+                                                         style="width: 230px">
+                                            <f:selectItem itemLabel="#{msg.devolucion}" itemValue="D"/>
+                                        </p:selectOneMenu>
+                                    </h:panelGrid>                                    
+                                </h:panelGrid>
+
+                                <h:panelGrid id="panelInfoEnvio1" columns="2" columnClasses="etiqueta etiquetaInfoEnvio">
+                                    <p:outputLabel value="#{entregaCertificadoBean.envioCertificado.tipoRegistroEntregaPresencial?msg.fechaEntrega:msg.fechaEnvio}:" 
+                                                   id="lblFechaEntrega" for="txtFechaEntrega"
+                                                   rendered="#{not entregaCertificadoBean.envioCertificado.tipoRegistroDevolucion}"/>
+                                    <h:panelGrid rendered="#{not entregaCertificadoBean.envioCertificado.tipoRegistroDevolucion}">
+                                        <p:calendar id="txtFechaEntrega" 
+                                                    value="#{entregaCertificadoBean.envioCertificado.fecha}" 
+                                                    required="true" 
+                                                    size="34" pattern="dd/MM/yyyy" 
+                                                    showOtherMonths="true" navigator="true"
+                                                    validatorMessage="Fecha Entrega:* Formato de fecha incorrecto."
+                                                    >
+                                            <p:ajax event="dateSelect" update="@this, lblFechaEntrega, msgFechaEntrega"/>
+                                            <p:ajax event="keyup" update="lblFechaEntrega, msgFechaEntrega"/>
+                                            <p:ajax event="change" update="@this"/>                                                
+                                        </p:calendar>                                        
+                                        <p:message for="txtFechaEntrega" id="msgFechaEntrega"/>
+                                    </h:panelGrid>                                
+
+                                    <p:outputLabel value="#{msg.fechaDevolucion}:" 
+                                                   id="lblFechaDevolucion" for="txtFechaDevolucion"
+                                                   rendered="#{entregaCertificadoBean.envioCertificado.tipoRegistroDevolucion}"/>
+                                    <h:panelGrid rendered="#{entregaCertificadoBean.envioCertificado.tipoRegistroDevolucion}">
+                                        <p:calendar id="txtFechaDevolucion" 
+                                                    value="#{entregaCertificadoBean.envioCertificado.fecha}" 
+                                                    required="true" 
+                                                    size="34" pattern="dd/MM/yyyy" 
+                                                    showOtherMonths="true" navigator="true"
+                                                    validatorMessage="Fecha Devolución:* Formato de fecha incorrecto."
+                                                    >
+                                            <p:ajax event="dateSelect" update="@this, lblFechaDevolucion, msgFechaDevolucion"/>
+                                            <p:ajax event="keyup" update="lblFechaDevolucion, msgFechaDevolucion"/>
+                                            <p:ajax event="change" update="@this"/>                                                
+                                        </p:calendar>                                        
+                                        <p:message for="txtFechaDevolucion" id="msgFechaDevolucion"/>
+                                    </h:panelGrid>               
+
+
+                                    <p:outputLabel rendered="false" value="#{msg.apellidos}:" for="txtDestinatarioApellidos"/>
+                                    <h:panelGrid rendered="false" columns="1" cellpadding="0" cellspacing="0">
+                                        <p:inputText id="txtDestinatarioApellidos" value="#{entregaCertificadoBean.envioCertificado.destinatarioApellidos}"
+                                                     size="34" required="true" maxlength="30"/>
+                                        <p:message for="txtDestinatarioApellidos"/>
+                                    </h:panelGrid>                                
+
+                                    <p:outputLabel id="lblEntregaTercero" for="selEntregaTercero" value="#{msg.entregadoATercero}:"
+                                                   rendered="#{entregaCertificadoBean.envioCertificado.tipoRegistroEntregaPresencial}"/>
+                                    <h:panelGrid columns="1" id="panelEntregaTercero"
+                                                 rendered="#{entregaCertificadoBean.envioCertificado.tipoRegistroEntregaPresencial}">
+                                        <p:selectOneRadio id="selEntregaTercero" value="#{entregaCertificadoBean.envioCertificado.entregadoATercero}"
+                                                          required="true">
+                                            <f:selectItem itemLabel="Si" itemValue="S"/>
+                                            <f:selectItem itemLabel="No" itemValue="N"/>
+                                            <p:ajax update="panelInfoEnvio"/>
+                                        </p:selectOneRadio>
+                                        <p:message for="selEntregaTercero"/>
+                                    </h:panelGrid>
+
+
+                                    <p:outputLabel value="#{msg.apellidosNombres}:" for="txtDestinatarioNombres"
+                                                   rendered="#{not entregaCertificadoBean.envioCertificado.tipoRegistroDevolucion}"/>
+                                    <h:panelGrid columns="1" cellpadding="0" cellspacing="0"
+                                                 rendered="#{not entregaCertificadoBean.envioCertificado.tipoRegistroDevolucion}">
+                                        <p:inputText id="txtDestinatarioNombres" value="#{entregaCertificadoBean.envioCertificado.destinatarioNombres}"
+                                                     size="34" required="true" maxlength="60"/>
+                                        <p:message for="txtDestinatarioNombres"/>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+
+
+                                <h:panelGrid id="panelInfoEnvio2" columns="2" columnClasses="etiqueta etiquetaInfoEnvio"
+                                             rendered="#{entregaCertificadoBean.envioCertificado.tipoRegistroEnvio}" >
+                                    <p:outputLabel id="lblProvincia" for="selProvincia" value="#{msg.provincia}:"/>
+                                    <h:panelGrid id="panelProvincia" columns="1" cellpadding="0" cellspacing="0">
+                                        <p:selectOneMenu value="#{entregaCertificadoBean.provincia}" 
+                                                         style="width: 230px"
+                                                         id="selProvincia"
+                                                         required="true"
+                                                         converter="omnifaces.SelectItemsConverter">
+                                            <p:ajax update="lblProvincia, panelProvincia, selCanton, selParroquia" 
+                                                    resetValues="false"
+                                                    listener="#{entregaCertificadoBean.setCanton(null)}"/>
+                                            <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{provinciaBean.provinciaActivoList}" var="prov" itemLabel="#{prov.nombre}" itemValue="#{prov}"/>
+                                        </p:selectOneMenu>
+                                        <p:message id="msgProvincia" for="selProvincia" />
+                                    </h:panelGrid>
+
+                                    <p:outputLabel id="lblCanton" for="selCanton" value="#{msg.canton}:"/>
+                                    <h:panelGrid id="panelCanton" columns="1" cellpadding="0" cellspacing="0">
+                                        <p:selectOneMenu value="#{entregaCertificadoBean.canton}" 
+                                                         id="selCanton"
+                                                         style="width: 230px"
+                                                         required="true"
+                                                         converter="omnifaces.SelectItemsConverter">
+                                            <p:ajax update="selParroquia, lblCanton, panelCanton"/>
+                                            <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{entregaCertificadoBean.provincia.cantonActivoList}" var="can" itemLabel="#{can.nombre}" itemValue="#{can}"/>
+                                        </p:selectOneMenu>
+                                        <p:message id="msgCanton" for="selCanton" />
+                                    </h:panelGrid>
+
+
+                                    <p:outputLabel id="lblParroquia" for="selParroquia" value="#{msg.parroquia}:"/>
+                                    <h:panelGrid id="panelParroquia" columns="1" cellpadding="0" cellspacing="0"> 
+                                        <p:selectOneMenu value="#{entregaCertificadoBean.envioCertificado.destinatarioParroquia}" 
+                                                         id="selParroquia"
+                                                         style="width: 230px"
+                                                         required="true"
+                                                         converter="omnifaces.SelectItemsConverter">
+                                            <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{entregaCertificadoBean.canton.parroquiaActivoList}" var="parr" itemLabel="#{parr.nombre}" itemValue="#{parr}"/>
+                                            <p:ajax event="change" update="lblParroquia, panelParroquia"/>
+                                        </p:selectOneMenu>
+                                        <p:message id="msgParroquia" for="selParroquia" />
+                                    </h:panelGrid>
+
+                                    <p:outputLabel id="lblDireccion" for="txtDireccion" value="#{msg.direccion}:"/>
+                                    <h:panelGrid id="panelDireccion" columns="1" cellpadding="0" cellspacing="0">
+                                        <p:inputTextarea id="txtDireccion" value="#{entregaCertificadoBean.envioCertificado.destinatarioDireccion}" 
+                                                         required="true" 
+                                                         cols="34" rows="2" maxlength="300" >
+                                            <p:ajax event="keyup" update="lblDireccion, msgDireccion"/>
+                                            <p:ajax event="change" update="@this"/>
+                                        </p:inputTextarea>
+                                        <p:message id="msgDireccion" for="txtDireccion"/>
+                                    </h:panelGrid>
+
+                                    <p:outputLabel value="#{msg.guia}:" for="txtGuia"/>
+                                    <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                        <p:inputText id="txtGuia" value="#{entregaCertificadoBean.envioCertificado.guia}"
+                                                     size="34" required="true" maxlength="25"/>
+                                        <p:message for="txtGuia"/>
+                                    </h:panelGrid>                                
+
+
+                                </h:panelGrid>
+                            </h:panelGrid>
+
+
+                            <h:panelGrid id="panelCertificadosEntregar" style="font-weight: bold">
+                                <p:outputLabel value="#{msg.certificadosEntregar}:" rendered="#{entregaCertificadoBean.envioCertificado.tipoRegistroEntregaPresencial}"/>
+                                <p:outputLabel value="#{msg.certificadosEnviar}:" rendered="#{entregaCertificadoBean.envioCertificado.tipoRegistroEnvio}"/>
+
+                            </h:panelGrid>
+
+                            <p:dataTable id="dtCalificacionesSel" 
+                                         value="#{entregaCertificadoBean.inscripcionList}" 
+                                         var="inscSel"
+                                         style="margin-top: 8px"
+                                         rowKey="#{inscSel}">
+                                <p:column headerText="#{msg.detalleInscripcion}" width="80" style="text-align: center">
+                                    <p:commandButton icon="fa fa-external-link" action="#{entregaCertificadoBean.setInscripcion(inscSel)}"
+                                                     process="@this"
+                                                     title="Ver detalle de la inscripción"
+                                                     onsuccess="PF('dlgInscripcion').show();" update="formPrincipal:dlgInscripcion"/>
+                                </p:column>
+                                <p:column headerText="#{msg.detalleEnvioEntrega}" width="80" style="text-align: center">
+                                    <p:commandButton icon="fa fa-external-link" action="#{entregaCertificadoBean.setInscripcion(inscSel)}"
+                                                     process="@this"
+                                                     title="Ver detalle de entrega/envío"
+                                                     onsuccess="PF('dlgInfoEntrega').show();" update="formPrincipal:dlgInfoEntrega"/>                                    
+                                </p:column>
+                                <p:column headerText="#{msg.identificacion}" width="120" style="text-align: center"
+                                          rendered="false">
+                                    <h:outputLabel value="#{inscSel.estudiante.persona.identificacion}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.nombres}" rendered="false">
+                                    <h:outputLabel value="#{inscSel.estudiante.persona.nombres}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.estudiante}">
+                                    <h:outputLabel value="#{inscSel.estudiante.persona.cedulaMasNombresCompletos}"/>
+                                </p:column>
+                                <p:column headerText="Puntaje/10" width="70" style="text-align: center"
+                                          rendered="#{entregaCertificadoBean.cursoCentro.tipoCertificado=='P'}">
+                                    <p:outputLabel value="#{inscSel.puntaje}"  style="float: right">
+                                        <f:convertNumber pattern="0.00"/>
+                                    </p:outputLabel>
+                                </p:column>
+                                <p:column width="80" style="text-align: right; ">
+                                    <f:facet name="header">
+                                        <center>
+                                            <h:outputLabel value="% Asistencia" style="font-weight: bold"/>
+                                        </center>
+                                    </f:facet>
+                                    <p:outputLabel value="#{inscSel.asistencia}" style="float: right">
+                                        <f:convertNumber pattern="0.00"/>
+                                    </p:outputLabel>
+                                </p:column>
+                                <p:column headerText="#{msg.descargarCertificado}" width="140">
+                                    <h:panelGroup rendered="#{inscSel.certificadoGeneracionOk}">
+                                        <a style="color: #0246af" target="_blank" href="#{request.contextPath}#{inscSel.ultimoCertificado.documentoUrlCompleto}">#{inscSel.ultimoCertificado.documentoNombre}</a>
+                                    </h:panelGroup>
+                                </p:column>
+
+                            </p:dataTable>
+
+                        </p:panel>
+
+
+
+
+                        <p:dialog id="dlgInscripcion"
+                                  widgetVar="dlgInscripcion"
+                                  header="#{msg.detalleInscripcion}"
+                                  closeOnEscape="true"
+                                  position="center top"
+                                  dynamic="true"
+                                  resizable="false"
+                                  width="900"
+                                  modal="true"
+                                  appendTo="@(body)"
+                                  >
+                            <p:outputPanel style="height:400px;overflow:auto">
+
+                                <h:panelGrid columns="1" style="width: 100%" id="panelInscripcion" cellpadding="10">
+                                    <p:fieldset legend="#{msg.datosCurso}">
+                                        <h:panelGrid columns="3" columnClasses="top2, top2" style="width: 100%">
+                                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInfoInscripcion" cellpadding="6" cellspacing="2">
+                                                <p:outputLabel value="#{msg.curso}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.cursoCentroCapacitacion.curso.nombre}"/>
+
+                                                <p:outputLabel rendered="#{entregaCertificadoBean.inscripcion.cursoCentroCapacitacion.cursoCorporativo}" value="#{msg.empresa}:" style="font-weight: bold"/>
+                                                <p:outputLabel rendered="#{entregaCertificadoBean.inscripcion.cursoCentroCapacitacion.cursoCorporativo}" value="#{entregaCertificadoBean.inscripcion.cursoCentroCapacitacion.inscripcionEmpresa.estudiante.persona.nombresCompletos}"/>
+
+                                                <p:outputLabel rendered="#{entregaCertificadoBean.inscripcion.cursoCentroCapacitacion.cursoContinuo}" value="#{msg.areaConocimiento}:" style="font-weight: bold"/>
+                                                <p:outputLabel rendered="#{entregaCertificadoBean.inscripcion.cursoCentroCapacitacion.cursoContinuo}" value="#{entregaCertificadoBean.inscripcion.cursoCentroCapacitacion.curso.programa.nombre}"/>
+
+
+
+                                                <p:outputLabel rendered="#{entregaCertificadoBean.inscripcion.cursoCentroCapacitacion.cursoContinuo}" value="#{msg.centroCapacitacion}:" style="font-weight: bold"/>
+                                                <p:outputLabel rendered="#{entregaCertificadoBean.inscripcion.cursoCentroCapacitacion.cursoContinuo}" value="#{entregaCertificadoBean.inscripcion.cursoCentroCapacitacion.centroCapacitacion.nombre}"/>
+
+                                                <p:outputLabel value="Tipo Certificado:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.cursoCentroCapacitacion.tipoCertificacionDescripcion}"/>
+
+
+                                                <p:outputLabel value="#{msg.instructor}:"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.cursoCentroCapacitacion.instructor.persona.nombresCompletos}"/>
+
+                                            </h:panelGrid>
+                                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInfoInscripcion" cellpadding="6" cellspacing="2">
+                                                <p:outputLabel value="#{msg.modalidad}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.cursoCentroCapacitacion.modalidadDescripcion}"/>
+
+
+                                                <p:outputLabel value="#{msg.nroHoras}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.cursoCentroCapacitacion.nroHoras}"/>
+
+
+                                                <p:outputLabel value="#{msg.precio}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.cursoCentroCapacitacion.precio}"/>
+
+                                                <p:outputLabel value="#{msg.fechaInicio}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.cursoCentroCapacitacion.fechaInicio}">
+                                                    <f:convertDateTime pattern="dd-MMM-yyyy"/>
+                                                </p:outputLabel>
+
+
+                                                <p:outputLabel value="#{msg.fechaFin}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.cursoCentroCapacitacion.fechaFin}">
+                                                    <f:convertDateTime pattern="dd-MMM-yyyy"/>
+                                                </p:outputLabel>
+
+
+                                            </h:panelGrid>
+
+
+                                        </h:panelGrid>
+                                    </p:fieldset>
+                                    <p:fieldset legend="#{msg.datosEstudiante}">
+                                        <h:panelGrid columns="2" columnClasses="top2, top2" id="panelDatosEstudiante" style="width: 100%">
+
+                                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInfoInscripcion" cellpadding="6" cellspacing="2"> 
+                                                <p:outputLabel value="#{msg.tipoIdentificacion}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.estudiante.persona.tipoIdentificacion.nombre}"/>
+
+                                                <p:outputLabel value="#{msg.identificacion}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.estudiante.persona.identificacion}"/>
+
+                                                <p:outputLabel value="#{msg.fechaNacimiento}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.estudiante.persona.fechaNacimiento}">
+                                                    <f:convertDateTime pattern="dd-MMM-yyyy"/>
+                                                </p:outputLabel>
+
+                                                <p:outputLabel value="#{msg.telefono}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.estudiante.persona.telefono}"/>
+
+
+                                            </h:panelGrid>
+
+                                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInfoInscripcion" cellpadding="6" cellspacing="2">
+                                                <p:outputLabel value="#{msg.apellidosNombres}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.estudiante.persona.nombresCompletos}"/>
+
+                                                <p:outputLabel rendered="false" value="#{msg.apellidos}:" style="font-weight: bold"/>
+                                                <p:outputLabel rendered="false" value="#{entregaCertificadoBean.inscripcion.estudiante.persona.apellidos}"/>
+
+
+                                                <p:outputLabel value="#{msg.genero}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.estudiante.persona.genero == 'M' ? 'Masculino' : 'Femenino'}"/>
+
+                                                <p:outputLabel value="#{msg.email}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.estudiante.persona.email}"/>
+
+                                                <p:outputLabel value="#{msg.celular}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.estudiante.persona.celular}"/>
+                                            </h:panelGrid>
+
+                                        </h:panelGrid>
+
+                                    </p:fieldset>    
+                                    <p:fieldset legend="#{msg.direccion}">
+                                        <h:panelGrid columns="2" columnClasses="top2, top2" id="panelDatosDireccion" style="width: 100%"> 
+
+                                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInfoInscripcion" cellpadding="6" cellspacing="2">
+                                                <p:outputLabel value="#{msg.provincia}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.estudiante.persona.parroquia.canton.provincia.nombre}"/>
+
+                                                <p:outputLabel value="#{msg.canton}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.estudiante.persona.parroquia.canton.nombre}"/>
+
+                                                <p:outputLabel value="#{msg.parroquia}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.estudiante.persona.parroquia.nombre}"/>
+
+                                            </h:panelGrid>
+
+                                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInfoInscripcion" cellpadding="6" cellspacing="2">
+                                                <p:outputLabel value="#{msg.direccion}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.estudiante.persona.direccion}"/>
+
+
+                                                <p:outputLabel value="#{msg.referencia}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.estudiante.persona.direccionReferencia}"/>
+
+                                            </h:panelGrid>
+                                        </h:panelGrid>
+                                        <p:separator/>
+
+                                        <p:outputLabel value="#{msg.contactoEmergencia}" style="font-weight: bold"/>
+                                        <h:panelGrid columns="1" style="width: 100%"> 
+                                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInfoInscripcion" cellpadding="6" cellspacing="2">
+
+                                                <p:outputLabel value="#{msg.nombres}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.estudiante.persona.contactoNombres}"/>
+
+                                                <p:outputLabel value="#{msg.apellidos}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.estudiante.persona.contactoApellidos}"/>
+
+                                                <p:outputLabel value="#{msg.telefono}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.estudiante.persona.contactoTelefono}"/>
+
+                                            </h:panelGrid>
+                                        </h:panelGrid>
+                                    </p:fieldset>
+                                    <p:fieldset legend="#{msg.informacionEmpresarial}">
+                                        <h:panelGrid columns="3" id="panelDatosInformacionEmpresarial" style="width: 100%" columnClasses="top1, top1, top1"> 
+
+                                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInfoInscripcion" cellpadding="6" cellspacing="2">
+                                                <p:outputLabel value="#{msg.trabajaActualmente}:" style="font-weight: bold"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.trabajaActualmente == 'S' ? 'Si' : 'No'}"/>
+
+                                                <p:outputLabel value="#{msg.nombreEmpresa}:" style="font-weight: bold" rendered="#{entregaCertificadoBean.inscripcion.trabajaActualmente == 'S'}"/>
+                                                <p:outputLabel value="#{entregaCertificadoBean.inscripcion.empresaTrabajo}" rendered="#{entregaCertificadoBean.inscripcion.trabajaActualmente == 'S'}"/>
+
+                                            </h:panelGrid>
+
+                                            <h:panelGrid>
+                                                <p:spacer height="1" width="1"/>
+                                                <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInfoInscripcion" cellpadding="6" cellspacing="2" rendered="#{entregaCertificadoBean.inscripcion.trabajaActualmente == 'S'}">
+                                                    <p:outputLabel value="#{msg.direccionEmpresa}:" style="font-weight: bold"/>
+                                                    <p:outputLabel value="#{entregaCertificadoBean.inscripcion.direccionTrabajo}"/>
+                                                </h:panelGrid>
+
+                                            </h:panelGrid>
+
+                                            <h:panelGrid>
+                                                <p:spacer height="1" width="1"/>
+                                                <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInfoInscripcion" cellpadding="6" cellspacing="2" rendered="#{entregaCertificadoBean.inscripcion.trabajaActualmente == 'S'}">
+                                                    <p:outputLabel value="#{msg.telefono}:" style="font-weight: bold"/>
+                                                    <p:outputLabel value="#{entregaCertificadoBean.inscripcion.telefonoTrabajo}"/>
+                                                </h:panelGrid>
+
+                                            </h:panelGrid>
+
+                                        </h:panelGrid>
+                                    </p:fieldset>
+
+                                </h:panelGrid>                                
+
+                            </p:outputPanel>
+                        </p:dialog>
+
+
+                        <p:dialog id="dlgInfoEntrega"
+                                  widgetVar="dlgInfoEntrega"
+                                  header="#{msg.detalleEnvioEntrega}"
+                                  closeOnEscape="true"
+                                  position="center top"
+                                  dynamic="true"
+                                  resizable="false"
+                                  width="900"
+                                  modal="true"
+                                  appendTo="@(body)"
+                                  >
+                            <p:outputPanel style="height:400px;overflow:auto">
+
+                                <h:panelGrid columns="1" style="width: 100%" id="panelInfoEntrega" cellpadding="10">
+                                    <p:dataTable value="#{entregaCertificadoBean.inscripcion.ultimoCertificado.envioCertificadoList}"
+                                                 var="envio">
+                                        <p:column headerText="#{msg.usuario}">
+                                            <h:outputLabel value="#{envio.enviadoPor.persona.nombresCompletos}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.accion}">
+                                            <h:outputLabel rendered="#{envio.tipoRegistroEntregaPresencial}" value="Entrega Presencial"/>
+                                            <h:outputLabel rendered="#{envio.tipoRegistroEnvio}" value="Envío"/>
+                                            <h:outputLabel rendered="#{envio.tipoRegistroDevolucion}" value="Devolución"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.fecha}" width="80">
+                                            <h:outputLabel value="#{envio.fecha}">
+                                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                            </h:outputLabel>
+                                        </p:column>
+                                        <p:column headerText="#{msg.entregadoATercero}">
+                                            <h:outputLabel value="Si" rendered="#{envio.entregadoATercero=='S'}"/>
+                                            <h:outputLabel value="No" rendered="#{envio.entregadoATercero=='N'}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.apellidosNombres}">
+                                            <h:outputLabel value="#{envio.destinatarioNombres}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.parroquia}">
+                                            <h:outputLabel value="#{envio.destinatarioParroquia.descripcionCompleta}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.direccion}">
+                                            <h:outputLabel value="#{envio.destinatarioDireccion}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.referencia}">
+                                            <h:outputLabel value="#{envio.destinatarioReferencia}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.guia}">
+                                            <h:outputLabel value="#{envio.guia}"/>
+                                        </p:column>
+
+                                    </p:dataTable>
+
+
+                                </h:panelGrid>
+                            </p:outputPanel>
+                        </p:dialog>
+
+
+
+                    </h:panelGrid>
+                </center>
+            </ui:define>
+        </ui:composition>
+
+    </h:body>
+</html>
+

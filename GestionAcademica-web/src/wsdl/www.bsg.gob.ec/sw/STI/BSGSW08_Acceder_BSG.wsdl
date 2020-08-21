@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://bsg.gob.ec/AccesoBSGService" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="AccesoBSGService" targetNamespace="http://bsg.gob.ec/AccesoBSGService">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://bsg.gob.ec/AccesoBSGService" targetNamespace="http://bsg.gob.ec/AccesoBSGService" version="1.0">
+
+  <xs:element name="ValidarPermiso" type="tns:ValidarPermiso"/>
+
+  <xs:element name="ValidarPermisoResponse" type="tns:ValidarPermisoResponse"/>
+
+  <xs:complexType name="ValidarPermiso">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ValidarPermisoPeticion" type="tns:validarPermisoPeticion"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="validarPermisoPeticion">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Cedula" type="xs:string"/>
+      <xs:element minOccurs="0" name="Urlsw" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ValidarPermisoResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:validarPermisoRespuesta"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="validarPermisoRespuesta">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Digest" type="xs:string"/>
+      <xs:element minOccurs="0" name="Fecha" type="xs:string"/>
+      <xs:element minOccurs="0" name="FechaF" type="xs:string"/>
+      <xs:element minOccurs="0" name="Mensaje" type="tns:mensajeError"/>
+      <xs:element minOccurs="0" name="Nonce" type="xs:string"/>
+      <xs:element minOccurs="0" name="TienePermiso" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="mensajeError">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="CodError" type="xs:string"/>
+      <xs:element minOccurs="0" name="DesError" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="ValidarPermisoResponse">
+    <wsdl:part element="tns:ValidarPermisoResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ValidarPermiso">
+    <wsdl:part element="tns:ValidarPermiso" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="BSG04_Acceder_BSG">
+    <wsdl:operation name="ValidarPermiso">
+      <wsdl:input message="tns:ValidarPermiso" name="ValidarPermiso">
+    </wsdl:input>
+      <wsdl:output message="tns:ValidarPermisoResponse" name="ValidarPermisoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="AccesoBSGServiceSoapBinding" type="tns:BSG04_Acceder_BSG">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="ValidarPermiso">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="ValidarPermiso">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ValidarPermisoResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="AccesoBSGService">
+    <wsdl:port binding="tns:AccesoBSGServiceSoapBinding" name="BSG04_Acceder_BSGPort">
+      <soap:address location="https://www.bsg.gob.ec/sw/STI/BSGSW08_Acceder_BSG"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

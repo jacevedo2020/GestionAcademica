@@ -1,0 +1,681 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <style>
+                    .etiquetaInscripcion{
+                        width: 180px;
+                    }
+
+                </style>                
+
+                <center>
+
+                    <h:panelGrid id="panelPrincipal" style="width: 95%">
+                        <p:growl/>
+
+                        <!--Panel listado de matriculas-->
+                        <p:panel rendered="#{registroFacturaBean.inscripcion == null}">
+                            <f:facet name="header">
+                                <center>
+                                    <h:panelGrid style="text-align: center" class="titulo">
+                                        <h:outputLabel value="Registro de Factura" rendered="#{menuBar.usuario.verificarRolAsistenteFacturacion()}"/>
+                                        <h:outputLabel value="Liquidación de Factura" rendered="#{menuBar.usuario.verificarRolFinanciero()}"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+
+                            <p:dataTable id="dtMatriculas" widgetVar="dtMatriculas"
+                                         value="#{registroFacturaBean.inscripcionList}" var="insc" paginator="true" rows="10" emptyMessage="#{msg.noExistenDatos}">
+                                <p:column headerText="Seleccionar" width="70" style="text-align: center">
+                                    <p:commandButton icon="fa fa-arrow-circle-right" title="#{msg.seleccionar}" action="#{registroFacturaBean.seleccionarInscripcion(insc)}" 
+                                                     update="formPrincipal:panelPrincipal" resetValues="true"/>
+                                </p:column>
+                                <p:column rendered="false" headerText="#{msg.tipoIdentificacion}" sortBy="#{insc.facturaTipoIdentificacion.nombre}">
+                                    <h:outputLabel value="#{insc.facturaTipoIdentificacion.nombre}"/>
+                                </p:column>
+
+                                <p:column rendered="true" width="30">
+                                    <h:outputLabel value="#{insc.id}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg.cedulaRuc}" 
+                                          sortBy="#{insc.facturaRuc}" 
+                                          filterBy="#{insc.facturaRuc}"
+                                          width="100" style="text-align: center">
+                                    <h:outputLabel value="#{insc.facturaRuc}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg.razonSocial}" 
+                                          sortBy="#{insc.facturaRazonSocial}"
+                                          filterBy="#{insc.facturaRazonSocial}"
+                                          filterMatchMode="contains">
+                                    <h:outputLabel value="#{insc.facturaRazonSocial}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg.direccion}" sortBy="#{insc.facturaDireccion}">
+                                    <h:outputLabel value="#{insc.facturaDireccion}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg.telefono}" sortBy="#{insc.facturaTelefono}">
+                                    <h:outputLabel value="#{insc.facturaTelefono}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.email}" sortBy="#{insc.facturaEmail}">
+                                    <h:outputLabel value="#{insc.facturaEmail}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg.estadoMatricula}" filterBy="#{insc.ultimoEstadoInscripcion.estado.descripcion}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtMatriculas').filter()" style="width: 90%">
+                                            <f:selectItem itemLabel="#{msg.seleccione}" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{estadoBean.estadoDescripcionList}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>                                    
+                                    <h:outputLabel value="#{insc.ultimoEstadoInscripcion.estado.descripcion}"/>
+                                </p:column>
+                                
+                                <p:column headerText="#{msg.nroFactura}" 
+                                          sortBy="#{insc.facturaNumero}"
+                                          filterBy="#{insc.facturaNumero}"
+                                          width="120">
+                                    <h:outputLabel value="#{insc.facturaNumero}"/>
+                                </p:column>
+
+                            </p:dataTable>
+                        </p:panel>
+
+                        <!--Panel de inscripcion-->
+                        <p:panel rendered="#{registroFacturaBean.inscripcion != null}">
+                            <f:facet name="header">
+                                <center class="titulo">
+                                    <h:panelGrid style="text-align: center">
+                                        <h:outputLabel value="Registro de Factura" rendered="#{menuBar.usuario.verificarRolAsistenteFacturacion()}"/>
+                                        <h:outputLabel value="Liquidación de Factura" rendered="#{menuBar.usuario.verificarRolFinanciero()}"/>
+                                        <p:commandButton icon="fa fa-reply"  value="Retornar" action="#{registroFacturaBean.init()}" 
+                                                         process="@this" update="panelPrincipal"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <h:panelGrid columns="1" style="width: 100%" id="panelInscripcion" cellpadding="10">
+                                <p:fieldset legend="#{msg.datosCurso}">
+                                    <h:panelGrid columns="2" columnClasses="top60, top40" style="width: 100%">
+                                        <h:panelGrid columns="2" cellpadding="6" cellspacing="2" columnClasses="etiqueta etiquetaInscripcion">
+                                            <p:outputLabel value="#{msg.curso}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.cursoCentroCapacitacion.curso.nombre}"/>
+
+                                            <p:outputLabel value="#{msg.areaConocimiento}:" rendered="#{registroFacturaBean.inscripcion.cursoCentroCapacitacion.cursoContinuo}"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.cursoCentroCapacitacion.curso.programa.nombre}" rendered="#{registroFacturaBean.inscripcion.cursoCentroCapacitacion.cursoContinuo}"/>
+
+                                            <p:outputLabel value="#{msg.tipoCurso}:"/>
+                                            <p:outputLabel value="Continuo" rendered="#{registroFacturaBean.inscripcion.cursoCentroCapacitacion.cursoContinuo}"/>
+                                            <p:outputLabel value="Corporativo" rendered="#{registroFacturaBean.inscripcion.cursoCentroCapacitacion.cursoCorporativo}"/>
+
+                                            <p:outputLabel value="#{msg.modalidad}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.cursoCentroCapacitacion.modalidadDescripcion}"/>
+
+
+                                            <p:outputLabel value="#{msg.centroCapacitacion}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.cursoCentroCapacitacion.centroCapacitacion.nombre}"/>
+
+
+                                            <p:outputLabel value="#{msg.instructor}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.cursoCentroCapacitacion.instructor.persona.nombresCompletos}"/>
+
+                                        </h:panelGrid>
+
+                                        <h:panelGrid columns="2" cellpadding="6" cellspacing="2" columnClasses="etiqueta etiquetaInscripcion">
+                                            <p:outputLabel value="Tipo Certificado:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.cursoCentroCapacitacion.tipoCertificacionDescripcion}"/>
+
+                                            <p:outputLabel value="#{msg.nroHoras}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.cursoCentroCapacitacion.nroHoras}"/>
+
+
+                                            <p:outputLabel value="#{msg.fechaInicio}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.cursoCentroCapacitacion.fechaInicio}">
+                                                <f:convertDateTime pattern="dd-MMM-yyyy"/>
+                                            </p:outputLabel>
+
+
+                                            <p:outputLabel value="#{msg.fechaFin}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.cursoCentroCapacitacion.fechaFin}">
+                                                <f:convertDateTime pattern="dd-MMM-yyyy"/>
+                                            </p:outputLabel>
+
+                                            <p:outputLabel value="#{msg.precio}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.cursoCentroCapacitacion.precio}">
+                                                <f:convertNumber pattern="0.00"/>
+                                            </p:outputLabel>
+
+
+
+                                        </h:panelGrid>
+
+                                    </h:panelGrid>
+                                </p:fieldset>
+
+
+                                <p:fieldset legend="#{msg.datosEstudiante}" rendered="#{registroFacturaBean.inscripcion.inscripcionEstudiante}">
+
+                                    <h:panelGrid columns="2" cellpadding="0" cellspacing="0" columnClasses="top60, top40" id="panelDatosEstudiante" style="width: 100%; ">
+
+                                        <h:panelGrid columns="2" cellpadding="4" cellspacing="2" columnClasses="etiqueta etiquetaInscripcion">
+                                            <p:outputLabel value="#{msg.tipoIdentificacion}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.estudiante.persona.tipoIdentificacion.nombre}"/>
+
+                                            <p:outputLabel value="#{msg.identificacion}:"/> 
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.estudiante.persona.identificacion}"/> 
+
+                                            <p:outputLabel value="#{msg.apellidosNombres}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.estudiante.persona.nombresCompletos}"/>
+
+                                            <p:outputLabel value="#{msg.email}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.estudiante.persona.email}"/>
+
+
+                                            <p:outputLabel value="#{msg.tipoEstudiante}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.tipoEstudiante.nombre}"/>
+
+                                        </h:panelGrid>
+
+
+                                        <h:panelGrid columns="2" cellpadding="4" cellspacing="2" columnClasses="etiqueta etiquetaInscripcion"> 
+                                            <p:outputLabel value="#{msg.genero}:"/>
+                                            <p:outputLabel value="Masculino" rendered="#{registroFacturaBean.inscripcion.estudiante.persona.genero == 'M'}"/>
+                                            <p:outputLabel value="Femenino" rendered="#{registroFacturaBean.inscripcion.estudiante.persona.genero == 'F'}"/>
+
+                                            <p:outputLabel value="#{msg.fechaNacimiento}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.estudiante.persona.fechaNacimiento}">
+                                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                            </p:outputLabel>
+
+
+                                            <p:outputLabel value="#{msg.telefono}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.estudiante.persona.telefono}"/>
+
+                                            <p:outputLabel value="#{msg.celular}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.estudiante.persona.celular}"/>
+
+                                        </h:panelGrid>
+
+                                    </h:panelGrid>
+
+
+
+                                </p:fieldset>    
+
+
+                                <p:fieldset legend="#{msg.direccionEstudiante}" rendered="#{registroFacturaBean.inscripcion.inscripcionEstudiante}">
+                                    <h:panelGrid columns="2" columnClasses="top60, top40" id="panelDatosDireccion" style="width: 100%"> 
+
+                                        <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInscripcion" cellpadding="4" cellspacing="2">
+                                            <p:outputLabel value="#{msg.provincia}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.estudiante.persona.provinciaNombre}"/>
+
+                                            <p:outputLabel value="#{msg.canton}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.estudiante.persona.cantonNombre}"/>
+
+                                            <p:outputLabel value="#{msg.parroquia}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.estudiante.persona.parroquiaNombre}"/>
+
+                                        </h:panelGrid>
+
+                                        <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInscripcion" cellpadding="4" cellspacing="2">
+                                            <p:outputLabel value="#{msg.direccion}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.estudiante.persona.direccion}"/>
+
+                                            <p:outputLabel value="#{msg.referencia}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.estudiante.persona.direccionReferencia}"/>
+
+                                        </h:panelGrid>
+                                    </h:panelGrid>
+
+                                    <h:panelGrid id="panelContacto" style="width: 100%">
+                                        <p:spacer width="1" height="5"/>
+                                        <p:outputLabel value="#{msg.contactoEmergencia}" style="font-weight: bold"/>
+
+                                        <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInscripcion" cellpadding="4" cellspacing="2">
+
+                                            <p:outputLabel value="#{msg.nombres}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.estudiante.persona.contactoNombres}"/>
+
+                                            <p:outputLabel value="#{msg.apellidos}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.estudiante.persona.contactoApellidos}"/>
+
+                                            <p:outputLabel value="#{msg.telefono}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.estudiante.persona.contactoTelefono}"/>
+                                        </h:panelGrid>
+
+                                    </h:panelGrid>
+                                </p:fieldset>
+                                <p:fieldset legend="#{msg.informacionEmpresarial}" rendered="#{registroFacturaBean.inscripcion.inscripcionEstudiante}">
+                                    <h:panelGrid id="panelDatosInformacionEmpresarial" columns="2" columnClasses="top60, top40" style="width: 100%">
+
+                                        <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInscripcion" cellpadding="4" cellspacing="2">
+                                            <p:outputLabel value="#{msg.trabajaActualmente}:"/>
+                                            <p:outputLabel value="Si" rendered="#{registroFacturaBean.inscripcion.trabajaActualmente=='S'}"/>
+                                            <p:outputLabel value="No" rendered="#{registroFacturaBean.inscripcion.trabajaActualmente=='N'}"/>
+
+                                            <p:outputLabel value="#{msg.nombreEmpresa}:"
+                                                           rendered="#{registroFacturaBean.inscripcion.trabajaActualmente=='S'}"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.estudiante.persona.empresaTrabajo}"
+                                                           rendered="#{registroFacturaBean.inscripcion.trabajaActualmente=='S'}"/>
+
+                                            <p:outputLabel value="#{msg.direccion}:"
+                                                           rendered="#{registroFacturaBean.inscripcion.trabajaActualmente=='S'}"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.estudiante.persona.direccionTrabajo}"
+                                                           rendered="#{registroFacturaBean.inscripcion.trabajaActualmente=='S'}"/>
+
+                                            <p:outputLabel value="#{msg.telefono}:"
+                                                           rendered="#{registroFacturaBean.inscripcion.trabajaActualmente=='S'}"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.estudiante.persona.telefonoTrabajo}"
+                                                           rendered="#{registroFacturaBean.inscripcion.trabajaActualmente=='S'}"/>
+
+                                        </h:panelGrid>
+
+
+                                    </h:panelGrid> 
+
+
+
+                                </p:fieldset>
+
+                                <p:fieldset legend="#{msg.informacionPago}" rendered="#{not registroFacturaBean.inscripcion.inscripcionEmpresa}">
+                                    <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInscripcion" cellpadding="4" cellspacing="2"
+                                                 id="panelInformacionPago">
+
+                                        <p:outputLabel value="#{msg.aplicaCredito}:"/>
+                                        <p:outputLabel value="Si" rendered="#{registroFacturaBean.inscripcion.creditoSi}"/>
+                                        <p:outputLabel value="No" rendered="#{not registroFacturaBean.inscripcion.creditoSi}"/>
+
+                                        <p:outputLabel value="#{msg.realizaAbono}:"
+                                                       rendered="#{registroFacturaBean.inscripcion.creditoSi}"/>
+                                        <p:outputLabel value="Si"
+                                                       rendered="#{registroFacturaBean.inscripcion.creditoSi and registroFacturaBean.inscripcion.abonoSi}"/>
+                                        <p:outputLabel value="No"
+                                                       rendered="#{registroFacturaBean.inscripcion.creditoSi and not registroFacturaBean.inscripcion.abonoSi}"/>
+
+                                        <p:outputLabel value="#{msg.pagaEmpresa}:"
+                                                       rendered="#{registroFacturaBean.inscripcion.abonoNo}"/>
+                                        <p:outputLabel value="Si"
+                                                       rendered="#{registroFacturaBean.inscripcion.abonoNo and registroFacturaBean.inscripcion.pagaEmpresaSi}"/>
+                                        <p:outputLabel value="Si"
+                                                       rendered="#{registroFacturaBean.inscripcion.abonoNo and not registroFacturaBean.inscripcion.pagaEmpresaSi}"/>
+
+                                        <p:outputLabel value="#{msg.formaPago}:" rendered="#{registroFacturaBean.inscripcion.abonoSi}"/>
+                                        <p:outputLabel value="#{registroFacturaBean.inscripcion.formaPagoDesc}" rendered="#{registroFacturaBean.inscripcion.abonoSi}"/>
+
+                                        <p:outputLabel value="#{msg.comprobantePago}:" rendered="#{registroFacturaBean.inscripcion.abonoSi and not registroFacturaBean.inscripcion.formaPagoEfectivo}"/>
+
+                                        <h:panelGrid columns="1" id="panelDocumentoPago" rendered="#{registroFacturaBean.inscripcion.abonoSi and not registroFacturaBean.inscripcion.formaPagoEfectivo}">
+                                            <a style="color: #0246af" target="_blank" href="#{request.contextPath}#{registroFacturaBean.inscripcion.documentoPagoUrlCompleto}">#{registroFacturaBean.inscripcion.documentoPagoNombre}</a>
+                                        </h:panelGrid>
+
+                                        <p:outputLabel value="#{msg.ordenCompra}:" rendered="#{registroFacturaBean.inscripcion.pagaEmpresaSi}"/>
+                                        <h:panelGrid rendered="#{registroFacturaBean.inscripcion.pagaEmpresaSi}">
+                                            <a style="color: #0246af" target="_blank" href="#{request.contextPath}#{registroFacturaBean.inscripcion.documentoPagoUrlCompleto}">#{registroFacturaBean.inscripcion.documentoPagoNombre}</a>
+                                        </h:panelGrid>
+
+                                    </h:panelGrid>                                        
+
+                                </p:fieldset>
+
+                                <p:fieldset legend="#{msg.medioEntero}">
+                                    <p:outputLabel value="#{registroFacturaBean.inscripcion.medioEnteroCursoDesc}"/>
+                                </p:fieldset>
+                                <p:fieldset legend="#{msg.informacionFacturaElectrónica}">
+
+                                    <h:panelGrid id="panelDatosFactura" columns="2" columnClasses="top50, top50" style="width: 100%">
+                                        <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInscripcion" cellpadding="4" cellspacing="2">
+
+                                            <p:outputLabel value="#{msg.tipoIdentificacion}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.facturaTipoIdentificacion.nombre}"/>
+
+                                            <p:outputLabel value="#{msg.identificacion}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.facturaRuc}"/>
+
+                                            <p:outputLabel value="#{msg.razonSocial}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.facturaRazonSocial}"/>
+
+                                        </h:panelGrid>
+
+                                        <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInscripcion" cellpadding="4" cellspacing="2">
+                                            <p:outputLabel value="#{msg.direccion}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.facturaDireccion}"/>
+
+                                            <p:outputLabel value="#{msg.email}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.facturaEmail}"/>
+
+                                            <p:outputLabel value="#{msg.telefono}:"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcion.facturaTelefono}"/>
+
+                                        </h:panelGrid>
+                                    </h:panelGrid>
+
+
+                                </p:fieldset>
+
+
+                                <p:fieldset legend="#{msg.listadoEstudiantes}" rendered="#{not registroFacturaBean.inscripcion.inscripcionEstudiante}">
+                                    <p:dataTable id="dtInscripcionesInstitucional"
+                                                 value="#{registroFacturaBean.inscripcion.cursoCentroCapacitacion.cursoCorporativo?registroFacturaBean.inscripcion.cursoCentroCapacitacion.inscripcionEstudianteList:registroFacturaBean.inscripcionGrupoList}"
+                                                 var="inscInstitucional" style="width: 100%">
+                                        <p:column headerText="Seleccionar" width="70" style="text-align: center">
+                                            <p:commandButton icon="fa fa-arrow-circle-right" title="Seleccionar" 
+                                                             action="#{registroFacturaBean.abrirEstudianteGrupo(inscInstitucional)}" 
+                                                             process="@this"
+                                                             update="formPrincipal:formEstudianteGrupo" resetValues="true"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.cedulaPasaporte}" width="110" style="text-align: center">
+                                            <h:outputLabel value="#{inscInstitucional.estudiante.persona.identificacion}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.apellidosNombres}" width="200">
+                                            <h:outputLabel value="#{inscInstitucional.estudiante.persona.nombresCompletos}"/>
+                                        </p:column>
+                                        <p:column rendered="false" headerText="#{msg.fechaNacimiento}" width="80" style="text-align: center">
+                                            <h:outputLabel value="#{inscInstitucional.estudiante.persona.fechaNacimiento}">
+                                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                            </h:outputLabel>
+                                        </p:column>
+                                        <p:column rendered="false" headerText="#{msg.genero}" width="60" style="text-align: center">
+                                            <h:outputLabel value="Masculino" rendered="#{inscInstitucional.estudiante.persona.genero=='M'}"/>
+                                            <h:outputLabel value="Femenino" rendered="#{inscInstitucional.estudiante.persona.genero=='F'}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.email}" width="180">
+                                            <h:outputLabel value="#{inscInstitucional.estudiante.persona.email}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.telefono}" width="60" style="text-align: center">
+                                            <h:outputLabel value="#{inscInstitucional.estudiante.persona.telefono}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.celular}" width="60" style="text-align: center">
+                                            <h:outputLabel value="#{inscInstitucional.estudiante.persona.celular}"/>
+                                        </p:column>
+                                        <p:column rendered="false" headerText="#{msg.discapacidad}" width="80" style="text-align: center">
+                                            <h:outputLabel value="SI" rendered="#{inscInstitucional.tieneDiscapacidad=='S'}"/>
+                                            <h:outputLabel value="NO" rendered="#{inscInstitucional.tieneDiscapacidad=='N'}"/>
+                                        </p:column>
+                                        <p:column rendered="false" headerText="#{msg.tipoDiscapacidad}" width="100">
+                                            <h:outputLabel value="#{inscInstitucional.tipoDiscapacidad}"/>
+                                        </p:column>
+
+                                    </p:dataTable>                                    
+
+                                </p:fieldset>
+
+
+                                
+
+                                <p:fieldset legend="#{msg.estadoMatricula}">
+                                    <h:panelGrid columns="3" columnClasses="etiqueta etiquetaInscripcion" cellpadding="4" cellspacing="2">
+                                        <p:outputLabel value="#{msg.estadoActual}:"/>
+                                        <p:outputLabel value="#{registroFacturaBean.inscripcion.ultimoEstadoInscripcion.estado.descripcion}"/>
+                                        <p:commandButton icon="fa fa-plus-circle" value="#{msg.cambiarEstado}" action="#{registroFacturaBean.inicioCambiarEstado()}" update="formPrincipal:dlgEstado" resetValues="true"
+                                                         disabled="#{(menuBar.usuario.verificarRolAsistenteFacturacion() and not registroFacturaBean.inscripcion.ultimoEstadoInscripcion.estado.estadoMatriculaAprobada) or (menuBar.usuario.verificarRolFinanciero() and not registroFacturaBean.inscripcion.ultimoEstadoInscripcion.estado.estadoFacturaRegistrada)}"/>
+                                    </h:panelGrid>
+
+                                    <p:dataTable value="#{registroFacturaBean.inscripcion.estadoInscripcionList}" var="estadoInsc">
+                                        <p:column headerText="#{msg.fechaHora}" width="120" style="text-align: center">
+                                            <h:outputLabel value="#{estadoInsc.fecha}">
+                                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                            </h:outputLabel>
+                                        </p:column>
+                                        <p:column headerText="#{msg.estado}" width="150" style="text-align: center">
+                                            <h:outputLabel value="#{estadoInsc.estado.descripcion}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.usuario}">
+                                            <h:outputLabel value="#{estadoInsc.usuario.persona.nombresCompletos}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.observacion}">
+                                            <h:outputLabel value="#{estadoInsc.observacion}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.nroFactura}" width="150">
+                                            <h:outputLabel value="#{estadoInsc.facturaNumero}"/>
+                                        </p:column>
+                                    </p:dataTable>
+                                </p:fieldset>
+                                
+                                
+
+                            </h:panelGrid>
+
+
+                        </p:panel>
+
+
+
+                        <p:dialog id="dlgEstudianteGrupo"  
+                                  widgetVar="dlgEstudianteGrupo"
+                                  closeOnEscape="true"
+                                  position="center top"
+                                  dynamic="true"
+                                  appendTo="@(body)"
+                                  modal="true"
+                                  header="#{msg.informacionEstudiante}" 
+                                  width="730">
+                            <h:form id="formEstudianteGrupo">
+                                <p:outputPanel id="panelEstudianteGrupo" style="height:400px;overflow:auto">
+                                    <br/>
+                                    <p:fieldset legend="#{msg.datosEstudiante}">
+
+                                        <h:panelGrid columns="2" columnClasses="top, top" style="width: 100%">
+                                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaAdministrador">
+                                                <p:outputLabel value="#{msg.tipoIdentificacion}:"/>
+                                                <p:outputLabel value="#{registroFacturaBean.inscripcionEstudiante.estudiante.persona.tipoIdentificacion.nombre}"/>
+
+                                                <p:outputLabel value="#{msg.identificacion}:"/>
+                                                <p:outputLabel value="#{registroFacturaBean.inscripcionEstudiante.estudiante.persona.identificacion}"/>
+
+
+                                                <p:outputLabel value="#{msg.telefono}:" />
+                                                <p:outputLabel value="#{registroFacturaBean.inscripcionEstudiante.estudiante.persona.telefono}" />
+
+
+                                                <p:outputLabel value="#{msg.celular}:" />
+                                                <p:outputLabel value="#{registroFacturaBean.inscripcionEstudiante.estudiante.persona.celular}" />
+
+                                                <p:outputLabel value="#{msg.fechaNacimiento}:" />
+                                                <p:outputLabel value="#{registroFacturaBean.inscripcionEstudiante.estudiante.persona.fechaNacimiento}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                </p:outputLabel>
+                                            </h:panelGrid>    
+
+
+                                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaAdministrador">
+                                                <p:outputLabel value="#{msg.apellidosNombres}:" />
+                                                <p:outputLabel value="#{registroFacturaBean.inscripcionEstudiante.estudiante.persona.nombresCompletos}" />
+
+                                                <p:outputLabel value="#{msg.email}:" />
+                                                <p:outputLabel value="#{registroFacturaBean.inscripcionEstudiante.estudiante.persona.email}" />
+
+                                                <p:outputLabel value="#{msg.tipoEstudiante}:" />
+                                                <p:outputLabel value="#{registroFacturaBean.inscripcionEstudiante.tipoEstudiante.nombre}" />
+                                            </h:panelGrid>                                            
+                                        </h:panelGrid> 
+                                    </p:fieldset>
+
+                                    <br/>
+                                    <p:fieldset legend="#{msg.direccionEstudiante}">
+                                        <h:panelGrid columns="2" columnClasses="top, top" id="panelDatosDireccion" style="width: 100%"> 
+
+                                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaDireccionGrupo" cellpadding="4" cellspacing="2">
+                                                <p:outputLabel value="#{msg.provincia}:"/>
+                                                <p:outputLabel value="#{registroFacturaBean.inscripcionEstudiante.estudiante.persona.provinciaNombre}"/>
+
+
+                                                <p:outputLabel value="#{msg.canton}:"/>
+                                                <p:outputLabel value="#{registroFacturaBean.inscripcionEstudiante.estudiante.persona.cantonNombre}"/>
+
+                                                <p:outputLabel value="#{msg.parroquia}:"/>
+                                                <p:outputLabel value="#{registroFacturaBean.inscripcionEstudiante.estudiante.persona.parroquiaNombre}"/>
+
+                                            </h:panelGrid>
+
+                                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaDireccionGrupo" cellpadding="4" cellspacing="2">
+                                                <p:outputLabel value="#{msg.direccion}:"/>
+                                                <p:outputLabel value="#{registroFacturaBean.inscripcionEstudiante.estudiante.persona.direccion}"/>
+
+                                                <p:outputLabel value="#{msg.referencia}:"/>
+                                                <p:outputLabel value="#{registroFacturaBean.inscripcionEstudiante.estudiante.persona.direccionReferencia}"/>
+
+                                            </h:panelGrid>
+                                        </h:panelGrid>
+
+                                        <h:panelGrid id="panelContacto" style="width: 100%">
+                                            <p:spacer width="1" height="5"/>
+                                            <p:outputLabel value="#{msg.contactoEmergencia}" style="font-weight: bold"/>
+
+                                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaDireccionGrupo" cellpadding="4" cellspacing="2">
+
+                                                <p:outputLabel value="#{msg.nombres}:"/>
+                                                <p:outputLabel value="#{registroFacturaBean.inscripcionEstudiante.estudiante.persona.contactoNombres}"/>
+
+                                                <p:outputLabel value="#{msg.apellidos}:"/>
+                                                <p:outputLabel value="#{registroFacturaBean.inscripcionEstudiante.estudiante.persona.contactoApellidos}"/>
+
+                                                <p:outputLabel value="#{msg.telefono}:"/>
+                                                <p:outputLabel value="#{registroFacturaBean.inscripcionEstudiante.estudiante.persona.contactoTelefono}"/>
+
+                                            </h:panelGrid>
+
+                                        </h:panelGrid>
+                                    </p:fieldset>         
+
+
+                                    <br/>
+                                    <p:fieldset legend="#{msg.informacionEmpresarial}" rendered="true">
+                                        <h:panelGrid columns="2" id="panelDatosInformacionEmpresarial" columnClasses="etiqueta etiquetaEmpresaGrupo"
+                                                     cellpadding="4" cellspacing="2"> 
+
+
+                                            <p:outputLabel value="#{msg.trabajaActualmente}:"/>
+                                            <p:outputLabel value="Si" rendered="#{registroFacturaBean.inscripcionEstudiante.trabajaActualmente=='S'}"/>
+                                            <p:outputLabel value="No" rendered="#{registroFacturaBean.inscripcionEstudiante.trabajaActualmente=='N'}"/>
+
+                                            <p:outputLabel value="#{msg.nombreEmpresa}:"
+                                                           rendered="#{registroFacturaBean.inscripcionEstudiante.trabajaActualmente=='S'}"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcionEstudiante.estudiante.persona.empresaTrabajo}"
+                                                           rendered="#{registroFacturaBean.inscripcionEstudiante.trabajaActualmente=='S'}"/>
+
+                                            <p:outputLabel value="#{msg.direccion}:"
+                                                           rendered="#{registroFacturaBean.inscripcionEstudiante.trabajaActualmente=='S'}"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcionEstudiante.estudiante.persona.direccionTrabajo}"
+                                                           rendered="#{registroFacturaBean.inscripcionEstudiante.trabajaActualmente=='S'}"/>
+
+                                            <p:outputLabel value="#{msg.telefono}:"
+                                                           rendered="#{registroFacturaBean.inscripcionEstudiante.trabajaActualmente=='S'}"/>
+                                            <p:outputLabel value="#{registroFacturaBean.inscripcionEstudiante.estudiante.persona.telefonoTrabajo}"
+                                                           rendered="#{registroFacturaBean.inscripcionEstudiante.trabajaActualmente=='S'}"/>
+
+
+                                        </h:panelGrid>
+                                    </p:fieldset>                                    
+
+                                </p:outputPanel>          
+                                <p:outputPanel style="background-color: #c2c3c5">
+                                    <center>
+                                        <h:panelGrid columns="1" cellspacing="6">
+                                            <p:commandButton value="#{msg.cerrar}"
+                                                             icon="ui-icon-close"
+                                                             onclick="PF('dlgEstudianteGrupo').hide();"
+                                                             />
+                                        </h:panelGrid>
+                                    </center>
+                                </p:outputPanel>
+
+
+
+
+
+                            </h:form>
+
+
+                        </p:dialog>
+                        
+
+                        <p:dialog id="dlgEstado"  
+                                  widgetVar="dlgEstado"
+                                  appendTo="@(body)"
+                                  modal="true"
+                                  closeOnEscape="true"
+                                  header="Cambiar Estado" 
+                                  width="500"
+                                  styleClass="disable-scroll"
+                                  >
+                            <h:form id="formEstado">
+                                <p:messages/>
+                                <p:outputPanel style="height:260px;overflow:auto">
+                                    <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInscripcion" cellpadding="4" cellspacing="2">
+                                        <p:outputLabel value="#{msg.estadoActual}:"/>
+                                        <p:outputLabel value="#{registroFacturaBean.inscripcion.ultimoEstadoInscripcion.estado.descripcion}"/>
+
+                                        <p:outputLabel value="#{msg.estadoNuevo}:"/>
+                                        <p:selectOneMenu value="#{registroFacturaBean.estadoInscripcion.estado}"
+                                                         converter="omnifaces.SelectItemsConverter">
+                                            <f:selectItems value="#{registroFacturaBean.estadoList}" var="est" itemLabel="#{est.descripcion}" itemValue="#{est}"/>
+                                        </p:selectOneMenu>
+
+                                        <p:outputLabel for="txtFacturaNumero" value="#{msg.nroFactura}:" rendered="#{menuBar.usuario.verificarRolAsistenteFacturacion()}"/>
+                                        <h:panelGrid cellpadding="0" rendered="#{menuBar.usuario.verificarRolAsistenteFacturacion()}">
+                                            <p:inputText id="txtFacturaNumero" value="#{registroFacturaBean.estadoInscripcion.facturaNumero}"
+                                                         maxlength="20" size="20"
+                                                         required="true"/>
+                                            <p:message for="txtFacturaNumero"/>
+                                        </h:panelGrid>
+
+                                        <p:outputLabel value="#{msg.nroFactura}:" rendered="#{menuBar.usuario.verificarRolFinanciero()}"/>
+                                        <p:outputLabel value="#{registroFacturaBean.inscripcion.facturaNumero}" rendered="#{menuBar.usuario.verificarRolFinanciero()}"/>
+
+                                        <p:outputLabel value="#{msg.observacion}:" for="txtObservacion"/>
+                                        <h:panelGrid cellpadding="0">
+                                            <p:inputTextarea id="txtObservacion" 
+                                                             required="true"
+                                                             label="Observación:"
+                                                             transient="true"
+                                                             value="#{registroFacturaBean.estadoInscripcion.observacion}"
+                                                             cols="40"
+                                                             rows="4"
+                                                             >
+                                            </p:inputTextarea>       
+                                            <p:message for="txtObservacion"/>
+                                        </h:panelGrid>
+                                    </h:panelGrid>
+                                </p:outputPanel>
+                                <p:outputPanel style="background-color: #c2c3c5">
+                                    <center>
+                                        <h:panelGrid columns="2" cellspacing="6">
+                                            <p:commandButton value="#{msg.grabar}" 
+                                                             icon="fa fa-save"
+                                                             process="formEstado"
+                                                             update="formEstado"
+                                                             onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"
+                                                             action ="#{registroFacturaBean.confirmarCambioEstado()}"  
+                                                             />
+                                            <p:commandButton value="#{msg.cancelar}"
+                                                             icon="fa fa-close"
+                                                             onclick="PF('dlgEstado').hide();"/>
+                                        </h:panelGrid>
+                                    </center>
+                                </p:outputPanel>
+                            </h:form>
+
+
+                        </p:dialog>
+
+                        
+                    </h:panelGrid>
+                </center>
+            </ui:define>
+        </ui:composition>
+
+    </h:body>
+</html>
+

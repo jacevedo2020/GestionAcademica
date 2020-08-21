@@ -1,0 +1,365 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <style>
+                    .etiqueta{
+                        background: #d4dee2;
+                        width: 135px;
+                        font-weight: bold;
+                        opacity: 0.95;
+                    }
+                </style>                
+                <center>
+
+                    <h:panelGrid id="panelPrincipal" style="width: 95%">
+                        <p:messages>
+                            <p:autoUpdate/>
+                        </p:messages>
+                        <p:panel>
+                            <f:facet name="header">
+                                <center>
+                                    <h:panelGrid style="text-align: center">
+                                        <h:outputLabel value="Mis Datos" class="titulo"/>
+                                        <h:panelGrid columns="2" cellpadding="0" cellspacing="0">
+                                            <p:commandButton icon="ui-icon-disk" value="#{msg.grabar}" action="#{misDatosBean.grabar()}" update="panelPrincipal"/>
+                                            <p:button value="Cancelar" icon="ui-icon-arrowreturn-1-w" outcome="/plantilla/plantilla.xhtml"/>
+
+                                        </h:panelGrid>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+
+                            <h:panelGrid cellpadding="10" style="width: 100%">
+                                <p:fieldset legend="#{msg.datosGenerales}">
+
+                                    <h:panelGrid columns="3" columnClasses="top1, top1, top1" style="width: 100%">
+                                        <h:panelGrid columns="2" cellpadding="4" cellspacing="2" columnClasses="etiqueta"> 
+
+                                            <p:outputLabel for="selTipoIdentificacion" value="#{msg.tipoIdentificacion}:"/>
+                                            <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                                <p:selectOneMenu id="selTipoIdentificacion" value="#{misDatosBean.usuario.persona.tipoIdentificacion}"
+                                                                 style="width: 100px"
+                                                                 disabled="true"
+                                                                 converter="omnifaces.SelectItemsConverter" required="true">
+                                                    <f:selectItems value="#{tipoIdentificacionBean.tipoIdentificacionList}" var="tipoId" itemLabel="#{tipoId.nombre}" itemValue="#{tipoId}"/>
+                                                </p:selectOneMenu>
+                                                <p:message for="selTipoIdentificacion"/>
+                                            </h:panelGrid>
+
+                                            <p:outputLabel id="lblCedula" for="hidCedula" value="#{msg.identificacion}:"/>
+                                            <h:panelGrid id="panelCedula" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtCedula"
+                                                             value="#{misDatosBean.usuario.persona.identificacion}"
+                                                             required="true"
+                                                             size="16"
+                                                             disabled="true"
+                                                             >
+                                                </p:inputText>
+                                                <h:inputHidden id="hidCedula" value="#{misDatosBean.usuario.persona.identificacion}"
+                                                               required="true" requiredMessage="No. Identificación:* Campo obligatorio">
+                                                </h:inputHidden> 
+
+                                                <p:message for="hidCedula"/>
+                                            </h:panelGrid>
+
+
+                                            <p:outputLabel id="lblGenero" for="selGenero" value="#{msg.genero}:"/>
+                                            <h:panelGrid id="panelGenero" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:selectOneRadio id="selGenero" value="#{misDatosBean.usuario.persona.genero}"
+                                                                  style="width: 200px"
+                                                                  required="true">
+                                                    <f:selectItem itemLabel="Femenino" itemValue="F"/>
+                                                    <f:selectItem itemLabel="Masculino" itemValue="M"/>
+                                                    <p:ajax update="lblGenero, panelGenero"/>
+                                                </p:selectOneRadio>
+                                                <p:message for="selGenero"/>
+                                            </h:panelGrid>
+                                        </h:panelGrid>
+
+                                        <h:panelGrid columns="2" columnClasses="etiqueta" cellpadding="4" cellspacing="2">
+                                            <p:outputLabel id="lblNombre" for="txtNombre" value="#{msg.nombres}:"/>
+                                            <h:panelGrid  id="panelNombre" columns="1" cellpadding="0" cellspacing="0" >
+                                                <p:inputText id="txtNombre" value="#{misDatosBean.usuario.persona.nombres}" required="true" 
+                                                             maxlength="30" size="35" >
+                                                    <p:ajax event="keyup" update="lblNombre, msgNombre"/>
+                                                </p:inputText>
+                                                <p:message id="msgNombre" for="txtNombre"/>
+                                            </h:panelGrid>
+
+                                            <p:outputLabel id="lblApellido" for="txtApellido" value="#{msg.apellidos}:"/>
+                                            <h:panelGrid id="panelApellido" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtApellido" value="#{misDatosBean.usuario.persona.apellidos}" required="true" 
+                                                             maxlength="30" size="35" >
+                                                    <p:ajax event="keyup" update="lblApellido, msgApellido"/>
+                                                </p:inputText>
+                                                <p:message id="msgApellido" for="txtApellido"/>
+                                            </h:panelGrid>
+
+
+
+                                            <p:outputLabel id="lblEmail" for="txtEmail" value="#{msg.email}:"/>
+                                            <h:panelGrid id="panelEmail" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtEmail" value="#{misDatosBean.usuario.persona.email}" required="true" 
+                                                             maxlength="60" size="35" >
+                                                    <p:ajax event="keyup" update="lblEmail, msgEmail"/>
+                                                </p:inputText>
+                                                <p:message id="msgEmail" for="txtEmail"/>
+                                            </h:panelGrid>
+
+
+
+                                        </h:panelGrid>
+
+                                        <h:panelGrid columns="2" cellpadding="4" cellspacing="2" columnClasses="etiqueta"> 
+
+                                            <p:outputLabel id="lblFechaNacimiento" for="txtFechaNacimiento" value="#{msg.fechaNacimiento}:"/>
+                                            <h:panelGrid id="panelFechaNacimiento" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:calendar id="txtFechaNacimiento" value="#{misDatosBean.usuario.persona.fechaNacimiento}" required="true" 
+                                                            size="10" pattern="dd/MM/yyyy" maxdate="#{misDatosBean.fechaActual}"
+                                                            showOtherMonths="true" navigator="true"
+                                                            yearRange="c-120:c+0" />
+                                                <p:message for="txtFechaNacimiento"/>
+                                            </h:panelGrid>
+
+
+                                            <p:outputLabel id="lblTelefono" for="txtTelefono" value="#{msg.telefono}:"/>
+                                            <h:panelGrid id="panelTelefono" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtTelefono"
+                                                             value="#{misDatosBean.usuario.persona.telefono}"
+                                                             required="true"
+                                                             size="10"
+                                                             validator="ValidadorTelefono"
+                                                             maxlength="9">
+                                                    <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                                    <p:ajax event="keyup" update="lblTelefono, msgTelefono"/>
+                                                </p:inputText>
+                                                <p:message id="msgTelefono" for="txtTelefono"/>
+                                            </h:panelGrid>
+
+
+                                            <p:outputLabel id="lblCelular" for="txtCelular" value="#{msg.celular}:"/>
+                                            <h:panelGrid id="panelCelular" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtCelular"
+                                                             value="#{misDatosBean.usuario.persona.celular}"
+                                                             required="true"
+                                                             size="10"
+                                                             validator="ValidadorCelular"
+                                                             maxlength="10">
+                                                    <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                                    <p:ajax event="keyup" update="lblCelular, msgCelular"/>
+                                                </p:inputText>
+                                                <p:message id="msgCelular" for="txtCelular"/>
+                                            </h:panelGrid>
+
+
+
+
+                                        </h:panelGrid>
+
+                                    </h:panelGrid>
+
+
+
+                                </p:fieldset>    
+                                <p:fieldset legend="#{msg.direccionEnvioCertificado}" rendered="#{misDatosBean.usuario.verificarRolEstudiante()}">
+                                    <h:panelGrid columns="3" columnClasses="top1, top1" id="panelDatosDireccion" style="width: 100%"> 
+
+                                        <h:panelGrid columns="2" columnClasses="etiqueta" cellpadding="4" cellspacing="2">
+                                            <p:outputLabel id="lblProvincia" for="selProvincia" value="#{msg.provincia}:"/>
+                                            <h:panelGrid id="panelProvincia" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:selectOneMenu value="#{misDatosBean.provincia}" 
+                                                                 style="width: 230px"
+                                                                 id="selProvincia"
+                                                                 required="true"
+                                                                 converter="omnifaces.SelectItemsConverter">
+                                                    <p:ajax update="lblProvincia, msgProvincia, selCanton, selParroquia"/>
+                                                    <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption=""/>
+                                                    <f:selectItems value="#{provinciaBean.provinciaActivoList}" var="prov" itemLabel="#{prov.nombre}" itemValue="#{prov}"/>
+                                                </p:selectOneMenu>
+                                                <p:message id="msgProvincia" for="selProvincia" />
+                                            </h:panelGrid>
+
+                                            <p:outputLabel id="lblCanton" for="selCanton" value="#{msg.canton}:"/>
+                                            <h:panelGrid id="panelCanton" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:selectOneMenu value="#{misDatosBean.canton}" 
+                                                                 id="selCanton"
+                                                                 style="width: 230px"
+                                                                 required="true"
+                                                                 converter="omnifaces.SelectItemsConverter">
+                                                    <p:ajax update="selParroquia, lblCanton, msgCanton"/>
+                                                    <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption=""/>
+                                                    <f:selectItems value="#{misDatosBean.provincia.cantonActivoList}" var="can" itemLabel="#{can.nombre}" itemValue="#{can}"/>
+                                                </p:selectOneMenu>
+                                                <p:message id="msgCanton" for="selCanton" />
+                                            </h:panelGrid>
+
+
+                                            <p:outputLabel id="lblParroquia" for="selParroquia" value="#{msg.parroquia}:"/>
+                                            <h:panelGrid id="panelParroquia" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:selectOneMenu value="#{misDatosBean.usuario.persona.parroquia}" 
+                                                                 id="selParroquia"
+                                                                 style="width: 230px"
+                                                                 required="true"
+                                                                 converter="omnifaces.SelectItemsConverter">
+                                                    <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption=""/>
+                                                    <f:selectItems value="#{misDatosBean.canton.parroquiaActivoList}" var="parr" itemLabel="#{parr.nombre}" itemValue="#{parr}"/>
+                                                    <p:ajax event="change" update="lblParroquia, msgParroquia"/>
+                                                </p:selectOneMenu>
+                                                <p:message id="msgParroquia" for="selParroquia" />
+                                            </h:panelGrid>
+
+                                        </h:panelGrid>
+
+                                        <h:panelGrid columns="2" columnClasses="etiqueta" cellpadding="4" cellspacing="2">
+                                            <p:outputLabel id="lblDireccion" for="txtDireccion" value="#{msg.direccion}:"/>
+                                            <h:panelGrid id="panelDireccion" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtDireccion" value="#{misDatosBean.usuario.persona.direccion}" required="true" 
+                                                             maxlength="30" size="50" >
+                                                    <p:ajax event="keyup" update="lblDireccion, msgDireccion"/>
+                                                </p:inputText>
+                                                <p:message id="msgDireccion" for="txtDireccion"/>
+                                            </h:panelGrid>
+
+
+                                            <p:outputLabel id="lblReferencia" for="txtReferencia" value="#{msg.referencia}:"/>
+                                            <h:panelGrid id="panelReferencia" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtReferencia"
+                                                             value="#{misDatosBean.usuario.persona.direccionReferencia}"
+                                                             required="true"
+                                                             size="50"
+                                                             >
+                                                    <p:ajax event="keyup" update="lblReferencia, msgReferencia"/>
+                                                </p:inputText>
+                                                <p:message id="msgReferencia" for="txtReferencia"/>
+                                            </h:panelGrid>
+
+                                        </h:panelGrid>
+                                    </h:panelGrid>
+
+                                    <h:panelGrid id="panelContacto" style="width: 100%">
+                                        <p:spacer width="1" height="5"/>
+                                        <p:outputLabel value="#{msg.contactoEmergencia}" style="font-weight: bold"/>
+
+                                        <h:panelGrid columns="2" columnClasses="etiqueta" cellpadding="4" cellspacing="2">
+
+                                            <p:outputLabel id="lblNombreContacto" for="txtNombreContacto" value="#{msg.nombres}:"/>
+                                            <h:panelGrid  id="panelNombreContacto" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtNombreContacto" value="#{misDatosBean.usuario.persona.contactoNombres}" required="true" 
+                                                             maxlength="30" size="35" >
+                                                    <p:ajax event="keyup" update="lblNombreContacto, msgNombreContacto"/>
+                                                </p:inputText>
+                                                <p:message id="msgNombreContacto" for="txtNombreContacto"/>
+                                            </h:panelGrid>
+
+                                            <p:outputLabel id="lblApellidoContacto" for="txtApellidoContacto" value="#{msg.apellidos}:"/>
+                                            <h:panelGrid id="panelApellidoContacto" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtApellidoContacto" value="#{misDatosBean.usuario.persona.contactoApellidos}" required="true" 
+                                                             maxlength="30" size="35" >
+                                                    <p:ajax event="keyup" update="lblApellidoContacto, msgApellidoContacto"/>
+                                                </p:inputText>
+                                                <p:message id="msgApellidoContacto" for="txtApellidoContacto"/>
+                                            </h:panelGrid>
+
+                                            <p:outputLabel id="lblTelefonoContacto" for="txtTelefonoContacto" value="#{msg.telefono}:"/>
+                                            <h:panelGrid id="panelTelefonoContacto" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtTelefonoContacto"
+                                                             value="#{misDatosBean.usuario.persona.contactoTelefono}"
+                                                             required="true"
+                                                             size="16"
+                                                             validator="ValidadorNumero"
+                                                             maxlength="10">
+                                                    <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                                    <p:ajax event="change" update="lblTelefonoContacto, msgTelefonoContacto"/>
+                                                </p:inputText>
+                                                <p:message id="msgTelefonoContacto" for="txtTelefonoContacto"/>
+                                            </h:panelGrid>
+
+                                        </h:panelGrid>
+
+                                    </h:panelGrid>
+                                </p:fieldset>
+                                <p:fieldset legend="#{msg.informacionEmpresarial}" rendered="#{misDatosBean.usuario.verificarRolEstudiante()}">
+                                    <h:panelGrid columns="1" id="panelDatosInformacionEmpresarial" style="width: 100%"> 
+
+                                        <h:panelGrid columns="1" >
+                                            <h:panelGrid columns="2" columnClasses="etiqueta" cellpadding="4" cellspacing="2">
+                                                <p:outputLabel for="selTrabajaActualmente" value="#{msg.trabajaActualmente}:"/>
+                                                <p:selectOneRadio id="selTrabajaActualmente" value="#{misDatosBean.usuario.persona.trabajaActualmente}"
+                                                                  required="true">
+                                                    <f:selectItem itemLabel="Si" itemValue="S"/>
+                                                    <f:selectItem itemLabel="No" itemValue="N"/>
+                                                    <p:ajax update="panelDatosEmpresa"/>
+                                                </p:selectOneRadio>
+                                            </h:panelGrid>                                        
+                                            <p:message for="selTrabajaActualmente"/>
+
+                                        </h:panelGrid>
+                                        <h:panelGrid columns="3" id="panelDatosEmpresa">
+
+                                            <h:panelGrid id="panelNombreEmpresa" columns="1" rendered="#{misDatosBean.usuario.persona.trabajaActualmente=='S'}">
+                                                <h:panelGrid columns="2" columnClasses="etiqueta" cellpadding="4" cellspacing="2">
+                                                    <p:outputLabel id="lblNombreEmpresa" for="txtNombreEmpresa" value="#{msg.nombreEmpresa}:"/>
+                                                    <p:inputText id="txtNombreEmpresa" value="#{misDatosBean.usuario.persona.empresaTrabajo}" required="true" 
+                                                                 maxlength="30" size="30" >
+                                                        <p:ajax event="keyup" update="lblNombreEmpresa, msgNombreEmpresa"/>
+                                                    </p:inputText>
+                                                </h:panelGrid>
+                                                <p:message id="msgNombreEmpresa" for="txtNombreEmpresa"/>
+                                            </h:panelGrid>
+
+
+                                            <h:panelGrid id="panelDireccionEmpresa" columns="1" rendered="#{misDatosBean.usuario.persona.trabajaActualmente=='S'}">
+                                                <h:panelGrid columns="2" columnClasses="etiqueta" cellpadding="4" cellspacing="2">
+                                                    <p:outputLabel id="lblDireccionEmpresa" for="txtDireccionEmpresa" value="#{msg.direccionEmpresa}:"/>
+                                                    <p:inputText id="txtDireccionEmpresa" value="#{misDatosBean.usuario.persona.direccionTrabajo}" required="true" 
+                                                                 maxlength="30" size="30" >
+                                                        <p:ajax event="keyup" update="lblDireccionEmpresa, msgDireccionEmpresa"/>
+                                                    </p:inputText>
+                                                </h:panelGrid>
+                                                <p:message id="msgDireccionEmpresa" for="txtDireccionEmpresa"/>
+                                            </h:panelGrid>
+
+
+
+                                            <h:panelGrid id="panelTelefonoEmpresa" columns="1" rendered="#{misDatosBean.usuario.persona.trabajaActualmente=='S'}">
+                                                <h:panelGrid columns="2" columnClasses="etiqueta" cellpadding="4" cellspacing="2">
+                                                    <p:outputLabel id="lblTelefonoEmpresa" for="txtTelefonoEmpresa" value="#{msg.telefono}:"/>
+                                                    <p:inputText id="txtTelefonoEmpresa"
+                                                                 value="#{misDatosBean.usuario.persona.telefonoTrabajo}"
+                                                                 required="true"
+                                                                 size="16"
+                                                                 validator="ValidadorNumero"
+                                                                 maxlength="10">
+                                                        <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                                        <p:ajax event="keyup" update="lblTelefonoEmpresa, msgTelefonoEmpresa"/>
+                                                    </p:inputText>
+                                                </h:panelGrid>
+                                                <p:message id="msgTelefonoEmpresa" for="txtTelefonoEmpresa"/>
+                                            </h:panelGrid>
+
+                                        </h:panelGrid>
+
+
+                                    </h:panelGrid>
+                                </p:fieldset>
+
+                            </h:panelGrid>
+
+                        </p:panel>
+                    </h:panelGrid>
+
+                </center>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>

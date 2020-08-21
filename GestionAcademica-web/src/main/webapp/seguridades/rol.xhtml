@@ -1,0 +1,270 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <style>
+                    .mystyle.ui-datatable .ui-datatable-scrollable-body{
+                        overflow-y: scroll !important;
+                        overflow-x: hidden !important;
+                    }                    
+                    .disable-scroll .ui-dialog-content {
+                        overflow: hidden !important;
+                    }
+                    .etiqueta{
+                        background: #d4dee2;
+                        width: 135px;
+                        font-weight: bold;
+                        opacity: 0.95;
+                    }
+                </style>                
+                <center>
+
+                    <h:panelGrid id="panelPrincipal" style="width: 95%">
+
+                        <p:panel rendered="#{rolBean.rol==null}">
+                            <f:facet name="header">
+                                <center>
+                                    <h:panelGrid style="text-align: center">
+                                        <h:outputLabel value="#{msg.listadoRoles}" class="titulo"/>
+                                        <p:commandButton icon="fa fa-plus-circle" value="#{msg.nuevo}" action="#{rolBean.nuevo()}" update="formPrincipal:panelPrincipal" resetValues="true"
+                                                         onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages closable="true"/>
+                            
+                            <p:dataTable id="dtRoles" value="#{rolBean.rolesList}" var="rol" paginator="true" rows="10" emptyMessage="#{msg.noExistenDatos}">
+                                <p:column headerText="#{msg.acciones}" width="100" style="text-align: center">
+                                    <p:commandButton icon="fa fa-pencil" title="#{msg.editar}" action="#{rolBean.seleccionar(rol)}" update="formPrincipal:panelPrincipal" resetValues="true"
+                                                     onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"/>
+                                    <p:commandButton icon="fa fa-trash-o" title="#{msg.eliminar}" action="#{rolBean.eliminar(rol)}" update="formPrincipal:panelPrincipal"
+                                                     disabled="#{rol.id le 7}">
+                                        <p:confirm header="#{msg.confirmacionTitulo}" message="#{msg.confirmacionMensaje}" />
+                                    </p:commandButton>
+                                </p:column>
+                                <p:column headerText="#{msg.nombre}" width="300" sortBy="#{rol.nombre}">
+                                    <h:outputLabel value="#{rol.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.descripcion}">
+                                    <h:outputLabel value="#{rol.descripcion}"/>
+                                </p:column>
+                            </p:dataTable>
+
+                        </p:panel>
+                        <p:panel rendered="#{rolBean.rol!=null}">
+                            <f:facet name="header">
+                                <center>
+                                    <h:outputLabel value="#{rolBean.rol.id==null?msg.creacionRol:msg.edicionRol}" class="titulo"/>
+                                    <h:panelGrid columns="3" cellpadding="0" cellspacing="0">
+                                        <p:commandButton icon="fa fa-save" value="#{msg.grabar}" action="#{rolBean.grabar()}" update="panelPrincipal" 
+                                                         onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"/>
+                                        <p:commandButton icon="fa fa-reply"  value="#{msg.cancelar}" action="#{rolBean.cancelar()}" immediate="false" process="@this" update="panelPrincipal"
+                                                         onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()">
+                                        </p:commandButton>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages closable="true"/>
+                            
+                            <h:panelGrid columns="2" cellpadding="3" cellspacing="2" columnClasses="etiqueta">
+                                <p:outputLabel id="lblNombre" for="txtNombre" value="#{msg.nombre}:"/>
+                                <h:panelGrid columns="1">
+                                    <p:inputText id="txtNombre" value="#{rolBean.rol.nombre}" required="true" 
+                                                 maxlength="75" size="50">
+                                        <p:ajax event="keyup" update="lblNombre, msgNombre"/>
+                                        <p:ajax event="change" update="@this"/>
+                                    </p:inputText>
+                                    <p:message id="msgNombre" for="txtNombre"/>
+                                </h:panelGrid>
+                                <p:outputLabel id="lblDescripcion" for="txtDescripcion" value="#{msg.descripcion}:"/>
+                                <h:panelGrid columns="1">
+                                    <p:inputText id="txtDescripcion" value="#{rolBean.rol.descripcion}" 
+                                                 required="true" maxlength="75" size="50">
+                                        <p:ajax event="keyup" update="lblDescripcion, msgDescripcion"/>
+                                        <p:ajax event="change" update="@this"/>
+                                    </p:inputText>
+                                    <p:message id="msgDescripcion" for="txtDescripcion" />
+                                </h:panelGrid>
+                            </h:panelGrid>
+
+                            <br/>
+                            <h:panelGrid columns="3" columnClasses="top, top, top">
+
+                                <p:dataTable value="#{rolBean.rol.rolOpcionList}" var="rolOpcion" id="dtOpciones"
+                                             emptyMessage="#{msg.noExistenDatos}">
+
+                                    <f:facet name="header">
+                                        <div style="text-align: left">
+                                            <p:outputLabel value="#{msg.opcionesAsignadas}"/>
+                                            <p:spacer width="10"/>
+                                            <p:commandButton icon="fa fa-plus-circle" value="#{msg.agregar}" 
+                                                             action="#{rolBean.nuevoOpcion()}"
+                                                             process="@this"
+                                                             update="formPrincipal:dlgOpciones"/>
+
+                                        </div>
+
+                                    </f:facet>
+                                    <p:column headerText="#{msg.eliminar}" width="50" style="text-align: center">
+                                        <p:commandButton icon="ui-icon-trash" title="#{msg.eliminar}" process="@this" action="#{rolBean.rol.eliminarRolOpcion(rolOpcion)}" update="dtOpciones"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg.nombre}" width="130" sortBy="#{rolOpcion.opcion.nombre}">
+                                        <h:outputLabel value="#{rolOpcion.opcion.nombre}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg.menu}" sortBy="#{rolOpcion.opcion.pathMenu}">
+                                        <h:outputLabel value="#{rolOpcion.opcion.pathMenu}"/>
+                                    </p:column>
+                                </p:dataTable>
+                                <p:spacer width="50"/>
+
+                                <p:dataTable value="#{rolBean.rol.usuarioRolList}" var="usuarioRol" id="dtUsuarios" emptyMessage="#{msg.noExistenDatos}">
+                                    <f:facet name="header">
+                                        <div style="text-align: left">
+                                            <p:outputLabel value="#{msg.usuariosAsignados}"/>
+                                            <p:spacer width="10"/>
+                                            <p:commandButton icon="fa fa-plus-circle" value="#{msg.agregar}" 
+                                                             action="#{rolBean.nuevoUsuario()}"
+                                                             process="@this"
+                                                             update="formPrincipal:dlgUsuarios"/>
+
+                                        </div>
+
+                                    </f:facet>
+
+                                    <p:column headerText="#{msg.eliminar}" width="50" style="text-align: center">
+                                        <p:commandButton icon="ui-icon-trash" title="#{msg.eliminar}" process="@this" action="#{rolBean.rol.eliminarUsuarioRol(usuarioRol)}" update="dtUsuarios"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg.identificacion}" width="130">
+                                        <h:outputLabel value="#{usuarioRol.usuario.persona.identificacion}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg.nombre}">
+                                        <h:outputLabel value="#{usuarioRol.usuario.persona.nombresCompletos}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGrid>
+
+                        </p:panel>
+
+
+
+                        <p:dialog id="dlgOpciones"  
+                                  widgetVar="dlgOpciones"
+                                  appendTo="@(body)"
+                                  modal="true"
+                                  header="Seleccionar #{msg.opcionesMenu}" 
+                                  width="80%"
+                                  styleClass="disable-scroll"
+                                  closeOnEscape="true">
+                            <h:form id="formOpciones">
+
+                                <p:outputPanel style="height:260px;overflow:auto">
+
+                                    <p:dataTable id="dtOpcionesSel"
+                                                 widgetVar="dtOpcionesSel"
+                                                 sortBy="#{opcionSel.nombre}"
+                                                 value="#{rolBean.opcionSeleccionList}" 
+                                                 var="opcionSel" 
+                                                 emptyMessage="#{msg.noExistenDatos}" 
+                                                 rowKey="#{opcionSel}" >
+
+                                        <p:column headerText="#{msg.seleccionar}" width="70" style="text-align: center">
+                                            <p:selectBooleanCheckbox value="#{opcionSel.seleccionado}"/>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg.nombre}" sortBy="#{opcionSel.nombre}" filterBy="#{opcionSel.nombre}" filterMatchMode="contains">
+                                            <h:outputText value="#{opcionSel.nombre}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.descripcion}" sortBy="#{opcionSel.descripcion}">
+                                            <h:outputText value="#{opcionSel.descripcion}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.menu}" sortBy="#{opcionSel.pathMenu}">
+                                            <h:outputText value="#{opcionSel.pathMenu}"/>
+                                        </p:column>
+                                    </p:dataTable>                                    
+                                </p:outputPanel>
+                                <p:outputPanel style="background-color: #c2c3c5">
+                                    <center>
+                                        <h:panelGrid columns="2" cellspacing="6">
+
+                                            <p:commandButton value="#{msg.aceptar}" 
+                                                             icon="fa fa-check"
+                                                             action ="#{rolBean.agregarOpciones()}"  
+                                                             process="@this, dtOpcionesSel"
+                                                             update="formPrincipal:dtOpciones"/>
+                                            <p:commandButton value="#{msg.cancelar}"
+                                                             icon="fa fa-close"
+                                                             onclick="PF('dlgOpciones').hide();"/>
+                                        </h:panelGrid>
+                                    </center>
+                                </p:outputPanel>
+                            </h:form>
+
+                        </p:dialog>
+                        <p:dialog id="dlgUsuarios"  
+                                  widgetVar="dlgUsuarios"
+                                  appendTo="@(body)"
+                                  modal="true"
+                                  closeOnEscape="true"
+                                  header="Seleccionar Usuarios" 
+                                  width="600"
+                                  styleClass="disable-scroll"
+                                  >
+                            <h:form>
+                                <p:outputPanel style="height:260px;overflow:auto">
+
+
+                                    <p:dataTable id="dtUsuariosSel"
+                                                 value="#{rolBean.usuarioSeleccionList}" 
+                                                 var="usuarioSel" 
+                                                 emptyMessage="#{msg.noExistenDatos}" 
+                                                 rowKey="#{usuarioSel}" >
+
+                                        <p:column headerText="#{msg.seleccionar}" width="70" style="text-align: center">
+                                            <p:selectBooleanCheckbox value="#{usuarioSel.seleccionado}"/>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg.identificacion}" width="130" sortBy="#{usuarioSel.persona.identificacion}" filterBy="#{usuarioSel.persona.identificacion}">
+                                            <h:outputText value="#{usuarioSel.persona.identificacion}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.nombre}" sortBy="#{usuarioSel.persona.nombres} #{usuarioSel.persona.apellidos}" filterBy="#{usuarioSel.persona.nombresCompletos}" filterMatchMode="contains">
+                                            <h:outputText value="#{usuarioSel.persona.nombresCompletos}"/>
+                                        </p:column>
+                                    </p:dataTable>
+                                </p:outputPanel>
+                                <p:outputPanel style="background-color: #c2c3c5">
+                                    <center>
+                                        <h:panelGrid columns="2" cellspacing="6">
+                                            <p:commandButton value="#{msg.aceptar}" 
+                                                             icon="fa fa-check"
+                                                             action ="#{rolBean.agregarUsuarios()}"  
+                                                             process="@this, dtUsuariosSel"
+                                                             update="formPrincipal:dtUsuarios"/>
+                                            <p:commandButton value="#{msg.cancelar}"
+                                                             icon="fa fa-close"
+                                                             onclick="PF('dlgUsuarios').hide();"/>
+                                        </h:panelGrid>
+                                    </center>
+                                </p:outputPanel>
+                            </h:form>
+
+
+                        </p:dialog>
+
+                    </h:panelGrid>
+                </center>
+
+
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

@@ -1,0 +1,144 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <style>
+                    .etiquetaProyecto{
+                        width: 130px;
+                    }
+                </style>                
+
+                <center>
+
+                    <h:panelGrid id="panelPrincipal" style="width: 95%">
+
+                        <p:panel rendered="#{proyectoBean.proyecto==null}">
+                            <f:facet name="header">
+                                <center>
+                                    <h:panelGrid style="text-align: center">
+                                        <h:outputLabel value="#{msg.listadoProyectos}" class="titulo"/>
+                                        <p:commandButton icon="fa fa-plus-circle" value="#{msg.nuevo}" action="#{proyectoBean.nuevo()}" update="formPrincipal:panelPrincipal" resetValues="true"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages closable="true"/>
+
+                            <p:dataTable id="dtProyectos" widgetVar="dtProyectos" value="#{proyectoBean.proyectoList}" var="proy" paginator="true" rows="10" emptyMessage="#{msg.noExistenDatos}">
+                                <p:column headerText="#{msg.acciones}" width="100" style="text-align: center">
+                                    <p:commandButton icon="fa fa-pencil" title="#{msg.editar}" action="#{proyectoBean.seleccionar(proy)}" update="formPrincipal:panelPrincipal" resetValues="true"/>
+                                    <p:commandButton icon="fa fa-trash-o" title="#{msg.eliminar}" action="#{proyectoBean.eliminar(proy)}" update="formPrincipal:panelPrincipal" oncomplete="PF('dtProyectos').filter();">
+                                        <p:confirm header="#{msg.confirmacionTitulo}" message="#{msg.confirmacionMensaje}" />
+                                    </p:commandButton>
+                                </p:column>
+                                <p:column headerText="#{msg.numero}" width="100" sortBy="#{proy.numeroCompleto}" filterBy="#{proy.numeroCompleto}" filterMatchMode="contains" style="text-align: center">
+                                    <h:outputLabel value="#{proy.numeroCompleto}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.nombre}" sortBy="#{proy.nombre}" filterBy="#{proy.nombre}" filterMatchMode="contains">
+                                    <h:outputLabel value="#{proy.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.estado}" width="150" style="text-align: center" sortBy="#{proy.estadoDescripcion}" filterBy="#{proy.estadoDescripcion}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtProyectos').filter()" style="width: 90%">
+                                            <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItem itemLabel="En Ejecución" itemValue="En Ejecución"/>
+                                            <f:selectItem itemLabel="Suspendido" itemValue="Suspendido"/>
+                                            <f:selectItem itemLabel="Finalizado" itemValue="Finalizado"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>                                    
+                                    <h:outputLabel value="#{proy.estadoDescripcion}"/>
+                                </p:column>
+                            </p:dataTable>
+
+                        </p:panel>
+                        <p:panel rendered="#{proyectoBean.proyecto!=null}">
+                            <f:facet name="header">
+                                <center>
+                                    <h:outputLabel value="#{proyectoBean.proyecto.id==null?msg.creacionProyecto:msg.edicionProyecto}" class="titulo"/>
+                                    <h:panelGrid columns="3" cellpadding="0" cellspacing="0">
+                                        <p:commandButton icon="fa fa-save" value="#{msg.grabar}" action="#{proyectoBean.grabar()}" update="panelPrincipal"/>
+                                        <p:commandButton icon="fa fa-reply"  value="#{msg.cancelar}" action="#{proyectoBean.cancelar()}" immediate="false" process="@this" update="panelPrincipal"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages closable="true"/>
+                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaProyecto" cellpadding="6" cellspacing="2">
+                                <p:outputLabel for="txtNumero1" value="#{msg.numero}:"/>
+                                <h:panelGrid columns="7" cellpadding="0" cellspacing="0">
+                                    <p:inputText id="txtNumero1" value="#{proyectoBean.proyecto.numero1}" required="true" 
+                                                 size="1" maxlength="1" requiredMessage="Número. Valor 1:* Campo obligatorio" validator="ValidadorNumero">
+                                        <p:keyFilter regEx="/[\d\-]/" preventPaste="false"/>                                      
+                                    </p:inputText>
+                                    <p:outputLabel value="."/>
+                                    <p:inputText id="txtNumero2" value="#{proyectoBean.proyecto.numero2}" required="true" validator="ValidadorNumero"
+                                                 size="1" maxlength="2" requiredMessage="Número. Valor 2:* Campo obligatorio">
+                                        <p:keyFilter regEx="/[\d\-]/" preventPaste="false"/>  
+                                    </p:inputText>
+                                    <p:outputLabel value="."/>
+                                    <p:inputText id="txtNumero3" value="#{proyectoBean.proyecto.numero3}" required="true" 
+                                                 size="3" maxlength="4" requiredMessage="Número. Valor 3:* Campo obligatorio" validator="ValidadorNumero">
+                                        <p:keyFilter regEx="/[\d\-]/" preventPaste="false"/>                                      
+                                    </p:inputText>
+                                    <h:panelGrid>
+                                        <p:message for="txtNumero1"/>
+                                        <p:message for="txtNumero2"/>
+                                        <p:message for="txtNumero3"/>
+                                    </h:panelGrid>
+
+                                </h:panelGrid>
+
+                                <p:outputLabel for="txtNombre" value="#{msg.nombre}:"/>
+                                <h:panelGrid columns="2" cellpadding="0" cellspacing="0">
+                                    <p:inputText id="txtNombre" value="#{proyectoBean.proyecto.nombre}" required="true" 
+                                                 maxlength="40" size="50" 
+                                                 validator="#{proyectoBean.validarNombre}"/>
+                                    <p:message for="txtNombre"/>
+                                </h:panelGrid>
+
+                                <p:outputLabel id="lblResponsable" for="selResponsable" value="#{msg.responsable}:"/>
+                                <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                    <p:selectOneMenu id="selResponsable" value="#{proyectoBean.proyecto.responsable}"
+                                                     converter="omnifaces.SelectItemsConverter"
+                                                     required="true"
+                                                     filter="true"
+                                                     style="width: 327px"
+                                                     filterMatchMode="contains">
+                                        <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption=""/>
+                                        <f:selectItems value="#{usuarioBean.usuarioAnalistaList}" var="responsable" itemLabel="#{responsable.persona.nombresCompletos}" itemValue="#{responsable}"/>
+                                        <p:ajax event="change" update="@this, lblResponsable, msgResponsable"/>
+                                    </p:selectOneMenu>
+                                    <p:message id="msgResponsable" for="selResponsable"/>
+                                </h:panelGrid>
+
+
+                                <p:outputLabel for="selEstado" value="#{msg.estado}:"/>
+                                <h:panelGrid columns="2" cellpadding="0" cellspacing="0">
+                                    <p:selectOneRadio id="selEstado" value="#{proyectoBean.proyecto.estado}" required="true">
+                                        <f:selectItem itemLabel="En Ejecución" itemValue="E"/>
+                                        <f:selectItem itemLabel="Suspendido" itemValue="S"/>
+                                        <f:selectItem itemLabel="Finalizado" itemValue="F"/>
+                                    </p:selectOneRadio>
+                                    <p:message for="selEstado"/>
+                                </h:panelGrid>
+                            </h:panelGrid>
+
+                        </p:panel>
+
+
+                    </h:panelGrid>
+                </center>
+
+
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

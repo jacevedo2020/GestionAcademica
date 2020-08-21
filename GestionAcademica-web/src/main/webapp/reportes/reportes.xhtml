@@ -1,0 +1,252 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <style>
+                    .etiquetaTipoCurso{
+                        width: 190px;
+                    }
+                    .etiquetaInfoCurso{
+                        width: 100px;
+                    }
+                    .etiquetaInfoEnvio{
+                        width: 190px;
+                    }
+                    .etiquetaInfoInscripcion{
+                        width: 150px;
+                    }
+                    .top1{
+                        vertical-align: top;
+                        width: 33%;
+                    }
+                    .top2{
+                        vertical-align: top;
+                        width: 50%;
+                    }
+                </style>                
+
+                <center>
+
+                    <h:panelGrid id="panelPrincipal" style="width: 95%">
+
+
+                        <!--Panel de seleccion de curso -->
+                        <p:panel rendered="#{reportesBean.cursoCentro == null}">
+                            <f:facet name="header">
+                                <center>
+                                    <h:panelGrid style="text-align: center" class="titulo">
+                                        <h:outputLabel value="#{msg.cursosDictados}"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages closable="true"/>
+                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaTipoCurso">
+                                <p:outputLabel value="Seleccione el Tipo de Curso:" style="font-weight: bold"/>
+                                <p:selectOneMenu value="#{reportesBean.tipoCurso}" style="width: 150px">
+                                    <f:selectItem itemLabel="Continuo" itemValue="C"/>
+                                    <f:selectItem itemLabel="Corporativo" itemValue="O"/>
+                                    <p:ajax listener="#{reportesBean.tipoCursoChange()}" update="dtCursosCentro"/>
+                                </p:selectOneMenu>
+                            </h:panelGrid>
+
+                            <p:dataTable id="dtCursosCentro" widgetVar="dtCursosCentro" transient="true" 
+                                         value="#{reportesBean.cursoCentroList}" var="cursoCentro" paginator="true" rows="10" emptyMessage="#{msg.noExistenDatos}">
+                                <p:column headerText="#{msg.entregarEnviarCertificado}" width="90" style="text-align: center">
+                                    <p:commandButton icon="fa fa-pencil" title="#{msg.seleccionar}" 
+                                                     action="#{reportesBean.seleccionarCursoCentro(cursoCentro)}" 
+                                                     update="formPrincipal:panelPrincipal" resetValues="true" process="@this"
+                                                     onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"/>
+                                </p:column>
+                                <p:column headerText="#{msg.areaConocimiento}" rendered="#{reportesBean.tipoCurso=='C'}" 
+                                          sortBy="#{cursoCentro.curso.programa.nombre}"
+                                          filterBy="#{cursoCentro.curso.programa.nombre}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtCursosCentro').filter()" style="width: 90%">
+                                            <f:selectItem itemLabel="#{msg.seleccione}" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{reportesBean.programaFiltroList}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputLabel value="#{cursoCentro.curso.programa.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.empresa}" rendered="#{reportesBean.tipoCurso=='O'}"
+                                          sortBy="#{cursoCentro.inscripcionEmpresa.estudiante.persona.nombresCompletos}">
+                                    <h:outputLabel value="#{cursoCentro.inscripcionEmpresa.estudiante.persona.nombresCompletos}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.curso}" sortBy="#{cursoCentro.curso.nombre}"
+                                          filterBy="#{cursoCentro.curso.nombre}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtCursosCentro').filter()" style="width: 90%">
+                                            <f:selectItem itemLabel="#{msg.seleccione}" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{reportesBean.cursoFiltroList}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputLabel value="#{cursoCentro.curso.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.centroCapacitacion}" rendered="#{reportesBean.tipoCurso=='C'}" 
+                                          sortBy="#{cursoCentro.centroCapacitacion.nombre}"
+                                          filterBy="#{cursoCentro.centroCapacitacion.nombre}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtCursosCentro').filter()" style="width: 90%">
+                                            <f:selectItem itemLabel="#{msg.seleccione}" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{reportesBean.centroCapacitacionFiltroList}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputLabel value="#{cursoCentro.centroCapacitacion.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.instructor}"
+                                          sortBy="#{cursoCentro.instructor.persona.nombresCompletos}">
+                                    <h:outputLabel value="#{cursoCentro.instructor.persona.nombresCompletos}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.modalidad}" width="80" style="text-align: center"
+                                          sortBy="#{cursoCentro.modalidadDescripcion}"
+                                          rendered="false">
+                                    <h:outputLabel value="#{cursoCentro.modalidadDescripcion}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.fechaInicio}" width="90" style="text-align: center"
+                                          sortBy="#{cursoCentro.fechaInicio}">
+                                    <h:outputLabel value="#{cursoCentro.fechaInicio}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                    </h:outputLabel>
+                                </p:column>
+                                <p:column headerText="#{msg.fechaFin}" width="80" style="text-align: center"
+                                          sortBy="#{cursoCentro.fechaFin}">
+                                    <h:outputLabel value="#{cursoCentro.fechaFin}" >
+                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                    </h:outputLabel>
+                                </p:column>
+                                <p:column headerText="#{msg.pendientesEntregaCertificado}" width="80" style="text-align: center"
+                                          sortBy="#{cursoCentro.inscripcionCertificadoEntregaEnvioPendienteList.size()}">
+                                    <h:outputLabel value="#{cursoCentro.inscripcionCertificadoEntregaEnvioPendienteList.size()}" >
+                                    </h:outputLabel>
+                                </p:column>
+                            </p:dataTable>
+                        </p:panel>
+
+
+
+
+
+                        <!--Panel de un curso especifico -->
+                        <p:panel rendered="#{reportesBean.cursoCentro != null}">
+                            <f:facet name="header">
+                                <h:panelGrid columns="3">
+                                    <h:outputLabel value="Reporte Control Asistencia Alumnos"/>
+                                    <h:commandLink target="_blank" 
+                                                   actionListener="#{reportesBean.generarReporte('RepControlAsistenciaAlumnos', true)}" 
+                                                   immediate="true">
+                                        <p:graphicImage url="/resources/images/pdf.png" width="28"/>
+                                    </h:commandLink>
+                                    <h:commandLink target="_blank" 
+                                                   actionListener="#{reportesBean.generarReporte('RepControlAsistenciaAlumnos', false)}" 
+                                                   immediate="true">
+                                        <p:graphicImage url="/resources/images/excel.png" width="30"/>
+                                    </h:commandLink>
+
+                                    <h:outputLabel value="Reporte Control Asistencia Instructor"/>
+                                    <h:commandLink target="_blank" 
+                                                   actionListener="#{reportesBean.generarReporte('RepControlAsistenciaInstructor', true)}" 
+                                                   immediate="true">
+                                        <p:graphicImage url="/resources/images/pdf.png" width="28"/>
+                                    </h:commandLink>
+                                    <h:commandLink target="_blank" 
+                                                   actionListener="#{reportesBean.generarReporte('RepControlAsistenciaInstructor', false)}" 
+                                                   immediate="true">
+                                        <p:graphicImage url="/resources/images/excel.png" width="30"/>
+                                    </h:commandLink>
+
+                                    
+                                    <h:outputLabel value="Reporte Control Entrega Alimentación"/>
+                                    <h:commandLink target="_blank" 
+                                                   actionListener="#{reportesBean.generarReporte('RepControlEntregaAlimentacion', true)}" 
+                                                   immediate="true">
+                                        <p:graphicImage url="/resources/images/pdf.png" width="28"/>
+                                    </h:commandLink>
+                                    <h:commandLink target="_blank" 
+                                                   actionListener="#{reportesBean.generarReporte('RepControlEntregaAlimentacion', false)}" 
+                                                   immediate="true">
+                                        <p:graphicImage url="/resources/images/excel.png" width="30"/>
+                                    </h:commandLink>
+                                    
+                                    <h:outputLabel value="Reporte de Participantes"/>
+                                    <h:commandLink target="_blank" 
+                                                   actionListener="#{reportesBean.generarReporte('RepParticipantes', true)}" 
+                                                   immediate="true">
+                                        <p:graphicImage url="/resources/images/pdf.png" width="28"/>
+                                    </h:commandLink>
+                                    <h:commandLink target="_blank" 
+                                                   actionListener="#{reportesBean.generarReporte('RepParticipantes', false)}" 
+                                                   immediate="true">
+                                        <p:graphicImage url="/resources/images/excel.png" width="30"/>
+                                    </h:commandLink>
+
+                                    
+                                    <h:outputLabel value="Reporte Registro Certificados"/>
+                                    <h:commandLink target="_blank" 
+                                                   actionListener="#{reportesBean.generarReporte('RepControlEntregaCertificado', true)}" 
+                                                   immediate="true">
+                                        <p:graphicImage url="/resources/images/pdf.png" width="28"/>
+                                    </h:commandLink>
+                                    <h:commandLink target="_blank" 
+                                                   actionListener="#{reportesBean.generarReporte('RepControlEntregaCertificado', false)}" 
+                                                   immediate="true">
+                                        <p:graphicImage url="/resources/images/excel.png" width="30"/>
+                                    </h:commandLink>
+
+                                    <h:outputLabel value="Reporte de Notas"/>
+                                    <h:commandLink target="_blank" 
+                                                   actionListener="#{reportesBean.generarReporte('RepNotas', true)}" 
+                                                   immediate="true">
+                                        <p:graphicImage url="/resources/images/pdf.png" width="28"/>
+                                    </h:commandLink>
+                                    <h:commandLink target="_blank" 
+                                                   actionListener="#{reportesBean.generarReporte('RepNotas', false)}" 
+                                                   immediate="true">
+                                        <p:graphicImage url="/resources/images/excel.png" width="30"/>
+                                    </h:commandLink>
+
+                                </h:panelGrid>
+                            </f:facet>
+                            <p:messages closable="true" id="msg2"/>
+
+                            <h:panelGrid id="panelInfoCurso" columnClasses="etiqueta etiquetaInfoCurso, , ,etiqueta etiquetaInfoCurso, , ,etiqueta etiquetaInfoCurso, , ,etiqueta etiquetaInfoCurso" columns="12">
+                                <p:outputLabel value="#{msg.curso}:"/>
+                                <p:outputLabel value="#{reportesBean.cursoCentro.curso.nombre}"/>
+                                <p:spacer height="1" width="40"/>
+
+                                <p:outputLabel value="#{msg.fechaInicio}:"/>
+                                <p:outputLabel value="#{reportesBean.cursoCentro.fechaInicio}" style="text-transform: uppercase">
+                                    <f:convertDateTime pattern="dd-MMM-yyyy"/>
+                                </p:outputLabel>
+                                <p:spacer height="1" width="40"/>
+
+                                <p:outputLabel value="#{msg.fechaFin}:"/>
+                                <p:outputLabel value="#{reportesBean.cursoCentro.fechaFin}" style="text-transform: uppercase">
+                                    <f:convertDateTime pattern="dd-MMM-yyyy"/>
+                                </p:outputLabel>
+                                <p:spacer height="1" width="40"/>
+
+                                <p:outputLabel value="#{msg.instructor}:"/>
+                                <p:outputLabel value="#{reportesBean.cursoCentro.instructor.persona.nombresCompletos}"/>
+
+
+                            </h:panelGrid>
+
+                        </p:panel>
+                    </h:panelGrid>
+                </center>
+            </ui:define>
+        </ui:composition>
+
+    </h:body>
+</html>
+

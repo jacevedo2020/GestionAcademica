@@ -1,0 +1,595 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <style>
+                    .etiquetaModPuntaje{
+                        width: 200px;
+                    }
+                    .etiqueta2{
+                        width: 90px;
+                    }
+                    .etiqueta etiqueta3{
+                        width: 190px;
+                    }
+                    .col_2_Observacion{
+                        width: 210px;
+                    }
+
+                </style>                
+
+                <center>
+
+                    <h:panelGrid id="panelPrincipal" style="width: 95%">
+                        <p:messages/>
+                        <p:panel rendered="#{registroNotasBean.cursoCentroCapacitacion == null}">
+                            <f:facet name="header">
+                                <center>
+                                    <h:panelGrid style="text-align: center" class="titulo">
+                                        <h:outputLabel value="#{msg.instructor}: #{menuBar.usuario.persona.nombresCompletos}"
+                                                       rendered="#{menuBar.usuario.verificarRolInstructor()}"/>
+                                        <h:outputLabel value="#{msg.cursosDictados}"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <h:panelGrid columns="2" columnClasses="etiqueta etiqueta3" cellpadding="3">
+                                <p:outputLabel value="Seleccione el Tipo de Curso:" style="font-weight: bold"/>
+                                <p:selectOneMenu value="#{registroNotasBean.tipoCurso}" style="width: 150px">
+                                    <f:selectItem itemLabel="Continuo" itemValue="C"/>
+                                    <f:selectItem itemLabel="Corporativo" itemValue="O"/>
+                                    <p:ajax listener="#{registroNotasBean.tipoCursoChange()}" update="dtCursos"/>
+                                </p:selectOneMenu>
+                            </h:panelGrid>
+
+                            <p:dataTable id="dtCursos" widgetVar="dtCursos" transient="true" 
+                                         value="#{registroNotasBean.cursoCentroCapacitacionList}" var="cursoCentro" paginator="true" rows="10" emptyMessage="#{msg.noExistenDatos}">
+                                <p:column>
+                                    <h:outputLabel value="#{cursoCentro.id}"/>
+                                </p:column>
+                                <p:column headerText="#{menuBar.usuario.verificarRolInstructor()?msg.registrarEvaluacion:msg.confirmarEvaluacion}" width="90" style="text-align: center">
+                                    <p:commandButton icon="fa fa-pencil" title="#{msg.seleccionar}" action="#{registroNotasBean.seleccionarCursoCentroCapacitacion(cursoCentro)}" update="formPrincipal:panelPrincipal" resetValues="true"/>
+                                </p:column>
+                                <p:column headerText="#{msg.areaConocimiento}" rendered="#{registroNotasBean.tipoCurso=='C'}" 
+                                          sortBy="#{cursoCentro.curso.programa.nombre}"
+                                          filterBy="#{cursoCentro.curso.programa.nombre}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtCursos').filter()" style="width: 90%">
+                                            <f:selectItem itemLabel="#{msg.seleccione}" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{registroNotasBean.programaFiltroList}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputLabel value="#{cursoCentro.curso.programa.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.empresa}" rendered="#{registroNotasBean.tipoCurso=='O'}"
+                                          sortBy="#{cursoCentro.inscripcionEmpresa.estudiante.persona.nombresCompletos}">
+                                    <h:outputLabel value="#{cursoCentro.inscripcionEmpresa.estudiante.persona.nombresCompletos}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.curso}" sortBy="#{cursoCentro.curso.nombre}"
+                                          filterBy="#{cursoCentro.curso.nombre}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtCursos').filter()" style="width: 90%">
+                                            <f:selectItem itemLabel="#{msg.seleccione}" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{registroNotasBean.cursoFiltroList}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputLabel value="#{cursoCentro.curso.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.centroCapacitacion}" rendered="#{registroNotasBean.tipoCurso=='C'}" 
+                                          sortBy="#{cursoCentro.centroCapacitacion.nombre}"
+                                          filterBy="#{cursoCentro.centroCapacitacion.nombre}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtCursos').filter()" style="width: 90%">
+                                            <f:selectItem itemLabel="#{msg.seleccione}" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{registroNotasBean.centroCapacitacionFiltroList}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputLabel value="#{cursoCentro.centroCapacitacion.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.instructor}" rendered="#{not menuBar.usuario.verificarRolInstructor()}"
+                                          sortBy="#{cursoCentro.instructor.persona.nombresCompletos}">
+                                    <h:outputLabel value="#{cursoCentro.instructor.persona.nombresCompletos}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.modalidad}" width="80" style="text-align: center"
+                                          sortBy="#{cursoCentro.modalidadDescripcion}"
+                                          rendered="false">
+                                    <h:outputLabel value="#{cursoCentro.modalidadDescripcion}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.fechaInicio}" width="90" style="text-align: center"
+                                          sortBy="#{cursoCentro.fechaInicio}">
+                                    <h:outputLabel value="#{cursoCentro.fechaInicio}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                    </h:outputLabel>
+                                </p:column>
+                                <p:column headerText="#{msg.fechaFin}" width="80" style="text-align: center"
+                                          sortBy="#{cursoCentro.fechaFin}">
+                                    <h:outputLabel value="#{cursoCentro.fechaFin}" >
+                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                    </h:outputLabel>
+                                </p:column>
+                                <p:column headerText="#{msg.evaluacionRegistrada}" width="80" style="text-align: center"
+                                          sortBy="#{cursoCentro.tieneInscripcionesEvaluacionPendiente}">
+                                    <p:graphicImage url="../resources/images/si03.png"  width="20" rendered="#{not cursoCentro.tieneInscripcionesEvaluacionPendiente}" title="Todas las evaluaciones han sido ingresadas"/>
+                                    <p:graphicImage url="../resources/images/no03.png" width="20" rendered="#{cursoCentro.tieneInscripcionesEvaluacionPendiente}" title="Aún no se ingresan todas las evaluaciones"/>
+                                </p:column>
+                                <p:column headerText="#{msg.evaluacionConfirmada}" width="90" style="text-align: center"
+                                          sortBy="#{cursoCentro.tieneInscripcionesEvaluacionPorAprobar}">
+                                    <p:graphicImage url="../resources/images/si03.png"  width="20" rendered="#{not cursoCentro.tieneInscripcionesEvaluacionPorAprobar}" title="Todas las evaluaciones han sido ingresadas"/>
+                                    <p:graphicImage url="../resources/images/no03.png" width="20" rendered="#{cursoCentro.tieneInscripcionesEvaluacionPorAprobar}" title="Aún no se ingresan todas las evaluaciones"/>
+                                </p:column>
+                            </p:dataTable>
+                        </p:panel>
+
+                        <p:panel rendered="#{registroNotasBean.cursoCentroCapacitacion != null}">
+                            <f:facet name="header">
+                                <center>
+                                    <h:panelGrid style="text-align: center" class="titulo" columnClasses="centrado">
+                                        <h:outputLabel value="#{msg.evaluacionEstudiantes}"
+                                                       rendered="#{menuBar.usuario.verificarRolInstructor()}"/>
+                                        <h:outputLabel value="#{msg.aprobacionEvaluacionEstudiantes}"
+                                                       rendered="#{not menuBar.usuario.verificarRolInstructor()}"/>
+                                        <h:panelGrid columns="4" cellpadding="0" cellspacing="0" >
+                                            <p:commandButton icon="fa fa-reply"  value="Retornar" action="#{registroNotasBean.init()}" immediate="false" process="@this" update="panelPrincipal"
+                                                             rendered="#{menuBar.usuario.verificarRolInstructor() and not registroNotasBean.modoEdicion}"/>
+                                            <p:commandButton icon="fa fa-pencil" value="#{msg.editar}" action="#{registroNotasBean.setModoEdicion(true)}" update="panelPrincipal"
+                                                             disabled="#{not registroNotasBean.cursoCentroCapacitacion.tieneInscripcionesEvaluacionPendiente}"
+                                                             rendered="#{menuBar.usuario.verificarRolInstructor() and not registroNotasBean.modoEdicion}"/>
+                                            <p:commandButton icon="fa fa-save" value="#{msg.grabar}" action="#{registroNotasBean.grabar()}" update="panelPrincipal"
+                                                             rendered="#{registroNotasBean.modoEdicion}"
+                                                             onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"/>
+                                            <p:commandButton icon="fa fa-reply"  value="#{msg.cancelar}" action="#{registroNotasBean.cancelar()}" immediate="false" process="@this" update="panelPrincipal"
+                                                             rendered="#{registroNotasBean.modoEdicion}"/>
+                                            
+                                            
+                                            <p:commandButton icon="fa fa-save" value="#{msg.aprobar}" action="#{registroNotasBean.grabarAprobacionNotas()}" update="panelPrincipal"
+                                                             rendered="#{not menuBar.usuario.verificarRolInstructor()}"
+                                                             disabled="#{not registroNotasBean.cursoCentroCapacitacion.tieneInscripcionesEvaluacionPendienteAprobar}">
+                                                <p:confirm header="#{msg.confirmacionTitulo}" message="¿Está seguro de aprobar las evaluaciones registradas de este curso ? Luego ya no podrá modificarlo."/>
+                                            </p:commandButton>
+                                            <p:commandButton icon="fa fa-reply"  value="#{msg.cancelar}" action="#{registroNotasBean.setCursoCentroCapacitacion(null)}" immediate="false" process="@this" update="panelPrincipal"
+                                                             rendered="#{not menuBar.usuario.verificarRolInstructor()}"/>
+                                            <p:commandButton icon="fa fa-check"  value="Finalizar" action="#{registroNotasBean.finalizar()}" immediate="false" process="@this" update="panelPrincipal"
+                                                             disabled="#{not registroNotasBean.cursoCentroCapacitacion.tieneInscripcionesAprobadasEvaluacionPendiente}"
+                                                             rendered="#{menuBar.usuario.verificarRolInstructor() and not registroNotasBean.modoEdicion}">
+                                                <p:confirm disabled="#{registroNotasBean.cursoCentroCapacitacion.tieneInscripcionesEvaluacionPendienteDigitar}" header="#{msg.confirmacionTitulo}" message="¿Está seguro de finalizar el registro de notas de este curso ? Luego ya no podrá modificarlo."/>
+                                            </p:commandButton>
+                                        </h:panelGrid>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+
+                            <h:panelGrid columnClasses="etiqueta etiqueta2, , ,etiqueta etiqueta2, , ,etiqueta etiqueta2, , ,etiqueta etiqueta2" columns="12" cellpadding="3" cellspacing="2">
+                                <p:outputLabel value="#{msg.curso}:"/>
+                                <p:outputLabel value="#{registroNotasBean.cursoCentroCapacitacion.curso.nombre}"/>
+                                <p:spacer height="1" width="40"/>
+
+                                <p:outputLabel value="#{msg.fechaInicio}:"/>
+                                <p:outputLabel value="#{registroNotasBean.cursoCentroCapacitacion.fechaInicio}" style="text-transform: uppercase">
+                                    <f:convertDateTime pattern="dd-MMM-yyyy"/>
+                                </p:outputLabel>
+                                <p:spacer height="1" width="40"/>
+
+                                <p:outputLabel value="#{msg.fechaFin}:"/>
+                                <p:outputLabel value="#{registroNotasBean.cursoCentroCapacitacion.fechaFin}" style="text-transform: uppercase">
+                                    <f:convertDateTime pattern="dd-MMM-yyyy"/>
+                                </p:outputLabel>
+                                <p:spacer height="1" width="40"/>
+
+                                <p:outputLabel value="#{msg.instructor}:"/>
+                                <p:outputLabel value="#{registroNotasBean.cursoCentroCapacitacion.instructor.persona.nombresCompletos}"/>
+
+
+                            </h:panelGrid>
+
+                            <p:dataTable id="dtCalificaciones" 
+                                         value="#{registroNotasBean.cursoCentroCapacitacion.inscripcionHabilitadaParaRegistroNotaList}" 
+                                         var="insc"
+                                         style="margin-top: 8px">
+                                <p:column width="20" rendered="false">
+                                    <h:outputLabel value="#{insc.id}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.identificacion}" width="120" style="text-align: center">
+                                    <h:outputLabel value="#{insc.estudiante.persona.identificacion}"/>
+                                </p:column>
+                                <p:column rendered="false" headerText="#{msg.apellidos}">
+                                    <h:outputLabel value="#{insc.estudiante.persona.apellidos}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.apellidosNombres}">
+                                    <h:outputLabel value="#{insc.estudiante.persona.nombresCompletos}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.inscripcionAprobada}" width="80" style="text-align: center">
+                                    <p:graphicImage url="../resources/images/si03.png" width="20" rendered="#{insc.estadoHabilitadoParaRegistroNotas}" title="Aprobada"/>
+                                    <p:graphicImage url="../resources/images/no03.png" width="20" rendered="#{not insc.estadoHabilitadoParaRegistroNotas}" title="Pendiente Aprobación"/>
+                                </p:column>
+                                <p:column headerText="#{msg.estadoEvaluacion}" width="90" style="text-align: center">
+                                    <h:outputLabel value="PENDIENTE" rendered="#{insc.estadoEvaluacion == 'P'}"/>
+                                    <h:outputLabel value="POR CONFIRMAR" rendered="#{insc.estadoEvaluacion == 'E'}"/>
+                                    <h:outputLabel value="SOLICITADO RECALIFICACION" rendered="#{insc.estadoEvaluacion == 'R'}"/>
+                                    <h:outputLabel value="CONFIRMADO" rendered="#{insc.estadoEvaluacion == 'A'}"/>
+                                </p:column>
+                                <p:column headerText="Puntaje/10" width="100" style="text-align: center"
+                                          rendered="#{registroNotasBean.cursoCentroCapacitacion.tipoCertificadoAprobacion}">
+                                    <p:commandButton icon="ui-icon-extlink" 
+                                                     rendered="#{insc.evaluacionPuntajeInicial.documentoJustificacionNombre!=null}"
+                                                     action="#{registroNotasBean.abrirSolicitudRecalificacionEjecutada(insc)}"
+                                                     title="Ver detalles de modificación"
+                                                     update="formPrincipal:dlgSolicitudRecalificacionPuntaje"
+                                                     />
+
+                                    <p:commandButton icon="fa fa-undo" 
+                                                     title="Solicitar modificación"
+                                                     rendered="#{menuBar.usuario.verificarRolAnalista() and insc.evaluacionEstadoPendienteAprobacion}"
+                                                     action="#{registroNotasBean.abrirSolicitudRecalificacion(insc)}"
+                                                     update="formPrincipal:dlgSolicitudRecalificacionPuntaje" />
+
+                                    <p:outputLabel value="#{insc.puntaje}" rendered="#{(not registroNotasBean.modoEdicion or not insc.evaluacionPorIngresar) and insc.estadoHabilitadoParaRegistroNotas}" style="float: right">
+                                        <f:convertNumber pattern="0.00"/>
+                                    </p:outputLabel>
+                                    <p:inputNumber value="#{insc.puntaje}" rendered="#{registroNotasBean.modoEdicion and insc.evaluacionPorIngresar}" size="5"/>
+                                </p:column>
+                                <p:column width="100" style="text-align: right; ">
+                                    <f:facet name="header">
+                                        <center>
+                                            <h:outputLabel value="% Asistencia" style="font-weight: bold"/>
+                                        </center>
+                                    </f:facet>
+                                    <p:commandButton icon="ui-icon-extlink" 
+                                                     rendered="#{insc.evaluacionAsistenciaInicial.documentoJustificacionNombre!=null}"
+                                                     action="#{registroNotasBean.abrirVisualizacionAsistencia(insc)}"
+                                                     title="Ver detalles de modificación"
+                                                     update="formPrincipal:dlgModificacionAsistencia"
+                                                     />
+                                    <p:commandButton icon="ui-icon-pencil" 
+                                                     rendered="#{menuBar.usuario.verificarRolAnalista() and insc.evaluacionEstadoPendienteAprobacion}"
+                                                     action="#{registroNotasBean.abrirModificacionAsistencia(insc)}"
+                                                     title="Editar"
+                                                     update="formPrincipal:dlgModificacionAsistencia" />
+
+                                    <p:outputLabel value="#{insc.asistencia}" rendered="#{(not registroNotasBean.modoEdicion or not insc.evaluacionEstadoPendienteIngreso) and insc.estadoHabilitadoParaRegistroNotas}" style="float: right">
+                                        <f:convertNumber pattern="0.00"/>
+                                    </p:outputLabel>
+
+                                    <p:inputNumber value="#{insc.asistencia}" rendered="#{registroNotasBean.modoEdicion and insc.estadoHabilitadoParaRegistroNotas and insc.evaluacionEstadoPendienteIngreso}" size="5"/>
+
+                                </p:column>
+                                <p:column headerText="#{msg.apruebaCurso}" width="120" style="text-align: center">
+                                    <p:graphicImage url="../resources/images/si03.png" width="20" rendered="#{insc.alumnoApruebaCurso}" title="Sí aprueba el curso"/>
+                                    <p:graphicImage url="../resources/images/no03.png" width="20" rendered="#{not insc.alumnoApruebaCurso}" title="No aprueba el curso"/>
+                                </p:column>
+                            </p:dataTable>
+
+                        </p:panel>
+
+
+
+
+
+
+                        <p:dialog id="dlgSolicitudRecalificacionPuntaje"
+                                  widgetVar="dlgSolicitudRecalificacionPuntaje"
+                                  header="#{msg.solicitudRecalificacion}"
+                                  closeOnEscape="true"
+                                  position="center top"
+                                  dynamic="true"
+                                  width="650"
+                                  minHeight="300"
+                                  modal="true"
+                                  appendTo="@(body)"
+                                  >
+                            <h:form  id="formSolicitudRecalificacionPuntaje" enctype = "multipart/form-data">
+                                <p:messages/>
+
+                                <h:panelGrid columns="2" columnClasses="etiqueta etiquetaModPuntaje" cellpadding="3" id="panelSolicitudRecalificacionPuntaje"
+                                             rendered="#{registroNotasBean.edicionEvaluacion}">
+                                    <h:panelGrid cellpadding="6">
+                                        <p:outputLabel value="#{msg.valorActual}:"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid cellpadding="6">
+                                        <p:outputLabel value="#{registroNotasBean.inscripcion.puntaje}"/>
+                                    </h:panelGrid>
+
+                                    <h:panelGrid cellpadding="6">
+                                        <p:outputLabel value="#{msg.observacion}:" for="txtModPuntajeObservacion"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid cellpadding="0">
+                                        <p:inputTextarea id="txtModPuntajeObservacion" 
+                                                         required="true"
+                                                         label="Observación"
+                                                         transient="true"
+                                                         value="#{registroNotasBean.observacionModicacion}"
+                                                         cols="63"
+                                                         rows="2"
+                                                         >
+                                        </p:inputTextarea>       
+                                        <p:message for="txtModPuntajeObservacion"/>
+                                    </h:panelGrid>
+
+
+                                    <h:panelGrid cellpadding="6">
+                                        <p:outputLabel value="#{msg.documentoJustificacion}:"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid columns="1" id="panelDocumentoJustificacionRecalificacion" cellpadding="0">
+                                        <p:fileUpload id="fileDocumento" 
+                                                      fileUploadListener="#{registroNotasBean.subirDocumentoJustificacionPuntaje}" 
+                                                      mode="advanced"
+                                                      style="width: 400px"
+                                                      label="#{msg.seleccionar}"
+                                                      update="formPrincipal:formSolicitudRecalificacionPuntaje:panelDocumentoJustificacionRecalificacion" 
+                                                      auto="true">
+                                            <a style="color: #0246af" target="_blank" href="#{request.contextPath}#{registroNotasBean.documentoJustificacionUrlCompleto}">#{registroNotasBean.documentoJustificacionNombre}</a>
+
+                                        </p:fileUpload>
+
+
+                                        <p:message for="hidNombreDocumento"></p:message>
+                                        <h:inputHidden id="hidNombreDocumento" value="#{registroNotasBean.documentoJustificacionNombre}"
+                                                       required="true" requiredMessage="Documento:* Campo obligatorio.">
+                                        </h:inputHidden> 
+                                    </h:panelGrid>
+
+                                </h:panelGrid>
+                                <h:panelGrid columns="2" columnClasses="etiqueta etiquetaModPuntaje" cellpadding="3"
+                                             rendered="#{not registroNotasBean.edicionEvaluacion}">
+
+                                    <h:panelGrid cellpadding="3">
+                                        <p:outputLabel value="#{msg.valorInicial}:"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid cellpadding="0">
+                                        <p:outputLabel value="#{registroNotasBean.inscripcion.evaluacionPuntajeInicial.valor}">
+                                            <f:convertNumber pattern="0.00"/>
+                                        </p:outputLabel>
+                                    </h:panelGrid>
+
+                                    <h:panelGrid cellpadding="3">
+                                        <p:outputLabel value="#{msg.valorActual}:"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid cellpadding="0">
+                                        <p:outputLabel value="#{registroNotasBean.inscripcion.puntaje}">
+                                            <f:convertNumber pattern="0.00"/>
+                                        </p:outputLabel>
+                                    </h:panelGrid>
+
+                                    <h:panelGrid cellpadding="3">
+                                        <p:outputLabel value="#{msg.solicitudModificacionPor}:"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid cellpadding="0">
+                                        <p:outputLabel value="#{registroNotasBean.inscripcion.evaluacionPuntajeInicial.solicitudModificacionPor.persona.nombresCompletos}"/>
+                                    </h:panelGrid>
+
+
+                                    <h:panelGrid cellpadding="3">
+                                        <p:outputLabel value="#{msg.solicitudModificacionFecha}:"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid cellpadding="0">
+                                        <p:outputLabel value="#{registroNotasBean.inscripcion.evaluacionPuntajeInicial.solicitudModificacionFecha}">
+                                            <f:convertDateTime pattern="dd-MMM-yyyy HH:mm"/>
+                                        </p:outputLabel>
+                                    </h:panelGrid>
+
+
+
+                                    <h:panelGrid cellpadding="3">
+                                        <p:outputLabel value="#{msg.observacion}:"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid cellpadding="0">
+                                        <p:outputLabel value="#{registroNotasBean.inscripcion.evaluacionPuntajeInicial.modificacionObservacion}"/>
+                                    </h:panelGrid>
+
+                                    <h:panelGrid cellpadding="3">
+                                        <p:outputLabel value="#{msg.documentoJustificacion}:"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid cellpadding="0">
+                                        <a style="color: #0246af" target="_blank" href="#{request.contextPath}#{registroNotasBean.inscripcion.evaluacionPuntajeInicial.documentoJustificacionUrlCompleto}">#{registroNotasBean.inscripcion.evaluacionPuntajeInicial.documentoJustificacionNombre}</a>
+                                    </h:panelGrid>
+
+                                    <h:panelGrid cellpadding="3">
+                                        <p:outputLabel value="#{msg.modificadoPor}:"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid cellpadding="0">
+                                        <p:outputLabel value="#{registroNotasBean.inscripcion.evaluacionPuntajeModificado.creadoPor.persona.nombresCompletos}"
+                                                       rendered="#{registroNotasBean.inscripcion.evaluacionPuntajeModificado != null}"/>
+                                    </h:panelGrid>
+
+                                    <h:panelGrid cellpadding="3">
+                                        <p:outputLabel value="#{msg.fechaModificacion}:"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid cellpadding="0">
+                                        <p:outputLabel value="#{registroNotasBean.inscripcion.evaluacionPuntajeModificado.fecha}"
+                                                       rendered="#{registroNotasBean.inscripcion.evaluacionPuntajeModificado != null}">
+                                            <f:convertDateTime pattern="dd-MMM-yyyy HH:mm"/>
+                                        </p:outputLabel>
+                                    </h:panelGrid>
+
+
+                                </h:panelGrid>
+
+
+                                <p:separator/>
+                                <center>
+                                    <h:panelGrid columns="2" rendered="#{registroNotasBean.edicionEvaluacion}">
+                                        <p:commandButton value="#{msg.grabar}" icon="ui-icon-disk" 
+                                                         process="formSolicitudRecalificacionPuntaje" 
+                                                         action="#{registroNotasBean.grabarSolicitudRecalificacion()}" 
+                                                         update="formSolicitudRecalificacionPuntaje, formPrincipal:dtCalificaciones"/>
+                                        <p:commandButton value="#{msg.cancelar}" icon="ui-icon-arrowreturn-1-w" onclick="PF('dlgSolicitudRecalificacionPuntaje').hide();"/>
+
+                                    </h:panelGrid>
+                                    <p:commandButton value="#{msg.cerrar}" icon="ui-icon-arrowreturn-1-w" onclick="PF('dlgSolicitudRecalificacionPuntaje').hide();"
+                                                     rendered="#{not registroNotasBean.edicionEvaluacion}"/>
+                                </center>
+                            </h:form>
+
+                        </p:dialog>
+
+
+
+
+
+
+                        <p:dialog id="dlgModificacionAsistencia"
+                                  widgetVar="dlgModificacionAsistencia"
+                                  header="#{registroNotasBean.edicionEvaluacion?msg.modificacionValorAsistencia:msg.informacionModificacionAsistencia}"
+                                  closeOnEscape="true"
+                                  position="center top"
+                                  dynamic="true"
+                                  width="650"
+                                  minHeight="300"
+                                  modal="true"
+                                  appendTo="@(body)"
+                                  >
+                            <h:form  id="formModificacionAsistencia" enctype = "multipart/form-data">
+                                <p:messages/>
+                                <h:panelGrid columns="2" columnClasses="etiqueta etiquetaModPuntaje" cellpadding="3" id="panelModificacionAsistencia"
+                                             rendered="#{registroNotasBean.edicionEvaluacion}">
+                                    <h:panelGrid cellpadding="6">                                    
+                                        <p:outputLabel value="#{msg.valorActual}:"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid cellpadding="0">
+                                        <p:outputLabel value="#{registroNotasBean.inscripcion.asistencia}"/>
+                                    </h:panelGrid>
+
+
+                                    <h:panelGrid cellpadding="6">
+                                        <p:outputLabel value="#{msg.nuevoValor}:" for="txtNuevoValorAsistencia"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid cellpadding="0">
+                                        <p:inputNumber id="txtNuevoValorAsistencia" 
+                                                       required="true"
+                                                       label="Nuevo Valor"
+                                                       transient="true"
+                                                       value="#{registroNotasBean.nuevoValor}" size="5">
+                                        </p:inputNumber>       
+                                        <p:message for="txtNuevoValorAsistencia"/>
+                                    </h:panelGrid>
+
+                                    <h:panelGrid cellpadding="6">
+                                        <p:outputLabel value="#{msg.observacion}:" for="txtModAsistenciaObservacion"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid cellpadding="0">
+                                        <p:inputTextarea id="txtModAsistenciaObservacion" 
+                                                         required="true"
+                                                         label="Observación"
+                                                         transient="true"
+                                                         value="#{registroNotasBean.observacionModicacion}"
+                                                         cols="63"
+                                                         rows="2"
+                                                         >
+                                        </p:inputTextarea>       
+                                        <p:message for="txtModAsistenciaObservacion"/>
+                                    </h:panelGrid>
+
+
+                                    <h:panelGrid cellpadding="6">
+                                        <p:outputLabel value="#{msg.documentoJustificacion}:"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid columns="1" id="panelDocumentoJustificacion" cellpadding="0">
+                                        <p:fileUpload id="fileDocumento" 
+                                                      fileUploadListener="#{registroNotasBean.subirDocumentoJustificacionAsistencia}" 
+                                                      mode="advanced"
+                                                      style="width: 400px"
+                                                      transient="true"
+                                                      label="#{msg.seleccionar}"
+                                                      update="formPrincipal:formModificacionAsistencia:panelDocumentoJustificacion" 
+                                                      auto="true">
+                                            <a style="color: #0246af" target="_blank" href="#{request.contextPath}#{registroNotasBean.documentoJustificacionUrlCompleto}">#{registroNotasBean.documentoJustificacionNombre}</a>
+
+                                        </p:fileUpload>
+
+
+                                        <p:message for="hidNombreDocumento"></p:message>
+                                        <h:inputHidden id="hidNombreDocumento" value="#{registroNotasBean.documentoJustificacionNombre}"
+                                                       required="true" transient="true"  requiredMessage="Documento:* Campo obligatorio.">
+                                        </h:inputHidden> 
+                                    </h:panelGrid>
+
+                                </h:panelGrid>
+                                <h:panelGrid columns="2" columnClasses="etiqueta etiquetaModPuntaje" cellpadding="3"
+                                             rendered="#{not registroNotasBean.edicionEvaluacion}">
+                                    <h:panelGrid cellpadding="3">
+                                        <p:outputLabel value="#{msg.valorInicial}:"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid cellpadding="0">
+                                        <p:outputLabel value="#{registroNotasBean.inscripcion.evaluacionAsistenciaInicial.valor}">
+                                            <f:convertNumber pattern="0.00"/>
+                                        </p:outputLabel>
+                                    </h:panelGrid>
+
+                                    <h:panelGrid cellpadding="3">
+                                        <p:outputLabel value="#{msg.valorActual}:"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid cellpadding="0">
+                                        <p:outputLabel value="#{registroNotasBean.inscripcion.evaluacionAsistenciaModificada.valor}">
+                                            <f:convertNumber pattern="0.00"/>
+                                        </p:outputLabel>
+                                    </h:panelGrid>
+
+                                    <h:panelGrid cellpadding="3">
+                                        <p:outputLabel value="#{msg.modificadoPor}:"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid cellpadding="0">
+                                        <p:outputLabel value="#{registroNotasBean.inscripcion.evaluacionAsistenciaModificada.creadoPor.persona.nombresCompletos}"/>
+                                    </h:panelGrid>
+
+                                    <h:panelGrid cellpadding="3">
+                                        <p:outputLabel value="#{msg.fechaModificacion}:"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid cellpadding="0">
+                                        <p:outputLabel value="#{registroNotasBean.inscripcion.evaluacionAsistenciaModificada.fecha}">
+                                            <f:convertDateTime pattern="dd-MMM-yyyy HH:mm"/>
+                                        </p:outputLabel>
+                                    </h:panelGrid>
+
+
+                                    <h:panelGrid cellpadding="3">
+                                        <p:outputLabel value="#{msg.observacion}:"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid cellpadding="0">
+                                        <p:outputLabel value="#{registroNotasBean.inscripcion.evaluacionAsistenciaInicial.modificacionObservacion}"/>
+                                    </h:panelGrid>
+
+
+                                    <h:panelGrid cellpadding="3">
+                                        <p:outputLabel value="#{msg.documentoJustificacion}:"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid cellpadding="0">
+                                        <a style="color: #0246af" target="_blank" href="#{request.contextPath}#{registroNotasBean.inscripcion.evaluacionAsistenciaInicial.documentoJustificacionUrlCompleto}">#{registroNotasBean.inscripcion.evaluacionAsistenciaInicial.documentoJustificacionNombre}</a>
+                                    </h:panelGrid>
+
+                                </h:panelGrid>
+
+
+                                <p:separator/>
+                                <center>
+                                    <h:panelGrid columns="2" rendered="#{registroNotasBean.edicionEvaluacion}">
+                                        <p:commandButton value="#{msg.grabar}" icon="ui-icon-disk" process="formModificacionAsistencia" 
+                                                         action="#{registroNotasBean.grabarModificacionAsistencia()}" update="formModificacionAsistencia, formPrincipal:dtCalificaciones"/>
+                                        <p:commandButton value="#{msg.cancelar}" icon="ui-icon-arrowreturn-1-w" onclick="PF('dlgModificacionAsistencia').hide();"/>
+
+                                    </h:panelGrid>
+                                    <p:commandButton value="#{msg.cerrar}" icon="ui-icon-arrowreturn-1-w" onclick="PF('dlgModificacionAsistencia').hide();"
+                                                     rendered="#{not registroNotasBean.edicionEvaluacion}"/>
+                                </center>
+                            </h:form>
+
+                        </p:dialog>
+
+                    </h:panelGrid>
+                </center>
+
+
+
+
+            </ui:define>
+        </ui:composition>
+
+    </h:body>
+</html>
+

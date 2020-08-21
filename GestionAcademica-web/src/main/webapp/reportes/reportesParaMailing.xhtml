@@ -1,0 +1,161 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <style>
+                    .etiquetaTipoCurso{
+                        width: 190px;
+                    }
+                    .etiquetaInfoCurso{
+                        width: 100px;
+                    }
+                    .etiquetaInfoEnvio{
+                        width: 190px;
+                    }
+                    .etiquetaInfoInscripcion{
+                        width: 150px;
+                    }
+                    .top1{
+                        vertical-align: top;
+                        width: 33%;
+                    }
+                    .top2{
+                        vertical-align: top;
+                        width: 50%;
+                    }
+                </style>                
+
+                <center>
+
+                    <h:panelGrid id="panelPrincipal" style="width: 95%">
+
+
+                        <!--Panel de seleccion de curso -->
+                        <p:panel rendered="#{reportesBean.cursoCentro == null}">
+                            <f:facet name="header">
+                                <center>
+                                    <h:panelGrid style="text-align: center" class="titulo">
+                                        <h:outputLabel value="#{msg.cursosDictados}"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages closable="true"/>
+                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaTipoCurso">
+                                <p:outputLabel value="#{msg.curso}:" style="font-weight: bold"/>
+                                <p:commandButton value="Definir filtro" action="#{reportesParaMailingBean.abrirVentanaFiltro(1)}"
+                                                 update="formPrincipal:formFiltro"/>
+
+                                <p:outputLabel value="#{msg.ciudad}:" style="font-weight: bold"/>
+                                <p:commandButton value="Definir filtro" action="#{reportesParaMailingBean.abrirVentanaFiltro(2)}"
+                                                 update="formPrincipal:formFiltro"/>
+
+                                <p:outputLabel value="#{msg.modalidad}:" style="font-weight: bold"/>
+                                <p:commandButton value="Definir filtro" action="#{reportesParaMailingBean.abrirVentanaFiltro(3)}"
+                                                 update="formPrincipal:formFiltro"/>
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="2">
+                                <h:commandLink target="_blank" 
+                                               actionListener="#{reportesParaMailingBean.generarReporte(true)}" 
+                                               immediate="true">
+                                    <p:graphicImage url="/resources/images/pdf.png" width="28"/>
+                                </h:commandLink>
+                                <h:commandLink target="_blank" 
+                                               actionListener="#{reportesParaMailingBean.generarReporte(false)}" 
+                                               immediate="true">
+                                    <p:graphicImage url="/resources/images/excel.png" width="30"/>
+                                </h:commandLink>                                
+                            </h:panelGrid>
+                        </p:panel>
+
+                        
+                        
+                        <p:dialog id="dlgFiltro"  
+                                  widgetVar="dlgFiltro"
+                                  closeOnEscape="true"
+                                  position="center top"
+                                  dynamic="true"
+                                  appendTo="@(body)"
+                                  modal="true"
+                                  header="#{reportesParaMailingBean.tituloFiltro}" 
+                                  width="730">
+                            <h:form id="formFiltro">
+
+                                <p:outputPanel id="panelFiltro" style="height:400px;overflow:auto">
+                                    <br/>
+                                    <p:messages/>
+                                    
+                                    <p:dataTable value="#{reportesParaMailingBean.cursoListTemp}" var="curso"
+                                                 rendered="#{reportesParaMailingBean.tipoFiltro==1}">
+                                        <p:column headerText="Seleccionar" width="80">
+                                            <p:selectBooleanCheckbox value="#{curso.seleccionado}"/>
+                                        </p:column>
+                                        <p:column headerText="Id." width="80">
+                                            <h:outputLabel value="#{curso.id}"/>
+                                        </p:column>
+                                        <p:column headerText="Nombre">
+                                            <h:outputLabel value="#{curso.nombre}"/>
+                                        </p:column>
+                                    </p:dataTable>
+
+                                    <p:dataTable value="#{reportesParaMailingBean.ciudadListTemp}" var="ciudad"
+                                                 rendered="#{reportesParaMailingBean.tipoFiltro==2}">
+                                        <p:column headerText="Seleccionar" width="80">
+                                            <p:selectBooleanCheckbox value="#{ciudad.seleccionado}"/>
+                                        </p:column>
+                                        <p:column headerText="Id." width="80">
+                                            <h:outputLabel value="#{ciudad.id}"/>
+                                        </p:column>
+                                        <p:column headerText="Nombre">
+                                            <h:outputLabel value="#{ciudad.cabeceraCantonal}"/>
+                                        </p:column>
+                                    </p:dataTable>
+
+                                    <p:dataTable value="#{reportesParaMailingBean.modalidadListTemp}" var="modalidad"
+                                                 rendered="#{reportesParaMailingBean.tipoFiltro==3}">
+                                        <p:column headerText="Seleccionar" width="80">
+                                            <p:selectBooleanCheckbox value="#{modalidad.seleccionado}"/>
+                                        </p:column>
+                                        <p:column headerText="Id." width="80">
+                                            <h:outputLabel value="#{modalidad.codigo}"/>
+                                        </p:column>
+                                        <p:column headerText="Nombre">
+                                            <h:outputLabel value="#{modalidad.nombre}"/>
+                                        </p:column>
+                                    </p:dataTable>
+                                </p:outputPanel>          
+                                <p:outputPanel style="background-color: #c2c3c5">
+                                    <center>
+                                        <h:panelGrid columns="2" cellspacing="6">
+                                            <p:commandButton value="#{msg.aceptar}" 
+                                                             icon="ui-icon-check"
+                                                             process="@this, panelFiltro"
+                                                             action="#{reportesParaMailingBean.aceptarFiltro()}"
+                                                             />
+                                            <p:commandButton value="#{msg.cancelar}"
+                                                             icon="ui-icon-close"
+                                                             onclick="PF('dlgFiltro').hide();"
+                                                             />
+                                        </h:panelGrid>
+                                    </center>
+                                </p:outputPanel>
+                            </h:form>
+                        </p:dialog>
+                    </h:panelGrid>
+                </center>
+            </ui:define>
+        </ui:composition>
+
+    </h:body>
+</html>
+

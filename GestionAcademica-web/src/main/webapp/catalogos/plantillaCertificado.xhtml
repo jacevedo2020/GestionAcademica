@@ -1,0 +1,141 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <style>
+                    .etiqueta{
+                        background: #d4dee2;
+                        width: 180px;
+                        font-weight: bold;
+                        opacity: 0.95;
+                    }
+                </style>
+
+                <center>
+
+                    <h:panelGrid id="panelPrincipal" style="width: 95%">
+
+                        <p:panel rendered="#{plantillaCertificadoBean.plantilla == null}">
+                            <f:facet name="header">
+                                <center>
+                                    <h:panelGrid style="text-align: center">
+                                        <h:outputLabel value="#{msg.listadoPlantillas}" class="titulo"/>
+                                        <p:commandButton icon="fa fa-plus-circle" value="#{msg.nuevo}" action="#{plantillaCertificadoBean.nuevo()}" update="formPrincipal:panelPrincipal" resetValues="true"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages closable="true"/>
+                            <p:dataTable id="dtPlantillas" value="#{plantillaCertificadoBean.plantillaList}" var="plantilla" paginator="true" rows="10" emptyMessage="#{msg.noExistenDatos}">
+                                <p:column headerText="#{msg.acciones}" width="100" style="text-align: center">
+                                    <p:commandButton icon="fa fa-pencil" title="#{msg.editar}" action="#{plantillaCertificadoBean.setPlantilla(plantilla)}" update="formPrincipal:panelPrincipal" resetValues="true"/>
+                                    <p:commandButton icon="fa fa-trash-o" title="#{msg.eliminar}" action="#{plantillaCertificadoBean.eliminar(plantilla)}" update="formPrincipal:panelPrincipal">
+                                        <p:confirm header="#{msg.confirmacionTitulo}" message="#{msg.confirmacionMensaje}" />
+                                    </p:commandButton>
+                                </p:column>
+                                <p:column headerText="#{msg.nombre}">
+                                    <h:outputLabel value="#{plantilla.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.descripcion}">
+                                    <h:outputLabel value="#{plantilla.descripcion})"/>
+                                </p:column>
+                                <p:column headerText="#{msg.documentoPlantilla}" width="250">
+                                    <a style="color: #0246af" target="_blank" href="#{request.contextPath}#{plantilla.documentoPlantillaUrlCompleto}">#{plantilla.documentoPlantillaNombre}</a>
+                                </p:column>
+                                <p:column headerText="#{msg.estado}" width="100" style="text-align: center">
+                                    <h:outputLabel value="Activo" rendered="#{plantilla.estado=='A'}"/>
+                                    <h:outputLabel value="Inactivo" rendered="#{plantilla.estado=='I'}"/>
+                                </p:column>
+                            </p:dataTable>
+
+                        </p:panel>
+                        <p:panel rendered="#{plantillaCertificadoBean.plantilla != null}">
+                            <f:facet name="header">
+                                <center class="titulo">
+                                    <h:outputLabel value="#{plantillaCertificadoBean.plantilla.fechaCreacion == null ? msg.creacionPlantilla : msg.edicionPlantilla}"/>
+                                    <h:panelGrid columns="3" cellpadding="0" cellspacing="0">
+                                        <p:commandButton icon="fa fa-save" value="#{msg.grabar}" action="#{plantillaCertificadoBean.grabar()}" update="panelPrincipal"/>
+                                        <p:commandButton icon="fa fa-reply"  value="#{msg.cancelar}" action="#{plantillaCertificadoBean.init()}" immediate="false" process="@this" update="panelPrincipal"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages closable="true"/>
+
+                            <h:panelGrid columns="2" columnClasses="etiqueta" cellpadding="6" cellspacing="2" style="width: 100%">
+                                <p:outputLabel id="lblNombre" for="txtNombre" value="#{msg.nombre}:"/>
+                                <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                    <p:inputText id="txtNombre" value="#{plantillaCertificadoBean.plantilla.nombre}" required="true" 
+                                                 maxlength="50" size="70" >
+                                        <p:ajax event="keyup" update="txtNombre, lblNombre, msgNombre"/>                                            
+                                    </p:inputText>
+                                    <p:message id="msgNombre" for="txtNombre"/>
+                                </h:panelGrid>
+
+                                <p:outputLabel id="lblDescripcion" for="txtDescripcion" value="#{msg.descripcion}:"/>
+                                <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                    <p:inputTextarea id="txtDescripcion" value="#{plantillaCertificadoBean.plantilla.descripcion}" required="true" 
+                                                     maxlength="50" cols="70" rows="2" >
+                                        <p:ajax event="keyup" update="lblDescripcion, msgDescripcion"/>
+                                        <p:ajax event="change" update="@this"/>                                    </p:inputTextarea>
+                                    <p:message id="msgDescripcion" for="txtDescripcion"/>
+                                </h:panelGrid>
+
+                                <p:outputLabel value="#{msg.documentoPlantilla}:" for="hidNombreDocumento"/>
+                                <h:panelGrid columns="1" id="panelDocumentoPlantilla">
+                                    <p:fileUpload id="fileDocumento" fileUploadListener="#{plantillaCertificadoBean.subirDocumentoPago}" 
+                                                  mode="advanced"
+                                                  allowTypes="/(\.|\/)(pdf)$/"
+                                                  sizeLimit="10000024"
+                                                  invalidFileMessage="Tipo de archivo incorrecto. Sólo se permiten archivos .pdf "
+                                                  invalidSizeMessage="Tamaño de archivo incorrecto. Sólo se permite hasta 10MB"
+                                                  style="width: 442px"
+                                                  label="#{msg.seleccionar}"
+                                                  update="panelDocumentoPlantilla" 
+                                                  auto="true"
+                                                  onstart="PF('blockUIWidget').block()" 
+                                                  oncomplete="PF('blockUIWidget').unblock()">
+                                        <a style="color: #0246af" target="_blank" href="#{request.contextPath}#{plantillaCertificadoBean.plantilla.documentoPlantillaUrlCompleto}">#{plantillaCertificadoBean.plantilla.documentoPlantillaNombre}</a>
+
+                                    </p:fileUpload>
+                                    <p:message for="hidNombreDocumento"></p:message>
+                                    <h:inputHidden id="hidNombreDocumento" value="#{plantillaCertificadoBean.plantilla.documentoPlantillaNombre}"
+                                                   required="true" requiredMessage="Documento de Plantilla:* Campo obligatorio">
+                                    </h:inputHidden> 
+                                </h:panelGrid>
+
+
+
+                                <p:outputLabel id="lblEstado" for="selEstado" value="#{msg.estado}:"/>
+                                <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                    <p:selectOneRadio id="selEstado" value="#{plantillaCertificadoBean.plantilla.estado}" required="true">
+                                        <f:selectItem itemLabel="Activo" itemValue="A"/>
+                                        <f:selectItem itemLabel="Inactivo" itemValue="I"/>
+                                        <p:ajax event="change" update="@this, lblEstado, msgEstado"/>
+                                    </p:selectOneRadio>
+                                    <p:message id="msgEstado" for="selEstado"/>
+                                </h:panelGrid>
+
+
+
+
+                            </h:panelGrid>
+
+                        </p:panel>
+
+                    </h:panelGrid>
+                </center>
+
+
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

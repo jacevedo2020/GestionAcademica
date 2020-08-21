@@ -1,0 +1,289 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <style>
+                    .etiqueta{
+                        background: #d4dee2;
+                        width: 230px;
+                        font-weight: bold;
+                        opacity: 0.95;
+                    }
+                    .estiloError {
+                        color: red !important;
+                    }
+
+                </style>
+                <center>
+
+                    <h:panelGrid id="panelPrincipal" style="width: 95%">
+
+                        <p:panel rendered="#{cursoBean.curso==null and not cursoBean.creacionMasiva}">
+                            <f:facet name="header">
+                                <center>
+                                    <h:panelGrid columnClasses="centrado">
+                                        <h:outputLabel value="#{msg.catalogoCursosContinuos}" class="titulo"/>
+                                        <h:panelGrid columns="2">
+                                            <p:commandButton icon="fa fa-plus-circle" value="#{msg.nuevo}" action="#{cursoBean.nuevo()}" update="formPrincipal:panelPrincipal" resetValues="true"/>
+                                            <p:commandButton icon="fa fa-plus-circle" value="#{msg.creacionMasiva}" action="#{cursoBean.nuevaCreacionMasiva()}" update="formPrincipal:panelPrincipal" resetValues="true"/>
+                                        </h:panelGrid>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages id="msg1" closable="true"/>
+                            <p:dataTable id="dtCursos" widgetVar="dtCursos" value="#{cursoBean.cursoList}" var="curso" paginator="true" rows="10" emptyMessage="#{msg.noExistenDatos}">
+                                <p:column headerText="#{msg.acciones}" width="60" style="text-align: center">
+                                    <p:commandButton icon="fa fa-pencil" title="#{msg.editar}" action="#{cursoBean.seleccionar(curso)}" update="formPrincipal:panelPrincipal" resetValues="true"/>
+                                    <p:commandButton icon="fa fa-trash-o" title="#{msg.eliminar}" action="#{cursoBean.eliminar(curso)}" update="formPrincipal:panelPrincipal" oncomplete="PF('dtCursos').filter();">
+                                        <p:confirm header="#{msg.confirmacionTitulo}" message="#{msg.confirmacionMensaje}" />
+                                    </p:commandButton>
+                                </p:column>
+                                <p:column headerText="#{msg.codigo}" width="100" sortBy="#{curso.codigo}" filterBy="#{curso.codigo}">
+                                    <h:outputLabel value="#{curso.codigo}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.nombre}" sortBy="#{curso.nombre}" filterBy="#{curso.nombre}" filterMatchMode="contains">
+                                    <h:outputLabel value="#{curso.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.areaConocimiento}" sortBy="#{curso.programa.nombre}" filterBy="#{curso.programa.nombre}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtCursos').filter()" style="width: 90%">
+                                            <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{cursoBean.programaFiltroList}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputLabel value="#{curso.programa.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.proyecto}" rendered="false">
+                                    <h:outputLabel value="#{curso.proyecto.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.modalidad}" width="120" style="text-align: center" sortBy="#{curso.modalidadDescripcion}" filterBy="#{curso.modalidadDescripcion}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtCursos').filter()" style="width: 80%">
+                                            <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{cursoBean.modalidadFiltroList}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet> 
+                                    
+                                    <h:outputLabel value="#{curso.modalidadDescripcion}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.nroHoras}" width="60" style="text-align: center">
+                                    <h:outputLabel value="#{curso.nroHoras}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.nroMinimoParticipantes}" width="100" style="text-align: center">
+                                    <h:outputLabel value="#{curso.nroMinimoParticipantes}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.precio}" width="40">
+                                    <h:outputLabel value="#{curso.precio}" style="float: right"/>
+                                </p:column>
+                            </p:dataTable>
+
+                        </p:panel>
+
+
+
+                        <p:panel rendered="#{cursoBean.curso!=null}">
+                            <f:facet name="header">
+                                <center>
+                                    <h:outputLabel value="#{cursoBean.curso.id==null?msg.creacionCursoContinuo:msg.edicionCursoContinuo}" class="titulo"/>
+                                    <h:panelGrid columns="3" cellpadding="0" cellspacing="0">
+                                        <p:commandButton icon="fa fa-save" value="#{msg.grabar}" action="#{cursoBean.grabar()}" update="panelPrincipal"/>
+                                        <p:commandButton icon="fa fa-reply"  value="#{msg.cancelar}" action="#{cursoBean.cancelar()}" immediate="false" process="@this" update="panelPrincipal">
+                                        </p:commandButton>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages id="msg2" closable="true"/>
+                            <h:panelGrid columns="2" columnClasses="etiqueta" cellpadding="6" cellspacing="2">
+                                <p:outputLabel id="lblCodigo" for="txtCodigo" value="#{msg.codigo}:"/>
+                                <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                    <p:inputText id="txtCodigo" value="#{cursoBean.curso.codigo}" required="false" 
+                                                 maxlength="50" size="54">
+                                        <p:ajax event="keyup" update="lblCodigo, msgCodigo"/>
+                                        <p:ajax event="change" update="@this"/>
+                                    </p:inputText>
+                                    <p:message id="msgCodigo" for="txtCodigo"/>
+                                </h:panelGrid>
+
+                                <p:outputLabel id="lblNombre" for="txtNombre" value="#{msg.nombre}:"/>
+                                <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                    <p:inputText id="txtNombre" value="#{cursoBean.curso.nombre}" required="true" 
+                                                 maxlength="100" size="54" style="text-transform: uppercase;">
+                                        <p:ajax event="keyup" update="lblNombre, msgNombre"/>
+                                        <p:ajax event="change" update="@this"/>
+                                    </p:inputText>
+                                    <p:message id="msgNombre" for="txtNombre"/>
+                                </h:panelGrid>
+
+                                <p:outputLabel id="lblAreaConocimiento" for="selAreaConocimiento" value="#{msg.areaConocimiento}:"/>
+                                <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                    <p:selectOneMenu id="selAreaConocimiento" value="#{cursoBean.curso.programa}" required="true"
+                                                     converter="omnifaces.SelectItemsConverter" style="width: 350px">
+                                        <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption="true"/>
+                                        <f:selectItems value="#{programaBean.programaActivoList}" var="prog" itemLabel="#{prog.nombre}" itemValue="#{prog}"/>
+                                        <p:ajax event="change" update="@this, lblAreaConocimiento, msgAreaConocimiento"/>
+                                    </p:selectOneMenu>
+                                    <p:message id="msgAreaConocimiento" for="selAreaConocimiento"/>
+                                </h:panelGrid>
+
+                                <p:outputLabel for="selProyecto" value="#{msg.proyecto}:" rendered="false"/>
+                                <h:panelGrid columns="1" cellpadding="0" cellspacing="0" rendered="false">
+                                    <p:selectOneMenu id="selProyecto" value="#{cursoBean.curso.proyecto}" required="true"
+                                                     converter="omnifaces.SelectItemsConverter" style="width: 332px">
+                                        <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption="true"/>
+                                        <f:selectItems value="#{proyectoBean.proyectoActivoList}" var="proy" itemLabel="#{proy.nombre}" itemValue="#{proy}"/>
+                                    </p:selectOneMenu>
+                                    <p:message for="selProyecto"/>
+                                </h:panelGrid>
+
+                                <p:outputLabel id="lblModalidad" for="selModalidad" value="#{msg.modalidad}:"/>
+                                <h:panelGrid columns="1" cellpadding="0" cellspacing="0" >
+                                    <p:selectOneRadio id="selModalidad" value="#{cursoBean.curso.modalidad}" required="true">
+                                        <f:selectItem itemLabel="Presencial" itemValue="P"/>
+                                        <f:selectItem itemLabel="Semipresencial" itemValue="S"/>
+                                        <f:selectItem itemLabel="Virtual" itemValue="V"/>
+                                        <f:selectItem itemLabel="Online" itemValue="O"/>
+                                        <p:ajax event="change" update="@this, lblModalidad, msgModalidad"/>
+                                    </p:selectOneRadio>
+                                    <p:message id="msgModalidad" for="selModalidad"/>
+                                </h:panelGrid>
+
+                                <p:outputLabel id="lblTipoCertificado" for="selTipoCertificado" value="Tipo Certificado:"/>
+                                <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                    <p:selectOneRadio id="selTipoCertificado" value="#{cursoBean.curso.tipoCertificado}" required="true">
+                                        <f:selectItem itemLabel="Asistencia" itemValue="A"/>
+                                        <f:selectItem itemLabel="Aprobación" itemValue="P"/>
+                                        <p:ajax event="change" update="@this, lblTipoCertificado, msgTipoCertificado"/>
+                                    </p:selectOneRadio>
+                                    <p:message id="msgTipoCertificado" for="selTipoCertificado"/>
+                                </h:panelGrid>
+
+                                <p:outputLabel id="lblHoras" for="txtHoras" value="#{msg.nroHoras}:"/>
+                                <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                    <p:inputNumber id="txtHoras" value="#{cursoBean.curso.nroHoras}" required="true" 
+                                                   size="10"  decimalPlaces="0" maxValue="1000">
+                                        <p:ajax event="keyup" update="lblHoras, msgHoras"/>
+                                        <p:ajax event="change" update="@this"/>
+                                    </p:inputNumber>
+                                    <p:message id="msgHoras" for="txtHoras"/>
+                                </h:panelGrid>
+
+                                <p:outputLabel id="lblMinimoParticipantes" for="txtMinimoParticipantes" value="#{msg.nroMinimoParticipantes}:"/>
+                                <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                    <p:inputNumber id="txtMinimoParticipantes" value="#{cursoBean.curso.nroMinimoParticipantes}" required="true" 
+                                                   size="10"  decimalPlaces="0" maxValue="100">
+                                        <p:ajax event="keyup" update="lblMinimoParticipantes, msgMinimoParticipantes"/>
+                                        <p:ajax event="change" update="@this"/>
+                                    </p:inputNumber>
+                                    <p:message id="msgMinimoParticipantes" for="txtMinimoParticipantes"/>
+                                </h:panelGrid>
+
+                                <p:outputLabel id="lblPrecio" for="txtPrecio" value="#{msg.precio}:"/>
+                                <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                    <p:inputNumber id="txtPrecio" value="#{cursoBean.curso.precio}" required="true" 
+                                                   maxlength="100" size="10"  decimalPlaces="2" maxValue="10000">
+                                        <p:ajax event="keyup" update="lblPrecio, msgPrecio"/>
+                                        <p:ajax event="change" update="@this"/>
+                                    </p:inputNumber>
+                                    <p:message id="msgPrecio" for="txtPrecio"/>
+                                </h:panelGrid>
+
+                                <p:outputLabel id="lblEstado" for="selEstado" value="#{msg.estado}:"/>
+                                <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                    <p:selectOneRadio id="selEstado" value="#{cursoBean.curso.estado}" required="true">
+                                        <f:selectItem itemLabel="Activo" itemValue="A"/>
+                                        <f:selectItem itemLabel="Inactivo" itemValue="I"/>
+                                        <p:ajax event="change" update="@this, lblEstado, msgEstado"/>
+                                    </p:selectOneRadio>
+                                    <p:message id="msgEstado" for="selEstado"/>
+                                </h:panelGrid>
+                            </h:panelGrid>
+
+                        </p:panel>
+                        
+                        
+                        <p:panel rendered="#{cursoBean.creacionMasiva}">
+                            <f:facet name="header">
+                                <center>
+                                    <h:outputLabel value="#{msg.creacionMasivaCursos}" class="titulo"/>
+                                    <h:panelGrid columns="3" cellpadding="0" cellspacing="0">
+                                        <p:commandButton icon="fa fa-save" value="#{msg.grabar}" action="#{cursoBean.grabar()}" update="panelPrincipal"/>
+                                        <p:commandButton icon="fa fa-reply"  value="#{msg.cancelar}" action="#{cursoBean.cancelar()}" immediate="false" process="@this" update="panelPrincipal"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages id="msg3" closable="true"/>
+                            <h:panelGrid columns="3" cellpadding="6" cellspacing="0" id="panelArchivo" columnClasses="etiqueta">
+                                <p:outputLabel value="Archivo .csv con listado de cursos:" for="fileDocumento"/>
+                                <h:panelGrid columns="1" >
+                                    <p:fileUpload id="fileDocumento" fileUploadListener="#{cursoBean.subirDocumentoCargaMasiva}" 
+                                                  mode="advanced"
+                                                  style="width: 700px"
+                                                  label="#{msg.seleccionar}"
+                                                  allowTypes="/(\.|\/)(csv)$/"
+                                                  sizeLimit="10024"
+                                                  invalidFileMessage="Tipo de archivo incorrecto. Sólo se permiten archivos .csv "
+                                                  invalidSizeMessage="Tamaño de archivo incorrecto. Sólo se permite hasta 10MB"
+                                                  update="panelArchivo, dtCursosMasivo, msg3" auto="true">
+                                    </p:fileUpload>
+                                </h:panelGrid>
+                            </h:panelGrid>
+                            
+                            <p:spacer width="1" height="10"/>
+                            <p:outputLabel value="Vista previa del listado de Cursos a agregar:" style="font-weight: bold;"/>
+                            
+                            <p:dataTable id="dtCursosMasivo" value="#{cursoBean.cursoTempList}" var="cursoMasivo"
+                                         emptyMessage="#{msg.noExistenDatos}"
+                                         rowStyleClass="#{cursoMasivo.error.length()>0 ? 'estiloError' : null}">
+                                <p:column headerText="#{msg.codigoAreaConocimiento}" width="100" style="text-align: center">
+                                    <h:outputLabel value="#{cursoMasivo.codigoAreaConocimiento}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.codigoCurso}" width="100" style="text-align: center">
+                                    <h:outputLabel value="#{cursoMasivo.codigoCurso}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.nombre}" width="300">
+                                    <h:outputLabel value="#{cursoMasivo.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.modalidad}" width="80" style="text-align: center">
+                                    <h:outputLabel value="#{cursoMasivo.modalidad}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.precio}" width="50">
+                                    <h:outputLabel value="#{cursoMasivo.precio}" style="float: right">
+                                        <f:convertNumber pattern="0.00"/>
+                                    </h:outputLabel>
+                                </p:column>
+                                <p:column headerText="#{msg.nroHoras}" width="80" style="text-align: center">
+                                    <h:outputLabel value="#{cursoMasivo.duracion}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.tipoCertificado}" width="80" style="text-align: center">
+                                    <h:outputLabel value="#{cursoMasivo.tipoCertificado}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.nroMinimoParticipantes}" width="100" style="text-align: center">
+                                    <h:outputLabel value="#{cursoMasivo.nroMinimoParticipantes}"/>
+                                </p:column>
+                                <p:column headerText="Error" width="300">
+                                    <h:outputLabel value="#{cursoMasivo.error}" escape="false" style="white-space:pre-line;" />
+                                </p:column>
+
+                            </p:dataTable>
+
+
+                        </p:panel>
+
+                    </h:panelGrid>
+                </center>
+
+
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

@@ -1,0 +1,171 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>#{msg.tituloAplicacion}</title>
+        <h:outputStylesheet name="css/themeOmega.css"/>
+        <h:outputScript name="primefaces.js" library="js"/>
+        <script language="javascript" type="text/javascript">
+            function stopRKey(evt) {
+                if (evt.keyCode === 13) {
+                    evt.preventDefault();
+                    return false;
+                }
+            }
+            document.onkeypress = stopRKey;
+        </script>
+        <style>
+            .site-footer {
+                background-color: #1c1c1c;
+            }
+            .site-footer, .site-footer a {
+                color: #666;
+            }
+            .site-footer {
+                background-color: #1c1c1c;
+                line-height: 35px;
+                padding: 15px 0;
+            }
+            .fa {
+                display: inline-block;
+                font: normal normal normal 14px/1 FontAwesome;
+                font-size: inherit;
+                text-rendering: auto;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }            
+            .fa-2 {
+                font-size: 2em !important;
+            }            
+            .fa-3 {
+                font-size: 3em !important;
+            }
+            .social-links .face:hover {
+                color: #3E5A98;
+            }
+            h3 {
+                font: 22px/1.1 "Raleway", sans-serif;
+            }
+            .col1{
+
+            }
+            .col2{
+                width: 200px;
+                text-align: right;
+            }
+            .pieCol1{
+                width: 33%;
+                vertical-align: top;
+            }
+        </style>
+    </h:head>
+
+    <h:body>
+        <p:layout fullPage="true">
+            <p:layoutUnit position="north" style="box-shadow: 6px 6px 6px #b3c5ca" gutter="0" >
+                <h:panelGrid style="width: 100%; ">
+                    <p:separator style="border: #093d6b 0.75px solid"/>
+                    <h:panelGrid columns="2" style="width: 100%;">
+                        <img src="resources/images/logo.jpg" alt="" height="40px" style="margin-left: 50px"/>                    
+                        <h:panelGrid style="text-align: center" cellpadding="0" cellspacing="0">
+                            <p:outputLabel value="SISTEMA DE GESTIÓN ACADÉMICA" style="font-weight: bold; font-size: 15px; color: #1d5188"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+
+                </h:panelGrid>
+            </p:layoutUnit>
+            <p:layoutUnit position="center">
+                <h:form id="formPrincipal">
+                    <p:confirmDialog global="true"  showEffect="fade" hideEffect="explode"  >
+                        <center>
+                            <h:panelGrid columns="2" >
+                                <p:commandButton value="#{msg.aceptar}"  styleClass="ui-confirmdialog-yes" icon="ui-icon-check" process="@this"  />
+                                <p:commandButton value="#{msg.cancelar}"  styleClass="ui-confirmdialog-no" icon="ui-icon-close" process="@this"/>
+                            </h:panelGrid>
+
+                        </center>
+                    </p:confirmDialog>
+
+                    <ui:insert name="content">
+
+                    </ui:insert>
+                </h:form>
+                <h:panelGrid columns="3" cellpadding="0" cellspacing="0" columnClasses="pieCol1, pieCol1, pieCol1" style="width: 100%; background-color: #252525; color: #c5c5c5">
+                    <h:panelGrid style="margin-left: 50px" cellpadding="0" cellspacing="0">
+                        <h3>
+                            CONTÁCTANOS
+                        </h3>
+                        <h:panelGrid columns="2" style="color: #767676" cellpadding="5" columnClasses="top, top">
+                            <i class="fa fa-map-marker"/>
+                            <p:outputLabel value="Av. General Rumiñahui s/n,Campus Universitario ESPE. Edificio de Servicios Generales ESPE, tras el Almacén Universitario."/>
+
+                            <i class="fa fa-clock-o"/>
+                            <p:outputLabel value="  Lun - Vie / 8:30 - 17:30"/>
+
+
+                            <i class="fa fa-phone"/>
+                            <p:outputLabel value="   (593-2) 3820800"/>
+
+
+                            <i class="fa fa-envelope"/>
+                            <p:outputLabel value="info@espe-innovativa.edu.ec"/>                            
+                        </h:panelGrid>
+                    </h:panelGrid>
+
+                    <h:panelGrid cellpadding="0" cellspacing="0">
+                        <h3>
+                            UBICACIÓN
+                        </h3>
+                        <h:panelGrid columns="1" style="color: #767676; width: 100%; text-align: center">
+                            <img src="resources/images/espe-150x150.png" alt="" width="150" height="150" title="UBICACIÓN"/>
+                        </h:panelGrid>
+                        <p:spacer width="1" height="5"/>
+                    </h:panelGrid>
+
+                    <h:panelGrid cellpadding="0" cellspacing="0">
+                        <h3>
+                            SIGUENOS
+                        </h3>
+                        <h:panelGrid columns="6" style="color: #767676" cellpadding="0" cellspacing="0">
+                            <a style="color: #767676" href="https://www.facebook.com/espe.innovativa/" target="_blank" title="Facebook" rel="noopener noreferrer"><i class="fa fa-facebook-official fa-3 face"></i></a>
+                            <a style="color: #767676" href="https://twitter.com/espeinnovativa" target="_blank" title="Twitter" rel="noopener noreferrer"><i class="fa fa-twitter-square fa-3 twitter"></i></a>
+                            <a style="color: #767676" href="https://linkeding.com" target="_blank" title="Linkeding" rel="noopener noreferrer"><i class="fa fa-linkedin-square fa-3 link"></i></a>
+                            <p:spacer height="1" width="20"/>
+                            <a style="color: #767676" href="fa fa-linkedin-square fa-3 link" target="_blank" title="Intranet" rel="noopener noreferrer"><i class="fa fa-cloud fa-2 intro"></i></a>
+                            <a style="color: #767676" href="https://webmail.espe-innovativa.edu.ec/owa" target="_blank" title="Webmail" rel="noopener noreferrer"><i class="fa fa-envelope fa-2 webmail"></i></a>
+
+                        </h:panelGrid>
+                        <h3>
+                            ACEPTAMOS
+                        </h3>
+                        <h:panelGrid columns="5" style="color: #767676">
+                            <i class="fa fa-cc-diners-club fa-3"/>
+                            <i class="fa fa-cc-discover fa-3"/>
+                            <i class="fa fa-cc-mastercard fa-3"/>
+                            <i class="fa fa-cc-visa fa-3"/>
+                            <i class="fa fa-cc-amex fa-3"/>
+
+                        </h:panelGrid>
+                    </h:panelGrid>
+
+                </h:panelGrid>
+
+                <footer id="colophon" class="site-footer" role="contentinfo">
+                    <div class="site-info container" style="margin-left: 50px">
+                        © 2019 Todos los derechos reservados| ESPE-INNOVATIVA EP	
+                    </div><!-- .site-info -->
+
+
+
+                </footer>
+
+            </p:layoutUnit>
+
+
+        </p:layout>
+    </h:body>
+</html>

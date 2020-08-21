@@ -1,0 +1,289 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:pe="http://primefaces.org/ui/extensions">
+    <h:head>
+        <title>#{msg.tituloAplicacion}</title>
+        <h:outputStylesheet name="css/themeOmega.css"/>
+        <h:outputScript name="primefaces.js" library="js"/>
+        <style>
+            .etiqueta{
+                background: #d4dee2;
+                width: 150px;
+                font-weight: bold;
+                opacity: 0.95;
+                text-align: right;
+            }
+            .col2{
+                text-align: left;
+                width: 265px;
+            }
+
+            .site-footer {
+                background-color: #1c1c1c;
+            }
+            .site-footer, .site-footer a {
+                color: #666;
+            }
+            .site-footer {
+                background-color: #1c1c1c;
+                line-height: 35px;
+                padding: 15px 0;
+            }
+            .fa {
+                display: inline-block;
+                font: normal normal normal 14px/1 FontAwesome;
+                font-size: inherit;
+                text-rendering: auto;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }            
+            .fa-2 {
+                font-size: 2em !important;
+            }            
+            .fa-3 {
+                font-size: 3em !important;
+            }
+            .social-links .face:hover {
+                color: #3E5A98;
+            }
+            h3 {
+                font: 22px/1.1 "Raleway", sans-serif;
+            }
+            .pieCol1{
+                width: 33%;
+                vertical-align: top;
+            }
+        </style>
+
+    </h:head>
+    <h:body>
+                    <pe:blockUI widgetVar="blockUIWidget">  
+                        <h:panelGrid columns="2">  
+                            <p:graphicImage value="/resources/images/ajax-loader1.gif" style="margin-right: 12px; vertical-align: middle;" />  
+                            <h:outputText value="#{msg.procesando}" style="white-space: nowrap;"/>  
+                        </h:panelGrid>   
+                    </pe:blockUI>              
+        
+        
+        <h:panelGrid style="width: 100%; ">
+            <p:separator style="border: #093d6b 0.75px solid"/>
+            <h:panelGrid columns="2" style="width: 100%;">
+                <img src="resources/images/logo.jpg" alt="" height="40px" style="margin-left: 50px"/>                    
+                <h:panelGrid style="text-align: center" cellpadding="0" cellspacing="0">
+                    <p:outputLabel value="SISTEMA DE GESTIÓN ACADÉMICA" style="font-weight: bold; font-size: 15px; color: #1d5188"/>
+                </h:panelGrid>
+            </h:panelGrid>
+
+        </h:panelGrid>
+
+
+
+
+
+        <h:form id="formPrincipal">
+            <center>
+
+                <p:panel id="panelPrincipal" style="margin-bottom: 35px; text-align: center; width: 95%">
+                    <f:facet name="header">
+                        <h:outputLabel value="#{msg.registroUsuario}" class="titulo"/>
+                        <h:panelGrid columns="2" style="margin: 0 auto" rendered="#{registroUsuarioBean.usuario.id == null}">
+                            <p:commandButton id="btnRegistrar" value="#{msg.grabar}"
+                                             icon="fa fa-save"
+                                             action="#{registroUsuarioBean.grabar()}"
+                                             update="panelPrincipal"
+                                             onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()">
+                            </p:commandButton>
+                            <p:button value="#{msg.cancelar}" outcome="/login" icon="fa fa-reply"></p:button>
+
+                        </h:panelGrid>
+
+                    </f:facet>
+                    <p:messages id="messages" showDetail="false" showSummary="true" closable="true" />
+                    <h:panelGrid style="margin: 0 auto" rendered="#{registroUsuarioBean.usuario.id == null}">
+
+                        <h:panelGrid columns="2" id="panelDatosGenerales" columnClasses="etiqueta, col2" cellpadding="6" cellspacing="2"> 
+                            <p:outputLabel for="selTipoIdentificacion" value="#{msg.tipoIdentificacion}:"/>
+                            <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                <p:selectOneMenu id="selTipoIdentificacion" value="#{registroUsuarioBean.usuario.persona.tipoIdentificacion}"
+                                                 style="width: 268px"
+                                                 converter="omnifaces.SelectItemsConverter" required="true">
+                                    <f:selectItems value="#{tipoIdentificacionBean.tipoIdentificacionList}" var="tipoId" itemLabel="#{tipoId.nombre}" itemValue="#{tipoId}"/>
+                                    <p:ajax listener="#{registroUsuarioBean.usuario.persona.setIdentificacion(null)}" update="panelDatosGenerales"/>
+                                </p:selectOneMenu>
+                                <p:message for="selTipoIdentificacion"/>
+                            </h:panelGrid>
+
+                            <p:outputLabel id="lblCedula" for="txtCedula" value="#{msg.identificacion}:" rendered="#{registroUsuarioBean.usuario.persona.tipoIdentificacion.id==1}"/>
+                            <h:panelGrid id="panelCedula" columns="1" cellpadding="0" cellspacing="0" 
+                                         rendered="#{registroUsuarioBean.usuario.persona.tipoIdentificacion.id==1}">
+                                <p:inputText id="txtCedula"
+                                             value="#{registroUsuarioBean.usuario.persona.identificacion}"
+                                             required="true"
+                                             size="40"
+                                             validator="ValidadorCedula"
+                                             maxlength="10">
+                                    <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                    <p:ajax event="keyup" update="lblCedula, msgCedula"/>
+                                    <p:ajax event="change" listener="#{registroUsuarioBean.buscarUsuario()}" update="lblCedula, msgCedula, @this, txtNombre"
+                                            onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"/>
+                                </p:inputText>
+                                <p:message id="msgCedula" for="txtCedula"/>
+                            </h:panelGrid>
+
+                            <p:outputLabel id="lblRuc" for="txtRuc" value="#{msg.identificacion}:" rendered="#{registroUsuarioBean.usuario.persona.tipoIdentificacion.id==2}"/>
+                            <h:panelGrid id="panelRuc" columns="1" cellpadding="0" cellspacing="0" 
+                                         rendered="#{registroUsuarioBean.usuario.persona.tipoIdentificacion.id==2}">
+                                <p:inputText id="txtRuc"
+                                             value="#{registroUsuarioBean.usuario.persona.identificacion}"
+                                             required="true"
+                                             size="40"
+                                             validator="ValidadorRuc"
+                                             maxlength="13">
+                                    <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                    <p:ajax event="keyup" update="lblRuc, msgRuc"/>
+                                    <p:ajax event="change" listener="#{registroUsuarioBean.buscarUsuario()}" update="lblRuc, msgRuc, @this"
+                                            onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"/>
+                                </p:inputText>
+                                <p:message id="msgRuc" for="txtRuc"/>
+                            </h:panelGrid>
+
+                            <p:outputLabel id="lblPasaporte" for="txtPasaporte" value="#{msg.identificacion}:" rendered="#{registroUsuarioBean.usuario.persona.tipoIdentificacion.id==3}"/>
+                            <h:panelGrid id="panelPasaporte" columns="1" cellpadding="0" cellspacing="0" 
+                                         rendered="#{registroUsuarioBean.usuario.persona.tipoIdentificacion.id==3}">
+                                <p:inputText id="txtPasaporte"
+                                             value="#{registroUsuarioBean.usuario.persona.identificacion}"
+                                             required="true"
+                                             size="40"
+                                             maxlength="13">
+                                    <p:ajax event="keyup" update="lblPasaporte, msgPasaporte"/>
+                                    <p:ajax event="change" listener="#{registroUsuarioBean.buscarUsuario()}" update="lblPasaporte, msgPasaporte, @this"
+                                            onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"/>
+                                </p:inputText>
+                                <p:message id="msgPasaporte" for="txtPasaporte"/>
+                            </h:panelGrid>
+
+                            <p:outputLabel rendered="false" id="lblApellido" for="txtApellido" value="#{msg.apellidos}:"/>
+                            <h:panelGrid rendered="false" id="panelApellido" columns="1" cellpadding="0" cellspacing="0">
+                                <p:inputText id="txtApellido" value="#{registroUsuarioBean.usuario.persona.apellidos}" required="true" 
+                                             maxlength="30" size="40" >
+                                    <p:ajax event="keyup" update="lblApellido, msgApellido"/>
+                                </p:inputText>
+                                <p:message id="msgApellido" for="txtApellido"/>
+                            </h:panelGrid>
+
+
+                            <p:outputLabel id="lblNombre" for="txtNombre" value="#{msg.apellidosNombres}:"/>
+                            <h:panelGrid  id="panelNombre" columns="1" cellpadding="0" cellspacing="0">
+                                <p:inputText id="txtNombre" value="#{registroUsuarioBean.usuario.persona.nombresCompletos}" required="true" 
+                                             maxlength="60" size="40" >
+                                    <p:ajax event="keyup" update="lblNombre, msgNombre"/>
+                                </p:inputText>
+                                <p:message id="msgNombre" for="txtNombre"/>
+                            </h:panelGrid>
+
+                            <p:outputLabel id="lblEmail" for="txtEmail" value="#{msg.email}:"/>
+                            <h:panelGrid id="panelEmail" columns="1" cellpadding="0" cellspacing="0">
+                                <p:inputText id="txtEmail" value="#{registroUsuarioBean.usuario.persona.email}" required="true" 
+                                             maxlength="60" size="40" >
+                                    <p:ajax event="keyup" update="lblEmail, msgEmail"/>
+                                </p:inputText>
+                                <p:message id="msgEmail" for="txtEmail"/>
+                            </h:panelGrid>
+
+                        </h:panelGrid>
+                    </h:panelGrid>
+
+
+                    <h:panelGrid style="margin: 0 auto" rendered="#{registroUsuarioBean.usuario.id != null}">
+                        <h:outputLabel value="#{msg.registroUsuarioMsg1}">
+
+                        </h:outputLabel>
+                        <p:button value="#{msg.aceptar}" outcome="/login"></p:button>
+
+                    </h:panelGrid>
+
+
+                </p:panel>               
+
+            </center>
+
+
+        </h:form>
+
+
+        <h:panelGrid columns="3" cellpadding="0" cellspacing="0" columnClasses="pieCol1, pieCol1, pieCol1" style="width: 100%; background-color: #252525; color: #c5c5c5">
+            <h:panelGrid style="margin-left: 50px" cellpadding="0" cellspacing="0">
+                <h3>
+                    CONTÁCTANOS
+                </h3>
+                <h:panelGrid columns="2" style="color: #767676" cellpadding="5" columnClasses="top, top">
+                    <i class="fa fa-map-marker"/>
+                    <p:outputLabel value="Av. General Rumiñahui s/n,Campus Universitario ESPE. Edificio de Servicios Generales ESPE, tras el Almacén Universitario."/>
+
+                    <i class="fa fa-clock-o"/>
+                    <p:outputLabel value="Lun - Vie / 8:30 - 17:30"/>
+
+
+                    <i class="fa fa-phone"/>
+                    <p:outputLabel value="(593-2) 3820800"/>
+
+
+                    <i class="fa fa-envelope"/>
+                    <p:outputLabel value="info@espe-innovativa.edu.ec"/>                            
+                </h:panelGrid>
+            </h:panelGrid>
+
+            <h:panelGrid cellpadding="0" cellspacing="0">
+                <h3>
+                    UBICACIÓN
+                </h3>
+                <h:panelGrid columns="1" style="color: #767676; width: 100%; text-align: center">
+                    <img src="resources/images/espe-150x150.png" alt="" width="150" height="150" title="UBICACIÓN"/>
+                </h:panelGrid>
+                <p:spacer width="1" height="5"/>
+            </h:panelGrid>
+
+            <h:panelGrid cellpadding="0" cellspacing="0">
+                <h3>
+                    SIGUENOS
+                </h3>
+                <h:panelGrid columns="6" style="color: #767676" cellpadding="0" cellspacing="0">
+                    <a style="color: #767676" href="https://www.facebook.com/espe.innovativa/" target="_blank" title="Facebook" rel="noopener noreferrer"><i class="fa fa-facebook-official fa-3 face"></i></a>
+                    <a style="color: #767676" href="https://twitter.com/espeinnovativa" target="_blank" title="Twitter" rel="noopener noreferrer"><i class="fa fa-twitter-square fa-3 twitter"></i></a>
+                    <a style="color: #767676" href="https://linkeding.com" target="_blank" title="Linkeding" rel="noopener noreferrer"><i class="fa fa-linkedin-square fa-3 link"></i></a>
+                    <p:spacer height="1" width="20"/>
+                    <a style="color: #767676" href="fa fa-linkedin-square fa-3 link" target="_blank" title="Intranet" rel="noopener noreferrer"><i class="fa fa-cloud fa-2 intro"></i></a>
+                    <a style="color: #767676" href="https://webmail.espe-innovativa.edu.ec/owa" target="_blank" title="Webmail" rel="noopener noreferrer"><i class="fa fa-envelope fa-2 webmail"></i></a>
+
+                </h:panelGrid>
+                <h3>
+                    ACEPTAMOS
+                </h3>
+                <h:panelGrid columns="5" style="color: #767676">
+                    <i class="fa fa-cc-diners-club fa-3"/>
+                    <i class="fa fa-cc-discover fa-3"/>
+                    <i class="fa fa-cc-mastercard fa-3"/>
+                    <i class="fa fa-cc-visa fa-3"/>
+                    <i class="fa fa-cc-amex fa-3"/>
+
+                </h:panelGrid>
+            </h:panelGrid>
+
+        </h:panelGrid>
+
+        <footer id="colophon" class="site-footer" role="contentinfo">
+            <div class="site-info container" style="margin-left: 50px">
+                © 2019 Todos los derechos reservados| ESPE-INNOVATIVA EP	
+            </div><!-- .site-info -->
+
+
+
+        </footer>
+    </h:body>
+</html>

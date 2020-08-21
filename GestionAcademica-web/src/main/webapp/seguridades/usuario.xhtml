@@ -1,0 +1,456 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:o="http://omnifaces.org/ui">
+    <h:head>
+        <title>Facelet Title</title>
+
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <style>
+                    .etiqueta{
+                        background: #d4dee2;
+                        width: 135px;
+                        font-weight: bold;
+                        opacity: 0.95;
+                    }
+                    .etiquetaDatosGenerales{
+                        width: 150px;
+                    }
+                    .etiqueta2{
+                        background: #d4dee2;
+                        width: 180px;
+                        font-weight: bold;
+                        opacity: 0.95;
+                    }
+                    .col_1{
+                        vertical-align: top;
+                        width: 50%;
+                    }
+                    .col_2{
+                        vertical-align: top;
+                        width: 50%;
+                    }
+                </style>
+
+
+                <center>
+
+                    <h:panelGrid id="panelPrincipal" style="width: 95%">
+                        <p:panel rendered="#{usuarioBean.usuario==null}">
+                            <f:facet name="header">
+                                <center>
+                                    <h:panelGrid style="text-align: center">
+                                        <h:outputLabel value="#{msg.listadoUsuarios}" class="titulo"/>
+                                        <p:commandButton icon="fa fa-plus-circle" value="#{msg.nuevo}" action="#{usuarioBean.nuevo()}" update="formPrincipal:panelPrincipal" resetValues="true"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages closable="true"/>
+
+                            <p:dataTable id="dtUsuarios" value="#{usuarioBean.usuarioList}" var="usu" paginator="true" rows="10" emptyMessage="#{msg.noExistenDatos}">
+                                <p:column headerText="#{msg.acciones}" width="100" style="text-align: center">
+                                    <p:commandButton icon="fa fa-pencil" title="#{msg.editar}" action="#{usuarioBean.seleccionar(usu)}" update="formPrincipal:panelPrincipal" resetValues="true"/>
+                                    <p:commandButton icon="fa fa-trash-o" title="#{msg.eliminar}" action="#{usuarioBean.eliminar(usu)}" update="formPrincipal:panelPrincipal">
+                                        <p:confirm header="#{msg.confirmacionTitulo}" message="#{msg.confirmacionMensaje}" />
+                                    </p:commandButton>
+                                    <p:commandButton icon="fa fa-undo" style="color: #0b6092" action="#{usuarioBean.seleccionarCambiarPassword(usu)}" update="formPrincipal:dlgResetearPassword"
+                                                     title="#{msg.resetearPassword}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.tipoIdentificacion}" width="100" style="text-align: center" sortBy="#{usu.persona.tipoIdentificacion.nombre}">
+                                    <h:outputLabel value="#{usu.persona.tipoIdentificacion.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.identificacion}" width="125" style="text-align: center" sortBy="#{usu.persona.identificacion}" filterBy="#{usu.persona.identificacion}">
+                                    <h:outputLabel value="#{usu.persona.identificacion}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.apellidosNombres}" sortBy="#{usu.persona.nombresCompletos}" filterBy="#{usu.persona.nombresCompletos}" filterMatchMode="contains">
+                                    <h:outputLabel value="#{usu.persona.nombresCompletos}"/>
+                                </p:column>
+                                <p:column rendered="false" headerText="#{msg.apellidos}" sortBy="#{usu.persona.apellidos}" filterBy="#{usu.persona.apellidos}" filterMatchMode="contains">
+                                    <h:outputLabel value="#{usu.persona.apellidos}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.telefono}" width="70" rendered="false">
+                                    <h:outputLabel value="#{usu.persona.telefono}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.celular}" width="70" rendered="false">
+                                    <h:outputLabel value="#{usu.persona.celular}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.email}" width="180">
+                                    <h:outputLabel value="#{usu.persona.email}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.estado}" width="60" style="text-align: center" sortBy="#{usu.estado=='A'?'Activo':'Inactivo'}">
+                                    <h:outputLabel value="#{usu.estado=='A'?'Activo':'Inactivo'}"/>
+                                </p:column>
+                            </p:dataTable>
+
+                        </p:panel>
+                        <p:panel rendered="#{usuarioBean.usuario!=null}" id="panelEdicion">
+                            <f:facet name="header">
+                                <center>
+                                    <h:outputLabel value="#{usuarioBean.usuario.id==null?msg.creacionUsuario:msg.edicionUsuario}" class="titulo"/>
+                                    <h:panelGrid columns="3" cellpadding="0" cellspacing="0">
+                                        <p:commandButton id="btnGrabar" icon="fa fa-save"  value="#{msg.grabar}" action="#{usuarioBean.grabar()}" update="panelPrincipal" 
+                                                         onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"/>
+                                        <p:commandButton icon="fa fa-reply"  value="#{msg.cancelar}" action="#{usuarioBean.cancelar()}" immediate="false" process="@this" update="panelPrincipal"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages closable="true"/>
+
+                            <h:panelGrid columns="2" columnClasses="col_1, col_2">
+                                <p:fieldset legend="#{msg.datosGenerales}">
+                                    <h:panelGrid columns="2" id="panelDatosGenerales" columnClasses="etiqueta etiquetaDatosGenerales" cellpadding="3" cellspacing="2"> 
+                                        <p:outputLabel for="selTipoIdentificacion" value="#{msg.tipoIdentificacion}:"/>
+                                        <h:panelGrid columns="1">
+                                            <p:selectOneMenu id="selTipoIdentificacion" value="#{usuarioBean.usuario.persona.tipoIdentificacion}"
+                                                             style="width: 268px"
+                                                             disabled="#{usuarioBean.usuario.id!=null}"
+                                                             converter="omnifaces.SelectItemsConverter" required="true">
+                                                <f:selectItems value="#{tipoIdentificacionBean.tipoIdentificacionList}" var="tipoId" itemLabel="#{tipoId.nombre}" itemValue="#{tipoId}"/>
+                                                <p:ajax update="panelEdicion" listener="#{usuarioBean.usuario.persona.setIdentificacion(null)}"/>
+                                            </p:selectOneMenu>
+                                            <p:message for="selTipoIdentificacion"/>
+                                        </h:panelGrid>
+
+                                        <p:outputLabel id="lblCedula" for="txtCedula" value="#{msg.identificacion}:" rendered="#{usuarioBean.usuario.persona.tipoIdentificacion.id==1}"/>
+                                        <h:panelGrid columns="1" rendered="#{usuarioBean.usuario.persona.tipoIdentificacion.id==1}">
+                                            <p:inputText id="txtCedula"
+                                                         value="#{usuarioBean.usuario.persona.identificacion}"
+                                                         required="true"
+                                                         size="40"
+                                                         disabled="#{usuarioBean.usuario.id!=null}"
+                                                         validator="ValidadorCedula"
+                                                         maxlength="10">
+                                                <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                                <p:ajax event="keyup" update="lblCedula, msgCedula"/>
+                                                <p:ajax event="change" listener="#{usuarioBean.buscarUsuario()}" 
+                                                        update="lblCedula, msgCedula, @this,txtNombre"
+                                                        onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"/>
+                                            </p:inputText>
+                                            <p:message id="msgCedula" for="txtCedula"/>
+                                        </h:panelGrid>
+
+                                        <p:outputLabel id="lblRuc" for="txtRuc" value="#{msg.identificacion}:" rendered="#{usuarioBean.usuario.persona.tipoIdentificacion.id==2}"/>
+                                        <h:panelGrid columns="1" rendered="#{usuarioBean.usuario.persona.tipoIdentificacion.id==2}">
+                                            <p:inputText id="txtRuc"
+                                                         value="#{usuarioBean.usuario.persona.identificacion}"
+                                                         required="true"
+                                                         size="40"
+                                                         disabled="#{usuarioBean.usuario.id!=null}"
+                                                         validator="ValidadorRuc"
+                                                         maxlength="13">
+                                                <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                                <p:ajax event="keyup" update="lblRuc, msgRuc"/>
+                                                <p:ajax event="change" listener="#{usuarioBean.buscarUsuario()}" update="lblRuc, msgRuc, @this"
+                                                        onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"/>
+                                            </p:inputText>
+                                            <p:message id="msgRuc" for="txtRuc"/>
+                                        </h:panelGrid>
+
+                                        <p:outputLabel id="lblPasaporte" for="txtPasaporte" value="#{msg.identificacion}:" rendered="#{usuarioBean.usuario.persona.tipoIdentificacion.id==3}"/>
+                                        <h:panelGrid columns="1" rendered="#{usuarioBean.usuario.persona.tipoIdentificacion.id==3}">
+                                            <p:inputText id="txtPasaporte"
+                                                         value="#{usuarioBean.usuario.persona.identificacion}"
+                                                         required="true"
+                                                         disabled="#{usuarioBean.usuario.id!=null}"
+                                                         size="40"
+                                                         maxlength="13">
+                                                <p:ajax event="keyup" update="lblPasaporte, msgPasaporte"/>
+                                                <p:ajax event="change" listener="#{usuarioBean.buscarUsuario()}" update="lblPasaporte, msgPasaporte, @this"
+                                                        onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"/>
+                                            </p:inputText>
+                                            <p:message id="msgPasaporte" for="txtPasaporte"/>
+                                        </h:panelGrid>
+
+
+                                        <p:outputLabel rendered="false" id="lblApellido" for="txtApellido" value="#{msg.apellidos}:"/>
+                                        <h:panelGrid rendered="false" columns="1">
+                                            <p:inputText id="txtApellido" value="#{usuarioBean.usuario.persona.apellidos}" required="true" 
+                                                         maxlength="30" size="40" >
+                                                <p:ajax event="keyup" update="lblApellido, msgApellido"/>
+                                            </p:inputText>
+                                            <p:message id="msgApellido" for="txtApellido"/>
+                                        </h:panelGrid>
+
+                                        <p:outputLabel id="lblNombre" for="txtNombre" value="#{msg.apellidosNombres}:"/>
+                                        <h:panelGrid columns="1">
+                                            <p:inputText id="txtNombre" value="#{usuarioBean.usuario.persona.nombresCompletos}" required="true" 
+                                                         maxlength="60" size="40" >
+                                                <p:ajax event="keyup" update="lblNombre, msgNombre"/>
+                                            </p:inputText>
+                                            <p:message  id="msgNombre" for="txtNombre"/>
+                                        </h:panelGrid>
+
+                                        <p:outputLabel id="lblTelefono" for="txtTelefono" value="#{msg.telefono}:"/>
+                                        <h:panelGrid columns="1">
+                                            <p:inputText id="txtTelefono"
+                                                         value="#{usuarioBean.usuario.persona.telefono}"
+                                                         required="true"
+                                                         size="40"
+                                                         validator="ValidadorTelefono"
+                                                         maxlength="9">
+                                                <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>  
+                                                <p:ajax event="keyup" update="lblTelefono, msgTelefono"/>
+                                            </p:inputText>
+                                            <p:message id="msgTelefono" for="txtTelefono"/>
+                                        </h:panelGrid>
+
+                                        <p:outputLabel id="lblCelular" for="txtCelular" value="#{msg.celular}:"/>
+                                        <h:panelGrid columns="1">
+                                            <p:inputText id="txtCelular"
+                                                         value="#{usuarioBean.usuario.persona.celular}"
+                                                         required="true"
+                                                         validator="ValidadorCelular"
+                                                         size="40"
+                                                         maxlength="10">
+                                                <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>  
+                                                <p:ajax event="keyup" update="lblCelular, msgCelular"/>
+                                            </p:inputText>
+                                            <p:message id="msgCelular" for="txtCelular"/>
+                                        </h:panelGrid>
+
+                                        <p:outputLabel id="lblEmail" for="txtEmail" value="#{msg.email}:"/>
+                                        <h:panelGrid columns="1">
+                                            <p:inputText id="txtEmail" value="#{usuarioBean.usuario.persona.email}" required="true" 
+                                                         maxlength="60" size="40" >
+                                                <p:ajax event="keyup" update="lblEmail, msgEmail"/>
+                                            </p:inputText>
+                                            <p:message id="msgEmail" for="txtEmail"/>
+                                        </h:panelGrid>
+
+                                        <p:outputLabel id="lblEstado" for="selEstado" value="#{msg.estado}:"/>
+                                        <h:panelGrid columns="1">
+                                            <p:selectOneRadio id="selEstado" value="#{usuarioBean.usuario.estado}" required="true">
+                                                <f:selectItem itemLabel="Activo" itemValue="A"/>
+                                                <f:selectItem itemLabel="Inactivo" itemValue="I"/>
+                                            </p:selectOneRadio>
+                                            <p:message id="msgEstado" for="selEstado"/>
+                                        </h:panelGrid>
+                                    </h:panelGrid>
+
+                                </p:fieldset>
+                                <p:fieldset legend="#{msg.rolesAsignados}">
+                                    <p:dataTable id="dtRoles" value="#{usuarioBean.usuario.usuarioRolList}" var="usrRol" emptyMessage="#{msg.noExistenDatos}">
+                                        <f:facet name="header">
+                                            <div style="text-align: left">
+                                                <p:commandButton icon="fa fa-plus-circle" value="#{msg.agregar}" 
+                                                                 action="#{usuarioBean.nuevoRol()}"
+                                                                 process="@this"
+                                                                 update="formPrincipal:dlgRoles"/>
+
+                                            </div>
+
+                                        </f:facet>
+
+                                        <p:column headerText="#{msg.eliminar}" width="50" style="text-align: center">
+                                            <p:commandButton icon="ui-icon-trash" title="#{msg.eliminar}" process="@this" action="#{usuarioBean.usuario.eliminarUsuarioRol(usrRol)}" update="dtRoles"/>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg.nombre}">
+                                            <h:outputLabel value="#{usrRol.rol.nombre}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.descripcion}">
+                                            <h:outputLabel value="#{usrRol.rol.descripcion}"/>
+                                        </p:column>
+
+                                    </p:dataTable>
+
+                                </p:fieldset>
+                            </h:panelGrid>
+
+
+                        </p:panel>
+
+                        <p:dialog id="dlgRoles"  
+                                  widgetVar="dlgRoles"
+                                  appendTo="@(body)"
+                                  modal="true"
+                                  header="Selección de #{msg.roles}" 
+                                  closeOnEscape="true"
+                                  width="700"
+                                  styleClass="disable-scroll"
+                                  >
+                            <h:form>
+                                <p:outputPanel style="height:260px;overflow:auto">
+                                    <p:dataTable id="dtRolesSel"
+                                                 value="#{usuarioBean.rolSeleccionList}" 
+                                                 var="rolSel" 
+                                                 emptyMessage="#{msg.noExistenDatos}" 
+                                                 rowKey="#{rolSel}" >
+
+                                        <p:column headerText="#{msg.seleccionar}" width="60" style="text-align: center">
+                                            <p:selectBooleanCheckbox value="#{rolSel.seleccionado}"/>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg.nombre}" sortBy="#{rolSel.nombre}" filterBy="#{rolSel.nombre}" filterMatchMode="contains">
+                                            <h:outputText value="#{rolSel.nombre}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.descripcion}" sortBy="#{rolSel.descripcion}">
+                                            <h:outputText value="#{rolSel.descripcion}"/>
+                                        </p:column>
+                                    </p:dataTable>
+                                </p:outputPanel>
+                                <center>
+                                    <h:panelGrid columns="2" cellspacing="6">
+                                        <p:commandButton value="#{msg.aceptar}" 
+                                                         icon="fa fa-check"
+                                                         action ="#{usuarioBean.agregarRoles()}"  
+                                                         process="@this, dtRolesSel"
+                                                         update="formPrincipal:dtRoles"/>
+                                        <p:commandButton value="#{msg.cancelar}"
+                                                         icon="fa fa-close"
+                                                         onclick="PF('dlgRoles').hide();"/>
+
+                                    </h:panelGrid>
+                                </center>
+
+                            </h:form>
+
+
+                        </p:dialog>
+
+                        <p:dialog id="dlgResetearPassword"  
+                                  widgetVar="dlgResetearPassword"
+                                  appendTo="@(body)"
+                                  modal="true"
+                                  header="#{msg.resetearPassword}" 
+                                  width="500">
+
+                            <script>
+                                function inicio() {
+                                    var field = $('#formPrincipal\\:formResetearPassword\\:pwd1');
+                                    var button = $('#formPrincipal\\:formResetearPassword\\:btnVer1');
+                                    var button2 = $('#formPrincipal\\:formResetearPassword\\:btnOcultar1');
+                                    if (field.attr('type') === 'password') {
+                                        jQuery(button2).hide();
+                                        jQuery(button).show();
+                                    } else {
+                                        jQuery(button).hide();
+                                        jQuery(button2).show();
+                                    }
+                                    field = $('#formPrincipal\\:formResetearPassword\\:pwd2');
+                                    button = $('#formPrincipal\\:formResetearPassword\\:btnVer2');
+                                    button2 = $('#formPrincipal\\:formResetearPassword\\:btnOcultar2');
+                                    if (field.attr('type') === 'password') {
+                                        jQuery(button2).hide();
+                                        jQuery(button).show();
+                                    } else {
+                                        jQuery(button).hide();
+                                        jQuery(button2).show();
+                                    }
+                                }
+
+                                function checkPassPwd1() {
+                                    var field = $('#formPrincipal\\:formResetearPassword\\:pwd1');
+                                    var button = $('#formPrincipal\\:formResetearPassword\\:btnVer1');
+                                    var button2 = $('#formPrincipal\\:formResetearPassword\\:btnOcultar1');
+                                    if (field.attr('type') === 'password') {
+                                        field.attr('type', 'text');
+                                        jQuery(button).hide();
+                                        jQuery(button2).show();
+                                    } else {
+                                        field.attr('type', 'password');
+                                        jQuery(button2).hide();
+                                        jQuery(button).show();
+                                    }
+                                }
+
+                                function checkPassPwd2() {
+                                    var field = $('#formPrincipal\\:formResetearPassword\\:pwd2');
+                                    var button = $('#formPrincipal\\:formResetearPassword\\:btnVer2');
+                                    var button2 = $('#formPrincipal\\:formResetearPassword\\:btnOcultar2');
+                                    if (field.attr('type') === 'password') {
+                                        field.attr('type', 'text');
+                                        jQuery(button).hide();
+                                        jQuery(button2).show();
+                                    } else {
+                                        field.attr('type', 'password');
+                                        jQuery(button2).hide();
+                                        jQuery(button).show();
+                                    }
+                                }
+
+
+                            </script>
+
+                            <h:form id="formResetearPassword">
+                                <h:panelGrid columns="4" columnClasses="etiqueta2">
+
+                                    <p:outputLabel for="pwd1" 
+                                                   value="#{msg.nuevoPassword}" />  
+                                    <p:password id="pwd1" 
+                                                value="#{usuarioBean.password}" 
+                                                match="pwd2" 
+                                                autocomplete="new-password"
+                                                required="true"
+                                                redisplay="true"
+                                                size="10"
+                                                validatorMessage="Error: Las contraseñas no coinciden.">
+                                    </p:password>  
+                                    <h:panelGrid>
+                                        <p:commandLink id="btnVer1" title="#{msg.verPassword}" onclick="checkPassPwd1()" style="vertical-align: -webkit-baseline-middle">
+                                            <h:graphicImage name="images/ver.png" width="20" />
+                                        </p:commandLink>
+                                        <p:commandLink id="btnOcultar1" title="#{msg.ocultarPassword}" onclick="checkPassPwd1()" style="vertical-align: -webkit-baseline-middle">
+                                            <h:graphicImage name="images/ocultar.png" width="20"/>
+                                        </p:commandLink>                                    
+
+                                    </h:panelGrid>
+                                    <p:message for="pwd1"/>
+
+                                    <p:outputLabel for="pwd2" value="#{msg.confirmarPassword}:" />  
+                                    <p:password id="pwd2" value="#{usuarioBean.password}" 
+                                                size="10"
+                                                redisplay="true"
+                                                autocomplete="new-password"
+                                                required="true" />  
+                                    <h:panelGrid>
+                                        <p:commandLink id="btnVer2" title="#{msg.verPassword}" onclick="checkPassPwd2()" style="vertical-align: -webkit-baseline-middle">
+                                            <h:graphicImage name="images/ver.png" width="20" />
+                                        </p:commandLink>
+                                        <p:commandLink id="btnOcultar2" title="#{msg.ocultarPassword}" onclick="checkPassPwd2()" style="vertical-align: -webkit-baseline-middle">
+                                            <h:graphicImage name="images/ocultar.png" width="20"/>
+                                        </p:commandLink>                                    
+
+                                    </h:panelGrid>
+                                    <p:message for="pwd2"/>
+                                </h:panelGrid>
+                                <br/>
+                                <p:separator/>
+                                <h:panelGrid style="width: 100%" columns="2">
+                                    <p:commandButton 
+                                        value="#{msg.grabar}" 
+                                        icon="fa fa-save" 
+                                        style="float: right"
+                                        process="formResetearPassword"
+                                        update="formResetearPassword"
+                                        action="#{usuarioBean.cambiarContrasenia()}"/>
+                                    <p:commandButton 
+                                        value="#{msg.cancelar}" 
+                                        process="@this"
+                                        icon="fa fa-close" 
+                                        onclick="PF('dlgResetearPassword').hide();"
+                                        />
+                                </h:panelGrid>
+                            </h:form>
+                            <o:onloadScript>
+                                inicio();
+                            </o:onloadScript>
+
+
+                        </p:dialog>
+                    </h:panelGrid>
+                </center>
+
+
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

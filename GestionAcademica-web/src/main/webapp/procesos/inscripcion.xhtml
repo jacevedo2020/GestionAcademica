@@ -1,0 +1,1257 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+
+            <ui:define name="content">
+                <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
+                <style>
+                    .etiquetaInscripcion{
+                        width: 180px;
+                    }
+                    .etiquetaDireccionGrupo{
+                        width: 100px;
+                    }
+                    .etiquetaEmpresaGrupo{
+                        width: 170px;
+                    }
+                    .top20{
+                        vertical-align: top;
+                        width: 20%;
+                    }
+                    .top25{
+                        vertical-align: top;
+                        width: 25%;
+                    }
+                    .top30{
+                        vertical-align: top;
+                        width: 30%;
+                    }
+                    .top33{
+                        vertical-align: top;
+                        width: 33%;
+                    }
+                    .top40{
+                        vertical-align: top;
+                        width: 40%;
+                    }
+                    .top50{
+                        vertical-align: top;
+                        width: 50%;
+                    }
+                    .top60{
+                        vertical-align: top;
+                        width: 60%;
+                    }
+                </style>                
+                <center>
+
+                    <h:panelGrid id="panelPrincipal" style="width: 95%">
+                        <p:panel rendered="#{inscripcionBean.inscripcion == null}">
+                            <f:facet name="header">
+                                <center class="titulo">
+                                    <h:panelGrid style="text-align: center">
+                                        <h:outputLabel value="#{msg.cursosDisponibles}"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages closable="true" />
+                            <p:dataTable id="dtCursos" widgetVar="dtCursos" value="#{cursoCentroCapacitacionBean.cursoCentroActivoList}" var="cursoCentro" paginator="false" rows="10" emptyMessage="#{msg.noExistenDatos}">
+                                <p:column headerText="#{msg.matricularse}" width="75" style="text-align: center">
+                                    <p:commandButton icon="fa fa-pencil" title="#{msg.matricularse}" action="#{inscripcionBean.seleccionarCurso(cursoCentro)}" update="formPrincipal:panelPrincipal" resetValues="true"/>
+                                </p:column>
+                                <p:column headerText="#{msg.centroCapacitacion}" groupRow="false" filterBy="#{cursoCentro.centroCapacitacion.nombre}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtCursos').filter()" style="width: 90%">
+                                            <f:selectItem itemLabel="#{msg.seleccione}" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{cursoCentroCapacitacionBean.centroCapacitacionFiltroList}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>                                    
+                                    <h:outputLabel value="#{cursoCentro.centroCapacitacion.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.areaConocimiento}" groupRow="false" filterBy="#{cursoCentro.curso.programa.nombre}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtCursos').filter()" style="width: 90%">
+                                            <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{cursoCentroCapacitacionBean.programaFiltroList}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputLabel value="#{cursoCentro.curso.programa.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.curso}" filterBy="#{cursoCentro.curso.nombre}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtCursos').filter()" style="width: 90%">
+                                            <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{cursoCentroCapacitacionBean.cursoFiltroList}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet> 
+                                    <h:outputLabel value="#{cursoCentro.curso.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.modalidad}" width="100" style="text-align: center" filterBy="#{cursoCentro.modalidadDescripcion}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('dtCursos').filter()" style="width: 80%">
+                                            <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{cursoCentroCapacitacionBean.modalidadFiltroList}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet> 
+                                    <h:outputLabel value="#{cursoCentro.modalidadDescripcion}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.tipoCertificado}" width="60" rendered="false">
+                                    <h:outputLabel value="#{cursoCentro.tipoCertificacionDescripcion}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg.nroHoras}" width="50">
+                                    <h:outputLabel value="#{cursoCentro.nroHoras}" style="float: right"/>
+                                </p:column>
+                                <p:column headerText="#{msg.precio}" width="40">
+                                    <h:outputLabel value="#{cursoCentro.precio}" style="float: right"/>
+                                </p:column>
+                                <p:column headerText="#{msg.fechaInicio}" width="60" style="text-align: center">
+                                    <h:outputLabel value="#{cursoCentro.fechaInicio}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                    </h:outputLabel>
+                                </p:column>
+                                <p:column headerText="#{msg.fechaFin}" width="60" style="text-align: center">
+                                    <h:outputLabel value="#{cursoCentro.fechaFin}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                    </h:outputLabel>
+                                </p:column>
+                            </p:dataTable>
+                        </p:panel>
+
+                        <p:panel rendered="#{inscripcionBean.inscripcion != null}">
+                            <f:facet name="header">
+                                <center class="titulo">
+                                    <h:panelGrid style="text-align: center">
+                                        <h:outputLabel value="#{msg.procesoMatricula}"/>
+                                        <h:panelGrid columns="3" cellpadding="0" cellspacing="0">
+                                            <p:commandButton icon="fa fa-save" value="#{msg.grabar}" action="#{inscripcionBean.grabar()}" update="panelPrincipal"
+                                                             onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"/>
+                                            <p:commandButton icon="fa fa-reply"  value="#{msg.cancelar}" action="#{inscripcionBean.cancelar()}" immediate="false" process="@this" update="panelPrincipal"/>
+                                        </h:panelGrid>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages closable="true" />
+
+                            <h:panelGrid columns="1" style="width: 95%" id="panelInscripcion" cellpadding="10">
+                                <p:outputLabel value="#{msg.camposObligatorios}" style="font-weight: bold"/>
+                                <p:fieldset legend="#{msg.datosCurso}">
+                                    <h:panelGrid columns="2" columnClasses="top60, top40" style="width: 100%">
+                                        <h:panelGrid columns="2" cellpadding="6" cellspacing="2" columnClasses="etiqueta etiquetaInscripcion">
+                                            <p:outputLabel value="#{msg.curso}:"/>
+                                            <p:outputLabel value="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.curso.nombre}"/>
+
+                                            <p:outputLabel value="#{msg.areaConocimiento}:" rendered="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.cursoContinuo}"/>
+                                            <p:outputLabel value="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.curso.programa.nombre}" rendered="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.cursoContinuo}"/>
+
+                                            <p:outputLabel value="#{msg.tipoCurso}:"/>
+                                            <p:outputLabel value="Continuo" rendered="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.cursoContinuo}"/>
+                                            <p:outputLabel value="Corporativo" rendered="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.cursoCorporativo}"/>
+
+                                            <p:outputLabel value="#{msg.modalidad}:"/>
+                                            <p:outputLabel value="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.modalidadDescripcion}"/>
+
+
+                                            <p:outputLabel value="#{msg.centroCapacitacion}:"/>
+                                            <p:outputLabel value="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.centroCapacitacion.nombre}"/>
+
+
+                                            <p:outputLabel value="#{msg.instructor}:"/>
+                                            <p:outputLabel value="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.instructor.persona.nombresCompletos}"/>
+
+                                        </h:panelGrid>
+
+                                        <h:panelGrid columns="2" cellpadding="6" cellspacing="2" columnClasses="etiqueta etiquetaInscripcion">
+                                            <p:outputLabel value="Tipo Certificado:"/>
+                                            <p:outputLabel value="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.tipoCertificacionDescripcion}"/>
+
+                                            <p:outputLabel value="#{msg.nroHoras}:"/>
+                                            <p:outputLabel value="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.nroHoras}"/>
+
+
+                                            <p:outputLabel value="#{msg.fechaInicio}:"/>
+                                            <p:outputLabel value="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.fechaInicio}">
+                                                <f:convertDateTime pattern="dd-MMM-yyyy"/>
+                                            </p:outputLabel>
+
+
+                                            <p:outputLabel value="#{msg.fechaFin}:"/>
+                                            <p:outputLabel value="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.fechaFin}">
+                                                <f:convertDateTime pattern="dd-MMM-yyyy"/>
+                                            </p:outputLabel>
+
+                                            <p:outputLabel value="#{msg.precio}:" rendered="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.cursoContinuo}"/>
+                                            <p:outputLabel value="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.precio}" rendered="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.cursoContinuo}"/>
+
+
+
+                                        </h:panelGrid>
+
+                                    </h:panelGrid>
+                                </p:fieldset>
+
+                                <p:fieldset legend="#{msg.tipoMatricula}">
+                                    <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                        <p:selectOneRadio value="#{inscripcionBean.tipoMatricula}"
+                                                          style="width: 200px"
+                                                          layout="grid"
+                                                          columns="1"
+                                                          >
+                                            <f:selectItem itemLabel="Individual" itemValue="I"/>
+                                            <f:selectItem itemLabel="Grupal" itemValue="G"/>
+                                            <p:ajax update="panelInscripcion" listener="#{inscripcionBean.onTipoMatriculaChange()}"/>
+                                        </p:selectOneRadio>
+                                    </h:panelGrid>
+
+                                </p:fieldset>    
+
+
+                                <p:fieldset legend="#{msg.datosEstudiante}" rendered="#{inscripcionBean.inscripcion.inscripcionEstudiante and inscripcionBean.tipoMatricula == 'I'}">
+
+                                    <h:panelGrid columns="2" cellpadding="0" cellspacing="0" columnClasses="top60, top40" id="panelDatosEstudiante" style="width: 100%; ">
+
+                                        <h:panelGrid columns="2" cellpadding="4" cellspacing="2" columnClasses="etiqueta etiquetaInscripcion">
+                                            <p:outputLabel for="selTipoIdentificacion" id="lblTipoIdentificacion" value="#{msg.tipoIdentificacion}:"/>
+                                            <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                                <p:selectOneMenu id="selTipoIdentificacion" value="#{inscripcionBean.inscripcion.estudiante.persona.tipoIdentificacion}"
+                                                                 style="width: 125px"
+                                                                 converter="omnifaces.SelectItemsConverter" required="true">
+                                                    <f:selectItems value="#{tipoIdentificacionBean.tipoIdentificacionParaInscripcionList}" var="tipoId" itemLabel="#{tipoId.nombre}" itemValue="#{tipoId}"/>
+                                                </p:selectOneMenu>
+                                            </h:panelGrid>
+
+                                            <p:outputLabel id="lblCedula" for="txtCedula" value="#{msg.identificacion}:" 
+                                                           rendered="#{inscripcionBean.inscripcion.estudiante.persona.tipoIdentificacion.id==1}"/>
+                                            <p:outputLabel id="lblPasaporte" for="txtPasaporte" value="#{msg.identificacion}:" 
+                                                           rendered="#{inscripcionBean.inscripcion.estudiante.persona.tipoIdentificacion.id==3}"/>
+                                            <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtCedula"
+                                                             value="#{inscripcionBean.inscripcion.estudiante.persona.identificacion}"
+                                                             required="true"
+                                                             size="16"
+                                                             maxlength="10"
+                                                             validator="ValidadorCedula"
+                                                             rendered="#{inscripcionBean.inscripcion.estudiante.persona.tipoIdentificacion.id==1}"
+                                                             >
+                                                    <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                                    <p:ajax event="keyup" update="lblCedula, msgCedula"/>
+                                                    <p:ajax event="change" listener="#{inscripcionBean.buscarPersona()}" update="panelInscripcion"
+                                                            onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"/>
+                                                </p:inputText>
+                                                <p:message id="msgCedula" for="txtCedula" rendered="#{inscripcionBean.inscripcion.estudiante.persona.tipoIdentificacion.id==1}"/>
+
+                                                <p:inputText id="txtPasaporte"
+                                                             value="#{inscripcionBean.inscripcion.estudiante.persona.identificacion}"
+                                                             required="true"
+                                                             size="16"
+                                                             rendered="#{inscripcionBean.inscripcion.estudiante.persona.tipoIdentificacion.id==3}"
+                                                             maxlength="13">
+                                                    <p:ajax event="keyup" update="lblPasaporte, msgPasaporte"/>
+                                                    <p:ajax event="change" listener="#{registroUsuarioBean.buscarPersona()}" update="panelInscripcion"
+                                                            onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()"/>
+                                                </p:inputText>
+                                                <p:message id="msgPasaporte" for="txtPasaporte" rendered="#{inscripcionBean.inscripcion.estudiante.persona.tipoIdentificacion.id==3}"/>
+
+                                            </h:panelGrid>
+
+
+                                            <p:outputLabel rendered="false" id="lblApellido" for="txtApellido" value="#{msg.apellidos}:"/>
+                                            <h:panelGrid rendered="false" id="panelApellido" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtApellido" value="#{inscripcionBean.inscripcion.estudiante.persona.apellidos}" required="true" 
+                                                             maxlength="30" size="35" >
+                                                    <p:ajax event="keyup" update="lblApellido, msgApellido"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputText>
+                                                <p:message id="msgApellido" for="txtApellido"/>
+                                            </h:panelGrid>
+
+
+
+                                            <p:outputLabel id="lblNombre" for="txtNombre" value="#{msg.apellidosNombres}:"/>
+                                            <h:panelGrid  id="panelNombre" columns="1" cellpadding="0" cellspacing="0" >
+                                                <p:inputText id="txtNombre" value="#{inscripcionBean.inscripcion.estudiante.persona.nombresCompletos}" required="true" 
+                                                             maxlength="60" size="35" >
+                                                    <p:ajax event="keyup" update="lblNombre, msgNombre"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputText>
+                                                <p:message id="msgNombre" for="txtNombre"/>
+                                            </h:panelGrid>
+
+
+                                            <p:outputLabel id="lblEmail" for="txtEmail" value="#{msg.email}:"/>
+                                            <h:panelGrid id="panelEmail" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtEmail" value="#{inscripcionBean.inscripcion.estudiante.persona.email}" required="true" 
+                                                             maxlength="60" size="35" >
+                                                    <p:ajax event="keyup" update="lblEmail, msgEmail"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputText>
+                                                <p:message id="msgEmail" for="txtEmail"/>
+                                            </h:panelGrid>
+
+
+
+
+
+                                            <p:outputLabel id="lblTipoEstudiante" for="selTipoEstudiante" value="#{msg.tipoEstudiante}:"/>
+                                            <h:panelGrid id="panelTipoEstudiante" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:selectOneMenu id="selTipoEstudiante" value="#{inscripcionBean.inscripcion.tipoEstudiante}"
+                                                                 style="width: 240px"
+                                                                 converter="omnifaces.SelectItemsConverter" 
+                                                                 required="true">
+                                                    <f:selectItem itemLabel="#{msg.seleccione}" itemValue="#{null}" noSelectionOption="true"/>
+                                                    <f:selectItems value="#{tipoEstudianteBean.tipoEstudianteList}" var="tipoEst" itemLabel="#{tipoEst.nombre}" itemValue="#{tipoEst}"/>
+                                                    <p:ajax update="lblTipoEstudiante, panelTipoEstudiante"/>
+                                                </p:selectOneMenu>
+                                                <p:message for="selTipoEstudiante"/>
+                                            </h:panelGrid>
+
+
+
+
+
+
+                                        </h:panelGrid>
+
+
+                                        <h:panelGrid columns="2" cellpadding="4" cellspacing="2" columnClasses="etiqueta etiquetaInscripcion"> 
+                                            <p:outputLabel id="lblGenero" for="selGenero" value="#{msg.genero}:"/>
+                                            <h:panelGrid id="panelGenero" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:selectOneRadio id="selGenero" value="#{inscripcionBean.inscripcion.estudiante.persona.genero}"
+                                                                  style="width: 200px"
+                                                                  layout="grid"
+                                                                  columns="1"
+                                                                  required="true">
+                                                    <f:selectItem itemLabel="Femenino" itemValue="F"/>
+                                                    <f:selectItem itemLabel="Masculino" itemValue="M"/>
+                                                    <p:ajax update="lblGenero, panelGenero"/>
+                                                </p:selectOneRadio>
+                                                <p:message for="selGenero"/>
+                                            </h:panelGrid>
+
+
+                                            <p:outputLabel id="lblFechaNacimiento" for="txtFechaNacimiento" value="#{msg.fechaNacimiento}:"/>
+                                            <h:panelGrid id="panelFechaNacimiento" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:calendar id="txtFechaNacimiento" value="#{inscripcionBean.inscripcion.estudiante.persona.fechaNacimiento}" required="true" 
+                                                            size="10" pattern="dd/MM/yyyy" 
+                                                            mindate="01/01/1900" maxdate="#{inscripcionBean.fechaActual}"
+                                                            showOtherMonths="true" navigator="true"
+                                                            validatorMessage="Fecha de Nacimiento:* Formato de fecha incorrecto."
+                                                            yearRange="c-120:c+300">
+                                                    <p:ajax event="dateSelect" update="@this,lblFechaNacimiento, msgFechaNacimiento"/>
+                                                    <p:ajax event="keyup" update="lblFechaNacimiento, msgFechaNacimiento"/>
+                                                    <p:ajax event="change" update="@this"/>                                                
+                                                </p:calendar>
+                                                <p:message id="msgFechaNacimiento" for="txtFechaNacimiento"/>
+
+                                            </h:panelGrid>
+
+
+                                            <p:outputLabel id="lblTelefono" for="txtTelefono" value="#{msg.telefono}:"/>
+                                            <h:panelGrid id="panelTelefono" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtTelefono"
+                                                             value="#{inscripcionBean.inscripcion.estudiante.persona.telefono}"
+                                                             required="false"
+                                                             size="10"
+                                                             validator="ValidadorTelefono"
+                                                             maxlength="9">
+                                                    <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                                    <p:ajax event="keyup" update="lblTelefono, msgTelefono"/>
+                                                </p:inputText>
+                                                <p:message id="msgTelefono" for="txtTelefono"/>
+                                            </h:panelGrid>
+
+
+                                            <p:outputLabel id="lblCelular" for="txtCelular" value="#{msg.celular}:"/>
+                                            <h:panelGrid id="panelCelular" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtCelular"
+                                                             value="#{inscripcionBean.inscripcion.estudiante.persona.celular}"
+                                                             required="true"
+                                                             size="10"
+                                                             validator="ValidadorCelular"
+                                                             maxlength="10">
+                                                    <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                                    <p:ajax event="keyup" update="lblCelular, msgCelular"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputText>
+                                                <p:message id="msgCelular" for="txtCelular"/>
+                                            </h:panelGrid>
+
+
+
+
+                                        </h:panelGrid>
+
+                                    </h:panelGrid>
+
+
+
+                                </p:fieldset>    
+                                <p:fieldset legend="#{msg.direccionEstudiante}" rendered="#{inscripcionBean.inscripcion.inscripcionEstudiante and inscripcionBean.tipoMatricula == 'I'}">
+                                    <h:panelGrid columns="2" columnClasses="top60, top40" id="panelDatosDireccion" style="width: 100%"> 
+
+                                        <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInscripcion" cellpadding="4" cellspacing="2">
+                                            <p:outputLabel id="lblProvincia" for="selProvincia" value="#{msg.provincia}:"/>
+                                            <h:panelGrid id="panelProvincia" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:selectOneMenu value="#{inscripcionBean.provincia}" 
+                                                                 style="width: 230px"
+                                                                 id="selProvincia"
+                                                                 required="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.direccionObligatoria}"
+                                                                 converter="omnifaces.SelectItemsConverter">
+                                                    <p:ajax update="lblProvincia, panelProvincia, selCanton, selParroquia"/>
+                                                    <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption="true"/>
+                                                    <f:selectItems value="#{provinciaBean.provinciaActivoList}" var="prov" itemLabel="#{prov.nombre}" itemValue="#{prov}"/>
+                                                </p:selectOneMenu>
+                                                <p:message id="msgProvincia" for="selProvincia" />
+                                            </h:panelGrid>
+
+                                            <p:outputLabel id="lblCanton" for="selCanton" value="#{msg.canton}:"/>
+                                            <h:panelGrid id="panelCanton" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:selectOneMenu value="#{inscripcionBean.canton}" 
+                                                                 id="selCanton"
+                                                                 style="width: 230px"
+                                                                 required="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.direccionObligatoria}"
+                                                                 converter="omnifaces.SelectItemsConverter">
+                                                    <p:ajax update="selParroquia, lblCanton, panelCanton"/>
+                                                    <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption="true"/>
+                                                    <f:selectItems value="#{inscripcionBean.provincia.cantonActivoList}" var="can" itemLabel="#{can.nombre}" itemValue="#{can}"/>
+                                                </p:selectOneMenu>
+                                                <p:message id="msgCanton" for="selCanton" />
+                                            </h:panelGrid>
+
+
+                                            <p:outputLabel id="lblParroquia" for="selParroquia" value="#{msg.parroquia}:"/>
+                                            <h:panelGrid id="panelParroquia" columns="1" cellpadding="0" cellspacing="0"> 
+                                                <p:selectOneMenu value="#{inscripcionBean.inscripcion.estudiante.persona.parroquia}" 
+                                                                 id="selParroquia"
+                                                                 style="width: 230px"
+                                                                 required="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.direccionObligatoria}"
+                                                                 converter="omnifaces.SelectItemsConverter">
+                                                    <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption="true"/>
+                                                    <f:selectItems value="#{inscripcionBean.canton.parroquiaActivoList}" var="parr" itemLabel="#{parr.nombre}" itemValue="#{parr}"/>
+                                                    <p:ajax event="change" update="lblParroquia, panelParroquia"/>
+                                                </p:selectOneMenu>
+                                                <p:message id="msgParroquia" for="selParroquia" />
+                                            </h:panelGrid>
+
+                                        </h:panelGrid>
+
+                                        <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInscripcion" cellpadding="4" cellspacing="2">
+                                            <p:outputLabel id="lblDireccion" for="txtDireccion" value="#{msg.direccion}:"/>
+                                            <h:panelGrid id="panelDireccion" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputTextarea id="txtDireccion" value="#{inscripcionBean.inscripcion.estudiante.persona.direccion}" 
+                                                                 required="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.direccionObligatoria}" 
+                                                                 cols="40" rows="2" maxlength="300" >
+                                                    <p:ajax event="keyup" update="lblDireccion, msgDireccion"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputTextarea>
+                                                <p:message id="msgDireccion" for="txtDireccion"/>
+                                            </h:panelGrid>
+
+
+                                            <p:outputLabel id="lblReferencia" for="txtReferencia" value="#{msg.referencia}:"/>
+                                            <h:panelGrid id="panelReferencia" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputTextarea id="txtReferencia"
+                                                                 value="#{inscripcionBean.inscripcion.estudiante.persona.direccionReferencia}"
+                                                                 required="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.direccionObligatoria}"
+                                                                 maxlength="250"
+                                                                 cols="40" rows="2"
+                                                                 >
+                                                    <p:ajax event="keyup" update="lblReferencia, msgReferencia"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputTextarea>
+                                                <p:message id="msgReferencia" for="txtReferencia"/>
+                                            </h:panelGrid>
+
+                                        </h:panelGrid>
+                                    </h:panelGrid>
+
+                                    <h:panelGrid id="panelContacto" style="width: 100%">
+                                        <p:spacer width="1" height="5"/>
+                                        <p:outputLabel value="#{msg.contactoEmergencia}" style="font-weight: bold"/>
+
+                                        <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInscripcion" cellpadding="4" cellspacing="2">
+
+                                            <p:outputLabel id="lblNombreContacto" for="txtNombreContacto" value="#{msg.nombres}:"/>
+                                            <h:panelGrid  id="panelNombreContacto" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtNombreContacto" value="#{inscripcionBean.inscripcion.estudiante.persona.contactoNombres}"
+                                                             required="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.direccionObligatoria}" 
+                                                             maxlength="30" size="35" >
+                                                    <p:ajax event="keyup" update="lblNombreContacto, msgNombreContacto"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputText>
+                                                <p:message id="msgNombreContacto" for="txtNombreContacto"/>
+                                            </h:panelGrid>
+
+                                            <p:outputLabel id="lblApellidoContacto" for="txtApellidoContacto" value="#{msg.apellidos}:"/>
+                                            <h:panelGrid id="panelApellidoContacto" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtApellidoContacto" value="#{inscripcionBean.inscripcion.estudiante.persona.contactoApellidos}"
+                                                             required="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.direccionObligatoria}" 
+                                                             maxlength="30" size="35" >
+                                                    <p:ajax event="keyup" update="lblApellidoContacto, msgApellidoContacto"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputText>
+                                                <p:message id="msgApellidoContacto" for="txtApellidoContacto"/>
+                                            </h:panelGrid>
+
+                                            <p:outputLabel id="lblTelefonoContacto" for="txtTelefonoContacto" value="#{msg.telefono}:"/>
+                                            <h:panelGrid id="panelTelefonoContacto" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtTelefonoContacto"
+                                                             value="#{inscripcionBean.inscripcion.estudiante.persona.contactoTelefono}"
+                                                             required="#{inscripcionBean.inscripcion.cursoCentroCapacitacion.direccionObligatoria}" 
+                                                             size="13"
+                                                             validator="ValidadorNumero"
+                                                             maxlength="10">
+                                                    <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                                    <p:ajax event="keyup" update="lblTelefonoContacto, msgTelefonoContacto"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputText>
+                                                <p:message id="msgTelefonoContacto" for="txtTelefonoContacto"/>
+                                            </h:panelGrid>
+
+                                        </h:panelGrid>
+
+                                    </h:panelGrid>
+                                </p:fieldset>
+                                <p:fieldset legend="#{msg.informacionEmpresarial}" rendered="#{inscripcionBean.inscripcion.inscripcionEstudiante and inscripcionBean.tipoMatricula == 'I'}">
+                                    <h:panelGrid id="panelDatosInformacionEmpresarial" columns="2" columnClasses="top60, top40" style="width: 100%">
+
+                                        <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInscripcion" cellpadding="4" cellspacing="2">
+                                            <p:outputLabel for="selTrabajaActualmente" value="#{msg.trabajaActualmente}:"/>
+                                            <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                                <p:selectBooleanButton id="selTrabajaActualmente" value="#{inscripcionBean.trabajaActualmente}"
+                                                                       required="true" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times">
+                                                    <p:ajax update="panelDatosInformacionEmpresarial" listener="#{inscripcionBean.onTrabajaActualmenteChange()}"/>
+                                                </p:selectBooleanButton>                                                
+                                                <p:message id="msgTrabajaActualmente" for="selTrabajaActualmente"/>
+                                            </h:panelGrid>
+
+                                            <p:outputLabel id="lblNombreEmpresa" for="txtNombreEmpresa" value="#{msg.nombreEmpresa}:"
+                                                           rendered="#{inscripcionBean.trabajaActualmente}"/>
+                                            <h:panelGrid columns="1" cellpadding="0" cellspacing="0" rendered="#{inscripcionBean.trabajaActualmente}">
+                                                <p:inputText id="txtNombreEmpresa" value="#{inscripcionBean.inscripcion.empresaTrabajo}" required="true" 
+                                                             maxlength="50" size="60" >
+                                                    <p:ajax event="keyup" update="lblNombreEmpresa, msgNombreEmpresa"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputText>
+                                                <p:message id="msgNombreEmpresa" for="txtNombreEmpresa"/>
+                                            </h:panelGrid>
+
+
+                                            <p:outputLabel id="lblDireccionEmpresa" for="txtDireccionEmpresa" value="#{msg.direccion}:"
+                                                           rendered="#{inscripcionBean.trabajaActualmente}"/>
+                                            <h:panelGrid columns="1" cellpadding="0" cellspacing="0" rendered="#{inscripcionBean.trabajaActualmente}">
+                                                <p:inputTextarea id="txtDireccionEmpresa" value="#{inscripcionBean.inscripcion.direccionTrabajo}" required="true" 
+                                                                 maxlength="300" cols="60" rows="2">
+                                                    <p:ajax event="keyup" update="lblDireccionEmpresa, msgDireccionEmpresa"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputTextarea>
+                                                <p:message id="msgDireccionEmpresa" for="txtDireccionEmpresa"/>
+                                            </h:panelGrid>
+
+                                            <p:outputLabel id="lblTelefonoEmpresa" for="txtTelefonoEmpresa" value="#{msg.telefono}:"
+                                                           rendered="#{inscripcionBean.trabajaActualmente}"/>
+                                            <h:panelGrid columns="1" cellpadding="0" cellspacing="0" rendered="#{inscripcionBean.trabajaActualmente}">
+                                                <p:inputText id="txtTelefonoEmpresa"
+                                                             value="#{inscripcionBean.inscripcion.telefonoTrabajo}"
+                                                             required="true"
+                                                             size="13"
+                                                             validator="ValidadorNumero"
+                                                             maxlength="10">
+                                                    <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                                    <p:ajax event="keyup" update="lblTelefonoEmpresa, msgTelefonoEmpresa"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputText>
+                                                <p:message id="msgTelefonoEmpresa" for="txtTelefonoEmpresa"/>
+                                            </h:panelGrid>
+
+                                        </h:panelGrid>
+
+
+                                    </h:panelGrid> 
+
+
+
+                                </p:fieldset>
+                                <p:fieldset legend="#{msg.informacionPago}">
+                                    <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInscripcion" cellpadding="4" cellspacing="2"
+                                                 id="panelInformacionPago">
+
+                                        <p:outputLabel id="lblCredito" for="selCredito" value="#{msg.aplicaCredito}:"/>
+                                        <h:panelGrid columns="1" id="panelCredito">
+                                            <p:selectBooleanButton id="selCredito" value="#{inscripcionBean.aplicaCredito}"
+                                                                   required="true" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times">
+                                                <p:ajax update="panelInformacionPago" listener="#{inscripcionBean.onAplicaCreditoChange()}"/>
+                                            </p:selectBooleanButton>
+                                            <p:message for="selCredito"/>
+                                        </h:panelGrid>
+
+
+                                        <p:outputLabel id="lblAbono" for="selAbono" value="#{msg.realizaAbono}:"
+                                                       rendered="#{inscripcionBean.inscripcion.creditoSi}"/>
+                                        <h:panelGrid columns="1" id="panelAbono"
+                                                     rendered="#{inscripcionBean.inscripcion.creditoSi}">
+                                            <p:selectBooleanButton id="selAbono" value="#{inscripcionBean.realizaAbono}"
+                                                                   required="true" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times">
+                                                <p:ajax update="panelInformacionPago" listener="#{inscripcionBean.onRealizaAbonoChange()}"/>
+                                            </p:selectBooleanButton>
+
+                                            <p:message for="selAbono"/>
+                                        </h:panelGrid>
+
+                                        <p:outputLabel id="lblPagaEmpresa" for="selPagaEmpresa" value="#{msg.pagaEmpresa}:"
+                                                       rendered="#{inscripcionBean.inscripcion.abonoNo}"/>
+                                        <h:panelGrid columns="1" id="panelPagaEmpresa"
+                                                     rendered="#{inscripcionBean.inscripcion.abonoNo}">
+                                            <p:selectBooleanButton id="selPagaEmpresa" value="#{inscripcionBean.pagaEmpresa}"
+                                                                   required="true" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times">
+                                                <p:ajax update="panelInformacionPago" listener="#{inscripcionBean.onPagaEmpresaChange()}"/>
+                                            </p:selectBooleanButton>
+                                            <p:message for="selPagaEmpresa"/>
+                                        </h:panelGrid>
+
+
+                                        <p:outputLabel id="lblFormaPago" for="selFormaPago" value="#{msg.formaPago}:" rendered="#{not menuBar.usuario.verificarRolEstudiante() and inscripcionBean.inscripcion.abonoSi}"/>
+                                        <h:panelGrid columns="1" id="panelFormaPago" rendered="#{not menuBar.usuario.verificarRolEstudiante() and inscripcionBean.inscripcion.abonoSi}">
+                                            <p:selectOneRadio id="selFormaPago" value="#{inscripcionBean.inscripcion.formaPago}" required="true"
+                                                              requiredMessage="Forma de Pago:* Campo obligatorio">
+                                                <f:selectItem itemLabel="Efectivo" itemValue="E"/>
+                                                <f:selectItem itemLabel="Cheque" itemValue="C"/>
+                                                <f:selectItem itemLabel="Depósito" itemValue="D"/>
+                                                <f:selectItem itemLabel="Tarjeta de Crédito" itemValue="T"/>
+                                                <f:selectItem itemLabel="Pago en Línea" itemValue="P"/>
+                                                <f:selectItem itemLabel="Transferencia Bancaria" itemValue="B"/>
+                                                <p:ajax update="panelInformacionPago"/>
+                                            </p:selectOneRadio>
+                                            <p:message for="selFormaPago"/>
+                                        </h:panelGrid>
+
+
+                                        <p:outputLabel id="lblFormaPago2" for="selFormaPago2" value="#{msg.formaPago}:" rendered="#{menuBar.usuario.verificarRolEstudiante() and inscripcionBean.inscripcion.abonoSi}"/>
+                                        <h:panelGrid columns="1" id="panelFormaPago2" rendered="#{menuBar.usuario.verificarRolEstudiante() and inscripcionBean.inscripcion.abonoSi}">
+                                            <p:selectOneRadio id="selFormaPago2" value="#{inscripcionBean.inscripcion.formaPago}" required="true"
+                                                              requiredMessage="Forma de Pago:* Campo obligatorio">
+                                                <f:selectItem itemLabel="Depósito" itemValue="D"/>
+                                                <f:selectItem itemLabel="Tarjeta de Crédito" itemValue="T"/>
+                                                <f:selectItem itemLabel="Pago en Línea" itemValue="P"/>
+                                                <f:selectItem itemLabel="Transferencia Bancaria" itemValue="B"/>
+                                                <p:ajax update="lblFormaPago2, panelFormaPago2"/>
+                                            </p:selectOneRadio>
+                                            <p:message for="panelInformacionPago"/>
+                                        </h:panelGrid>
+
+
+
+
+                                        <p:outputLabel value="#{msg.comprobantePago}:" for="hidNombreDocumento" rendered="#{inscripcionBean.inscripcion.abonoSi and not inscripcionBean.inscripcion.formaPagoEfectivo}"/>
+                                        <h:panelGrid columns="1" id="panelDocumentoPago" rendered="#{inscripcionBean.inscripcion.abonoSi and not inscripcionBean.inscripcion.formaPagoEfectivo}">
+                                            <p:fileUpload id="fileDocumento" fileUploadListener="#{inscripcionBean.subirDocumentoPago}" 
+                                                          mode="advanced"
+                                                          style="width: 100%"
+                                                          label="#{msg.seleccionar}"
+                                                          update="panelDocumentoPago" auto="true">
+                                                <a style="color: #0246af" target="_blank" href="#{request.contextPath}#{inscripcionBean.inscripcion.documentoPagoUrlCompleto}">#{inscripcionBean.inscripcion.documentoPagoNombre}</a>
+
+                                            </p:fileUpload>
+                                            <p:message for="hidNombreDocumento"></p:message>
+                                            <h:inputHidden id="hidNombreDocumento" value="#{inscripcionBean.inscripcion.documentoPagoNombre}"
+                                                           required="true" requiredMessage="Comprobante de Pago:* Campo obligatorio">
+                                            </h:inputHidden> 
+                                        </h:panelGrid>
+
+                                        <p:outputLabel value="#{msg.ordenCompra}:" for="hidNombreDocumento2" rendered="#{inscripcionBean.inscripcion.pagaEmpresaSi}"/>
+                                        <h:panelGrid columns="1" id="panelDocumentoPago2" rendered="#{inscripcionBean.inscripcion.pagaEmpresaSi}">
+                                            <p:fileUpload id="fileDocumento2" fileUploadListener="#{inscripcionBean.subirDocumentoPago}" 
+                                                          mode="advanced"
+                                                          style="width: 100%"
+                                                          label="#{msg.seleccionar}"
+                                                          update="panelDocumentoPago2" auto="true">
+                                                <a style="color: #0246af" target="_blank" href="#{request.contextPath}#{inscripcionBean.inscripcion.documentoPagoUrlCompleto}">#{inscripcionBean.inscripcion.documentoPagoNombre}</a>
+
+                                            </p:fileUpload>
+                                            <p:message for="hidNombreDocumento2"></p:message>
+                                            <h:inputHidden id="hidNombreDocumento2" value="#{inscripcionBean.inscripcion.documentoPagoNombre}"
+                                                           required="true" requiredMessage="Orden de compra:* Campo obligatorio">
+                                            </h:inputHidden> 
+                                        </h:panelGrid>
+
+                                    </h:panelGrid>                                        
+
+                                </p:fieldset>
+
+                                <p:fieldset legend="#{msg.medioEntero}">
+                                    <p:selectOneRadio id="selMedio" value="#{inscripcionBean.inscripcion.medioEnteroCurso}" required="true"
+                                                      requiredMessage="Medio por el cual se enteró del curso:* Campo obligatorio">
+                                        <f:selectItem itemLabel="Redes Sociales" itemValue="S"/>
+                                        <f:selectItem itemLabel="Página Web" itemValue="P"/>
+                                        <f:selectItem itemLabel="Correo Electrónico" itemValue="C"/>
+                                        <f:selectItem itemLabel="Flyers" itemValue="Y"/>
+                                        <f:selectItem itemLabel="Prensa Escrita" itemValue="E"/>
+                                        <f:selectItem itemLabel="Radio" itemValue="R"/>
+                                        <f:selectItem itemLabel="Referido" itemValue="F"/>
+                                        <p:ajax update="msgMedioEntero"/>
+                                    </p:selectOneRadio>
+                                    <p:message id="msgMedioEntero" for="selMedio"/>
+                                </p:fieldset>
+                                <p:fieldset legend="#{msg.informacionFacturaElectrónica}">
+
+                                    <h:panelGrid id="panelDatosFactura" columns="2" columnClasses="top50, top50" style="width: 100%">
+                                        <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInscripcion" cellpadding="4" cellspacing="2">
+
+                                            <p:outputLabel for="selTipoIdentificacionFactura" value="#{msg.tipoIdentificacion}:"/>
+                                            <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                                <p:selectOneMenu id="selTipoIdentificacionFactura" value="#{inscripcionBean.inscripcion.facturaTipoIdentificacion}"
+                                                                 style="width: 123px"
+                                                                 converter="omnifaces.SelectItemsConverter" required="true">
+                                                    <f:selectItems value="#{tipoIdentificacionBean.tipoIdentificacionParaFacturaList}" var="tipoId" itemLabel="#{tipoId.nombre}" itemValue="#{tipoId}"/>
+                                                    <p:ajax listener="#{inscripcionBean.inscripcion.setFacturaRuc(null)}" update="panelDatosFactura"/>
+
+                                                </p:selectOneMenu>
+                                                <p:message for="selTipoIdentificacionFactura"/>
+                                            </h:panelGrid>
+
+                                            <p:outputLabel id="lblCedulaFactura" for="txtCedulaFactura" value="#{msg.identificacion}:" rendered="#{inscripcionBean.inscripcion.facturaTipoIdentificacion.id==1}"/>
+                                            <h:panelGrid id="panelCedulaFactura" cellpadding="0" cellspacing="0" columns="1" rendered="#{inscripcionBean.inscripcion.facturaTipoIdentificacion.id==1}">
+                                                <p:inputText id="txtCedulaFactura"
+                                                             value="#{inscripcionBean.inscripcion.facturaRuc}"
+                                                             validator="ValidadorCedula"
+                                                             required="true"
+                                                             size="16"
+                                                             maxlength="10"
+                                                             >
+                                                    <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                                    <p:ajax event="keyup" update="lblCedulaFactura, msgCedulaFactura"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputText>
+                                                <p:message id="msgCedulaFactura" for="txtCedulaFactura"/>
+                                            </h:panelGrid>
+
+                                            <p:outputLabel id="lblRucFactura" for="txtRucFactura" value="#{msg.identificacion}:" rendered="#{inscripcionBean.inscripcion.facturaTipoIdentificacion.id==2}"/>
+                                            <h:panelGrid id="panelRucRucFactura" cellpadding="0" cellspacing="0" columns="2" rendered="#{inscripcionBean.inscripcion.facturaTipoIdentificacion.id==2}">
+                                                <p:inputText id="txtRucFactura"
+                                                             value="#{inscripcionBean.inscripcion.facturaRuc}"
+                                                             required="true"
+                                                             size="16"
+                                                             validator="ValidadorRuc"
+                                                             maxlength="13">
+                                                    <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                                    <p:ajax event="keyup" update="lblRucFactura, msgRucFactura"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputText>
+                                                <p:message id="msgRucFactura" for="txtRucFactura"/>
+                                            </h:panelGrid>
+
+                                            <p:outputLabel id="lblFacturaRazonSocial" for="txtFacturaRazonSocial" value="#{msg.razonSocial}:"/>
+                                            <h:panelGrid  id="panelFacturaRazonSocial" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputTextarea id="txtFacturaRazonSocial" value="#{inscripcionBean.inscripcion.facturaRazonSocial}" required="true" 
+                                                                 maxlength="300" cols="40" rows="2">
+                                                    <p:ajax event="keyup" update="lblFacturaRazonSocial, msgFacturaRazonSocial"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputTextarea>
+                                                <p:message id="msgFacturaRazonSocial" for="txtFacturaRazonSocial"/>
+                                            </h:panelGrid>
+                                        </h:panelGrid>
+
+                                        <h:panelGrid columns="2" columnClasses="etiqueta etiquetaInscripcion" cellpadding="4" cellspacing="2">
+                                            <p:outputLabel id="lblFacturaDireccion" for="txtFacturaDireccion" value="#{msg.direccion}:"/>
+                                            <h:panelGrid  id="panelFacturaDireccion" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputTextarea id="txtFacturaDireccion" value="#{inscripcionBean.inscripcion.facturaDireccion}" required="true" 
+                                                                 maxlength="300" cols="40" rows="2">
+                                                    <p:ajax event="keyup" update="lblFacturaDireccion, msgFacturaDireccion"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputTextarea>
+                                                <p:message id="msgFacturaDireccion" for="txtFacturaDireccion"/>
+                                            </h:panelGrid>
+
+                                            <p:outputLabel id="lblFacturaEmail" for="txtFacturaEmail" value="#{msg.email}:"/>
+                                            <h:panelGrid id="panelFacturaEmail" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtFacturaEmail" value="#{inscripcionBean.inscripcion.facturaEmail}" required="true" 
+                                                             maxlength="60" size="40">
+                                                    <p:ajax event="keyup" update="lblFacturaEmail, msgFacturaEmail"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputText>
+                                                <p:message id="msgFacturaEmail" for="txtFacturaEmail"/>
+                                            </h:panelGrid>
+
+
+                                            <p:outputLabel id="lblFacturaTelefono" for="txtFacturaTelefono" value="#{msg.telefono}:"/>
+                                            <h:panelGrid id="panelFacturaTelefono" columns="1" cellpadding="0" cellspacing="0">
+                                                <p:inputText id="txtFacturaTelefono"
+                                                             value="#{inscripcionBean.inscripcion.facturaTelefono}"
+                                                             required="true"
+                                                             size="13"
+                                                             validator="ValidadorNumero"
+                                                             maxlength="10">
+                                                    <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                                    <p:ajax event="keyup" update="lblFacturaTelefono, msgFacturaTelefono"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputText>
+                                                <p:message id="msgFacturaTelefono" for="txtFacturaTelefono"/>
+                                            </h:panelGrid>
+                                        </h:panelGrid>
+                                    </h:panelGrid>
+
+
+                                </p:fieldset>
+
+                                <p:fieldset legend="#{msg.listadoEstudiantes}" rendered="#{inscripcionBean.tipoMatricula == 'G'}">
+                                    <p:commandButton icon="fa fa-plus-circle" value="#{msg.agregar}" action="#{inscripcionBean.abrirEstudianteGrupo()}" 
+                                                     update="formPrincipal:formEstudianteGrupo"
+                                                     process="@this"
+                                                     resetValues="true"
+                                                     oncomplete="PF('dlgEstudianteGrupo').show();" />
+                                    <p:dataTable id="tblInscripcionesGrupo" value="#{inscripcionBean.inscripcionList}" var="insc"
+                                                 emptyMessage="#{msg.noExistenDatos}">
+                                        <p:column headerText="#{msg.acciones}" width="100" style="text-align: center">
+                                            <p:commandButton icon="fa fa-pencil" title="#{msg.editar}" action="#{inscripcionBean.seleccionarEstudianteGrupo(insc)}" resetValues="true"
+                                                             process="@this"
+                                                             update="formPrincipal:formEstudianteGrupo"
+                                                             />
+                                            <p:commandButton icon="fa fa-trash-o" title="#{msg.eliminar}" action="#{inscripcionBean.eliminarEstudianteGrupo(insc)}" update="formPrincipal:tblInscripcionesGrupo"
+                                                             process="@this"/>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg.apellidosNombres}">
+                                            <h:outputLabel value="#{insc.estudiante.persona.nombresCompletos}"/>
+                                        </p:column> 
+                                        <p:column headerText="#{msg.cedulaPasaporte}" width="110">
+                                            <h:outputLabel value="#{insc.estudiante.persona.identificacion}"/>
+                                        </p:column> 
+                                        <p:column headerText="#{msg.email}" width="160">
+                                            <h:outputLabel value="#{insc.estudiante.persona.email}"/>
+                                        </p:column> 
+                                        <p:column headerText="#{msg.telefono}" width="80">
+                                            <h:outputLabel value="#{insc.estudiante.persona.telefono}"/>
+                                        </p:column> 
+                                        <p:column headerText="#{msg.celular}" width="80">
+                                            <h:outputLabel value="#{insc.estudiante.persona.celular}"/>
+                                        </p:column> 
+
+                                    </p:dataTable>
+                                </p:fieldset>
+
+                            </h:panelGrid>
+
+
+                        </p:panel>
+
+
+
+
+                        <p:dialog id="dlgEstudianteGrupo"  
+                                  widgetVar="dlgEstudianteGrupo"
+                                  closeOnEscape="true"
+                                  position="center top"
+                                  dynamic="true"
+                                  appendTo="@(body)"
+                                  modal="true"
+                                  header="#{msg.informacionEstudiante}" 
+                                  width="730">
+                            <h:form id="formEstudianteGrupo">
+                                <pe:blockUI widgetVar="blockUIWidget2" target="formEstudianteGrupo">  
+                                    <h:panelGrid columns="2">  
+                                        <p:graphicImage value="/resources/images/ajax-loader1.gif" style="margin-right: 12px; vertical-align: middle;" />  
+                                        <h:outputText value="#{msg.procesando}" style="white-space: nowrap;"/>  
+                                    </h:panelGrid>   
+                                </pe:blockUI>              
+
+                                <p:outputPanel id="panelEstudianteGrupo" style="height:400px;overflow:auto">
+                                    <br/>
+                                    <p:messages/>
+                                    <p:fieldset legend="#{msg.datosEstudiante}">
+
+                                        <h:panelGrid columns="2" columnClasses="top, top" style="width: 100%">
+                                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaAdministrador">
+                                                <p:outputLabel id="lblCedulaGrupo" for="txtCedulaGrupo" value="#{msg.identificacion}:" 
+                                                               rendered="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.tipoIdentificacion.id==1}"/>
+                                                <p:outputLabel id="lblPasaporteGrupo" for="txtPasaporteGrupo" value="#{msg.identificacion}:" 
+                                                               rendered="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.tipoIdentificacion.id==3}"/>
+
+                                                <h:panelGrid cellpadding="0">
+                                                    <p:selectOneMenu id="selTipoIdentificacionGrupo" value="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.tipoIdentificacion}"
+                                                                     style="width: 105px"
+                                                                     converter="omnifaces.SelectItemsConverter" required="true">
+                                                        <f:selectItems value="#{tipoIdentificacionBean.tipoIdentificacionParaInscripcionList}" var="tipoIdGrupo" itemLabel="#{tipoIdGrupo.nombre}" itemValue="#{tipoIdGrupo}"/>
+                                                        <p:ajax update="panelEstudianteGrupo"/>
+                                                    </p:selectOneMenu>
+                                                    <p:inputText id="txtCedulaGrupo"
+                                                                 value="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.identificacion}"
+                                                                 required="true"
+                                                                 size="13"
+                                                                 rendered="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.tipoIdentificacion.id==1}"                                                         
+                                                                 validator="ValidadorCedula"
+                                                                 maxlength="10">
+                                                        <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                                        <p:ajax event="keyup" update="lblCedulaGrupo, msgCedulaGrupo"/>
+                                                        <p:ajax event="change" listener="#{inscripcionBean.buscarPersonaGrupo()}" update="panelEstudianteGrupo"
+                                                                onstart="PF('blockUIWidget2').block()" oncomplete="PF('blockUIWidget2').unblock()"/>
+                                                    </p:inputText>
+                                                    <p:message id="msgCedulaGrupo" for="txtCedulaGrupo" rendered="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.tipoIdentificacion.id==1}"/>
+
+                                                    <p:inputText id="txtPasaporteGrupo"
+                                                                 value="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.identificacion}"
+                                                                 required="true"
+                                                                 size="13"
+                                                                 rendered="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.tipoIdentificacion.id==3}"
+                                                                 maxlength="13">
+                                                        <p:ajax event="keyup" update="lblPasaporteGrupo, msgPasaporteGrupo"/>
+                                                        <p:ajax event="change" listener="#{inscripcionBean.buscarPersonaGrupo()}" update="panelEstudianteGrupo"
+                                                                onstart="PF('blockUIWidget2').block()" oncomplete="PF('blockUIWidget2').unblock()"/>
+                                                    </p:inputText>
+                                                    <p:message id="msgPasaporteGrupo" for="txtPasaporteGrupo" rendered="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.tipoIdentificacion.id==3}"/>
+
+                                                </h:panelGrid>
+
+
+
+                                                <p:outputLabel id="lblTelefonoGrupo" for="txtTelefonoGrupo" value="#{msg.telefono}:" />
+                                                <h:panelGrid id="panelTelefonoGrupo" cellpadding="0">
+                                                    <p:inputText id="txtTelefonoGrupo"
+                                                                 value="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.telefono}"
+                                                                 required="false"
+                                                                 size="13"
+                                                                 validator="ValidadorTelefono"
+                                                                 maxlength="9">
+                                                        <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                                        <p:ajax event="keyup" update="lblTelefonoGrupo, msgTelefonoGrupo"/>
+                                                        <p:ajax event="change" update="@this"/>
+                                                    </p:inputText>
+                                                    <p:message id="msgTelefonoGrupo" for="txtTelefonoGrupo"/>
+                                                </h:panelGrid> 
+
+
+                                                <p:outputLabel id="lblCelularGrupo" for="txtCelularGrupo" value="#{msg.celular}:" />
+                                                <h:panelGrid id="panelCelularGrupo" cellpadding="0">
+                                                    <p:inputText id="txtCelularGrupo"
+                                                                 value="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.celular}"
+                                                                 required="true"
+                                                                 size="13"
+                                                                 validator="ValidadorCelular"
+                                                                 maxlength="10">
+                                                        <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                                        <p:ajax event="keyup" update="lblCelularGrupo, msgCelularGrupo"/>
+                                                        <p:ajax event="change" update="@this"/>
+                                                    </p:inputText>
+                                                    <p:message id="msgCelularGrupo" for="txtCelularGrupo"/>
+                                                </h:panelGrid> 
+
+                                                <p:outputLabel id="lblFechaNacimientoGrupo" for="txtFechaNacimientoGrupo" value="#{msg.fechaNacimiento}:" />
+                                                <h:panelGrid id="panelFechaNacimientoGrupo" cellpadding="0">
+                                                    <p:calendar id="txtFechaNacimientoGrupo" value="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.fechaNacimiento}" required="true" 
+                                                                size="13" pattern="dd/MM/yyyy" 
+                                                                mindate="01/01/1900" maxdate="#{inscripcionBean.fechaActual}"
+                                                                showOtherMonths="true" navigator="true"
+                                                                validatorMessage="Fecha de Nacimiento:* Formato de fecha incorrecto."
+                                                                yearRange="c-120:c+300">
+                                                        <p:ajax event="dateSelect" update="@this,lblFechaNacimientoGrupo, msgFechaNacimientoGrupo"/>
+                                                        <p:ajax event="keyup" update="lblFechaNacimientoGrupo, msgFechaNacimientoGrupo"/>
+                                                        <p:ajax event="change" update="@this"/>                                                
+                                                    </p:calendar>
+                                                    <p:message id="msgFechaNacimientoGrupo" for="txtFechaNacimientoGrupo"/>
+                                                </h:panelGrid> 
+
+
+                                            </h:panelGrid>    
+
+
+                                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaAdministrador">
+                                                <p:outputLabel id="lblNombreGrupo" for="txtNombreGrupo" value="#{msg.apellidosNombres}:" />
+                                                <h:panelGrid id="panelNombreGrupo" cellpadding="0">
+                                                    <p:inputText id="txtNombreGrupo" value="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.nombresCompletos}" required="true" 
+                                                                 maxlength="60" size="35" >
+                                                        <p:ajax event="keyup" update="lblNombreGrupo, msgNombreGrupo"/>
+                                                        <p:ajax event="change" update="@this"/>
+                                                    </p:inputText>
+                                                    <p:message id="msgNombreGrupo" for="txtNombreGrupo"/>
+                                                </h:panelGrid> 
+
+
+                                                <p:outputLabel id="lblEmailGrupo" for="txtEmailGrupo" value="#{msg.email}:" />
+                                                <h:panelGrid id="panelEmailGrupo" cellpadding="0">
+                                                    <p:inputText id="txtEmailGrupo" value="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.email}" required="true" 
+                                                                 maxlength="60" size="35" >
+                                                        <p:ajax event="keyup" update="lblEmailGrupo, msgEmailGrupo"/>
+                                                        <p:ajax event="change" update="@this"/>
+                                                    </p:inputText>
+                                                    <p:message id="msgEmailGrupo" for="txtEmailGrupo"/>
+                                                </h:panelGrid> 
+
+
+
+                                                <p:outputLabel id="lblTipoEstudianteGrupo" for="selTipoEstudianteGrupo" value="#{msg.tipoEstudiante}:" />
+                                                <h:panelGrid id="panelTipoEstudianteGrupo" cellpadding="0">
+                                                    <p:selectOneMenu id="selTipoEstudianteGrupo" value="#{inscripcionBean.inscripcionEstudiante.tipoEstudiante}"
+                                                                     style="width: 240px"
+                                                                     converter="omnifaces.SelectItemsConverter" 
+                                                                     required="true">
+                                                        <f:selectItem itemLabel="#{msg.seleccione}" itemValue="#{null}" noSelectionOption="true"/>
+                                                        <f:selectItems value="#{tipoEstudianteBean.tipoEstudianteList}" var="tipoEstGrupo" itemLabel="#{tipoEstGrupo.nombre}" itemValue="#{tipoEstGrupo}"/>
+                                                        <p:ajax update="lblTipoEstudianteGrupo, panelTipoEstudianteGrupo"/>
+                                                    </p:selectOneMenu>
+
+                                                    <p:message id="msgTipoEstudianteGrupo" for="selTipoEstudianteGrupo"/>
+                                                </h:panelGrid> 
+
+
+                                                <p:outputLabel id="lblGenero" for="selGenero" value="#{msg.genero}:"/>
+                                                <h:panelGrid id="panelGenero" columns="1" cellpadding="0">
+                                                    <p:selectOneRadio id="selGenero" value="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.genero}"
+                                                                      style="width: 200px"
+                                                                      layout="grid"
+                                                                      columns="1"
+                                                                      required="true">
+                                                        <f:selectItem itemLabel="Femenino" itemValue="F"/>
+                                                        <f:selectItem itemLabel="Masculino" itemValue="M"/>
+                                                        <p:ajax update="lblGenero, panelGenero"/>
+                                                    </p:selectOneRadio>
+                                                    <p:message for="selGenero"/>
+                                                </h:panelGrid>
+
+
+                                            </h:panelGrid>                                            
+
+                                        </h:panelGrid> 
+
+
+
+                                    </p:fieldset>
+
+                                    <br/>
+                                    <p:fieldset legend="#{msg.direccionEstudiante}">
+                                        <h:panelGrid columns="2" columnClasses="top, top" id="panelDatosDireccion" style="width: 100%"> 
+
+                                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaDireccionGrupo" cellpadding="4" cellspacing="2">
+                                                <p:outputLabel id="lblProvincia" for="selProvincia" value="#{msg.provincia}:"/>
+                                                <h:panelGrid id="panelProvincia" columns="1" cellpadding="0" cellspacing="0">
+                                                    <p:selectOneMenu value="#{inscripcionBean.provincia}" 
+                                                                     style="width: 230px"
+                                                                     id="selProvincia"
+                                                                     required="#{inscripcionBean.inscripcionEstudiante.cursoCentroCapacitacion.direccionObligatoria}"
+                                                                     converter="omnifaces.SelectItemsConverter">
+                                                        <p:ajax update="lblProvincia, panelProvincia, selCanton, selParroquia"/>
+                                                        <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption="true"/>
+                                                        <f:selectItems value="#{provinciaBean.provinciaActivoList}" var="prov" itemLabel="#{prov.nombre}" itemValue="#{prov}"/>
+                                                    </p:selectOneMenu>
+                                                    <p:message id="msgProvincia" for="selProvincia" />
+                                                </h:panelGrid>
+
+                                                <p:outputLabel id="lblCanton" for="selCanton" value="#{msg.canton}:"/>
+                                                <h:panelGrid id="panelCanton" columns="1" cellpadding="0" cellspacing="0">
+                                                    <p:selectOneMenu value="#{inscripcionBean.canton}" 
+                                                                     id="selCanton"
+                                                                     style="width: 230px"
+                                                                     required="#{inscripcionBean.inscripcionEstudiante.cursoCentroCapacitacion.direccionObligatoria}"
+                                                                     converter="omnifaces.SelectItemsConverter">
+                                                        <p:ajax update="selParroquia, lblCanton, panelCanton"/>
+                                                        <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption="true"/>
+                                                        <f:selectItems value="#{inscripcionBean.provincia.cantonActivoList}" var="can" itemLabel="#{can.nombre}" itemValue="#{can}"/>
+                                                    </p:selectOneMenu>
+                                                    <p:message id="msgCanton" for="selCanton" />
+                                                </h:panelGrid>
+
+
+                                                <p:outputLabel id="lblParroquia" for="selParroquia" value="#{msg.parroquia}:"/>
+                                                <h:panelGrid id="panelParroquia" columns="1" cellpadding="0" cellspacing="0"> 
+                                                    <p:selectOneMenu value="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.parroquia}" 
+                                                                     id="selParroquia"
+                                                                     style="width: 230px"
+                                                                     required="#{inscripcionBean.inscripcionEstudiante.cursoCentroCapacitacion.direccionObligatoria}"
+                                                                     converter="omnifaces.SelectItemsConverter">
+                                                        <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption="true"/>
+                                                        <f:selectItems value="#{inscripcionBean.canton.parroquiaActivoList}" var="parr" itemLabel="#{parr.nombre}" itemValue="#{parr}"/>
+                                                        <p:ajax event="change" update="lblParroquia, panelParroquia"/>
+                                                    </p:selectOneMenu>
+                                                    <p:message id="msgParroquia" for="selParroquia" />
+                                                </h:panelGrid>
+
+                                            </h:panelGrid>
+
+                                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaDireccionGrupo" cellpadding="4" cellspacing="2">
+                                                <p:outputLabel id="lblDireccion" for="txtDireccion" value="#{msg.direccion}:"/>
+                                                <h:panelGrid id="panelDireccion" columns="1" cellpadding="0" cellspacing="0">
+                                                    <p:inputTextarea id="txtDireccion" value="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.direccion}" 
+                                                                     required="#{inscripcionBean.inscripcionEstudiante.cursoCentroCapacitacion.direccionObligatoria}" 
+                                                                     cols="30" rows="2" maxlength="300" >
+                                                        <p:ajax event="keyup" update="lblDireccion, msgDireccion"/>
+                                                        <p:ajax event="change" update="@this"/>
+                                                    </p:inputTextarea>
+                                                    <p:message id="msgDireccion" for="txtDireccion"/>
+                                                </h:panelGrid>
+
+
+                                                <p:outputLabel id="lblReferencia" for="txtReferencia" value="#{msg.referencia}:"/>
+                                                <h:panelGrid id="panelReferencia" columns="1" cellpadding="0" cellspacing="0">
+                                                    <p:inputTextarea id="txtReferencia"
+                                                                     value="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.direccionReferencia}"
+                                                                     required="#{inscripcionBean.inscripcionEstudiante.cursoCentroCapacitacion.direccionObligatoria}"
+                                                                     maxlength="250"
+                                                                     cols="30" rows="2"
+                                                                     >
+                                                        <p:ajax event="keyup" update="lblReferencia, msgReferencia"/>
+                                                        <p:ajax event="change" update="@this"/>
+                                                    </p:inputTextarea>
+                                                    <p:message id="msgReferencia" for="txtReferencia"/>
+                                                </h:panelGrid>
+
+                                            </h:panelGrid>
+                                        </h:panelGrid>
+
+                                        <h:panelGrid id="panelContacto" style="width: 100%">
+                                            <p:spacer width="1" height="5"/>
+                                            <p:outputLabel value="#{msg.contactoEmergencia}" style="font-weight: bold"/>
+
+                                            <h:panelGrid columns="2" columnClasses="etiqueta etiquetaDireccionGrupo" cellpadding="4" cellspacing="2">
+
+                                                <p:outputLabel id="lblNombreContacto" for="txtNombreContacto" value="#{msg.nombres}:"/>
+                                                <h:panelGrid  id="panelNombreContacto" columns="1" cellpadding="0" cellspacing="0">
+                                                    <p:inputText id="txtNombreContacto" value="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.contactoNombres}"
+                                                                 required="#{inscripcionBean.inscripcionEstudiante.cursoCentroCapacitacion.direccionObligatoria}" 
+                                                                 maxlength="30" size="35" >
+                                                        <p:ajax event="keyup" update="lblNombreContacto, msgNombreContacto"/>
+                                                        <p:ajax event="change" update="@this"/>
+                                                    </p:inputText>
+                                                    <p:message id="msgNombreContacto" for="txtNombreContacto"/>
+                                                </h:panelGrid>
+
+                                                <p:outputLabel id="lblApellidoContacto" for="txtApellidoContacto" value="#{msg.apellidos}:"/>
+                                                <h:panelGrid id="panelApellidoContacto" columns="1" cellpadding="0" cellspacing="0">
+                                                    <p:inputText id="txtApellidoContacto" value="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.contactoApellidos}"
+                                                                 required="#{inscripcionBean.inscripcionEstudiante.cursoCentroCapacitacion.direccionObligatoria}" 
+                                                                 maxlength="30" size="35" >
+                                                        <p:ajax event="keyup" update="lblApellidoContacto, msgApellidoContacto"/>
+                                                        <p:ajax event="change" update="@this"/>
+                                                    </p:inputText>
+                                                    <p:message id="msgApellidoContacto" for="txtApellidoContacto"/>
+                                                </h:panelGrid>
+
+                                                <p:outputLabel id="lblTelefonoContacto" for="txtTelefonoContacto" value="#{msg.telefono}:"/>
+                                                <h:panelGrid id="panelTelefonoContacto" columns="1" cellpadding="0" cellspacing="0">
+                                                    <p:inputText id="txtTelefonoContacto"
+                                                                 value="#{inscripcionBean.inscripcionEstudiante.estudiante.persona.contactoTelefono}"
+                                                                 required="#{inscripcionBean.inscripcionEstudiante.cursoCentroCapacitacion.direccionObligatoria}" 
+                                                                 size="16"
+                                                                 validator="ValidadorNumero"
+                                                                 maxlength="10">
+                                                        <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                                        <p:ajax event="keyup" update="lblTelefonoContacto, msgTelefonoContacto"/>
+                                                        <p:ajax event="change" update="@this"/>
+                                                    </p:inputText>
+                                                    <p:message id="msgTelefonoContacto" for="txtTelefonoContacto"/>
+                                                </h:panelGrid>
+
+                                            </h:panelGrid>
+
+                                        </h:panelGrid>
+                                    </p:fieldset>         
+
+
+                                    <br/>
+                                    <p:fieldset legend="#{msg.informacionEmpresarial}" rendered="true">
+                                        <h:panelGrid columns="2" id="panelDatosInformacionEmpresarial" columnClasses="etiqueta etiquetaEmpresaGrupo"
+                                                     cellpadding="4" cellspacing="2"> 
+
+                                            <p:outputLabel for="selTrabajaActualmente" value="#{msg.trabajaActualmente}:"/>
+                                            <h:panelGrid cellspacing="0" cellpadding="0">
+                                                <p:selectBooleanButton id="selTrabajaActualmente" value="#{inscripcionBean.trabajaActualmente}"
+                                                                       required="true" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times">
+                                                    <p:ajax update="panelDatosInformacionEmpresarial" listener="#{inscripcionBean.onTrabajaActualmenteGrupoChange()}"/>
+                                                </p:selectBooleanButton>
+                                                <p:message id="msgTrabajaActualmente" for="selTrabajaActualmente"/>
+                                            </h:panelGrid>                                        
+
+                                            <p:outputLabel id="lblNombreEmpresa" for="txtNombreEmpresa" value="#{msg.nombreEmpresa}:"
+                                                           rendered="#{inscripcionBean.inscripcionEstudiante.trabajaActualmente=='S'}"/>
+                                            <h:panelGrid cellspacing="0" cellpadding="0"
+                                                         rendered="#{inscripcionBean.inscripcionEstudiante.trabajaActualmente=='S'}">
+                                                <p:inputText id="txtNombreEmpresa" value="#{inscripcionBean.inscripcionEstudiante.empresaTrabajo}" required="true" 
+                                                             maxlength="30" size="30" >
+                                                    <p:ajax event="keyup" update="lblNombreEmpresa, msgNombreEmpresa"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputText>
+                                                <p:message id="msgNombreEmpresa" for="txtNombreEmpresa"
+                                                           rendered="#{inscripcionBean.inscripcionEstudiante.trabajaActualmente=='S'}"/>
+                                            </h:panelGrid>
+
+
+                                            <p:outputLabel id="lblDireccionEmpresa" for="txtDireccionEmpresa" value="#{msg.direccionEmpresa}:"
+                                                           rendered="#{inscripcionBean.inscripcionEstudiante.trabajaActualmente=='S'}"/>
+                                            <h:panelGrid cellspacing="0" cellpadding="0"
+                                                         rendered="#{inscripcionBean.inscripcionEstudiante.trabajaActualmente=='S'}">
+                                                <p:inputText id="txtDireccionEmpresa" value="#{inscripcionBean.inscripcionEstudiante.direccionTrabajo}" required="true" 
+                                                             maxlength="30" size="30" >
+                                                    <p:ajax event="keyup" update="lblDireccionEmpresa, msgDireccionEmpresa"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputText>
+                                                <p:message id="msgDireccionEmpresa" for="txtDireccionEmpresa"
+                                                           rendered="#{inscripcionBean.inscripcionEstudiante.trabajaActualmente=='S'}"/>
+                                            </h:panelGrid>
+
+
+                                            <p:outputLabel id="lblTelefonoEmpresa" for="txtTelefonoEmpresa" value="#{msg.telefono}:"
+                                                           rendered="#{inscripcionBean.inscripcionEstudiante.trabajaActualmente=='S'}"/>
+                                            <h:panelGrid cellspacing="0" cellpadding="0"
+                                                         rendered="#{inscripcionBean.inscripcionEstudiante.trabajaActualmente=='S'}">
+                                                <p:inputText id="txtTelefonoEmpresa"
+                                                             value="#{inscripcionBean.inscripcionEstudiante.telefonoTrabajo}"
+                                                             required="true"
+                                                             size="13"
+                                                             validator="ValidadorNumero"
+                                                             maxlength="10">
+                                                    <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                                    <p:ajax event="keyup" update="lblTelefonoEmpresa, msgTelefonoEmpresa"/>
+                                                    <p:ajax event="change" update="@this"/>
+                                                </p:inputText>
+                                                <p:message id="msgTelefonoEmpresa" for="txtTelefonoEmpresa"
+                                                           rendered="#{inscripcionBean.inscripcionEstudiante.trabajaActualmente=='S'}"/>
+                                            </h:panelGrid>
+
+
+
+                                        </h:panelGrid>
+                                    </p:fieldset>                                    
+
+                                </p:outputPanel>          
+                                <p:outputPanel style="background-color: #c2c3c5">
+                                    <center>
+                                        <h:panelGrid columns="2" cellspacing="6">
+                                            <p:commandButton value="#{msg.aceptar}" 
+                                                             icon="ui-icon-check"
+                                                             process="@this, panelEstudianteGrupo"
+                                                             action="#{inscripcionBean.agregarEstudianteGrupo()}"
+                                                             update="formPrincipal:tblInscripcionesGrupo, panelEstudianteGrupo"
+                                                             />
+                                            <p:commandButton value="#{msg.cancelar}"
+                                                             icon="ui-icon-close"
+                                                             onclick="PF('dlgEstudianteGrupo').hide();"
+                                                             />
+                                        </h:panelGrid>
+                                    </center>
+                                </p:outputPanel>
+
+
+
+
+
+                            </h:form>
+
+
+                        </p:dialog>
+
+
+                    </h:panelGrid>
+                </center>
+            </ui:define>
+        </ui:composition>
+
+    </h:body>
+</html>
+

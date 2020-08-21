@@ -1,0 +1,244 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/plantilla/plantilla.xhtml">
+            <ui:define name="content">
+                <style>
+                    .etiquetaCentroCapacitacion{
+                        width: 100px;
+                    }
+                    .etiquetaAdministrador{
+                        width: 150px;
+                    }
+                    .col_1{
+                        vertical-align: top;
+                        width: 50%;
+                    }
+                    .col_2{
+                        vertical-align: top;
+                        width: 50%;
+                    }
+                </style>
+
+                <center>
+
+                    <h:panelGrid id="panelPrincipal" style="width: 95%">
+
+                        <p:panel rendered="#{centroCapacitacionBean.centroCapacitacion == null}">
+                            <f:facet name="header">
+                                <center>
+                                    <h:panelGrid style="text-align: center">
+                                        <h:outputLabel value="#{msg.listadoCentrosCapacitacion}" class="titulo"/>
+                                        <p:commandButton icon="fa fa-plus-circle" value="#{msg.nuevo}" action="#{centroCapacitacionBean.nuevo()}" update="formPrincipal:panelPrincipal" resetValues="true"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+                            <p:messages closable="true"/>
+                            <p:dataTable id="dtCentros" value="#{centroCapacitacionBean.centroCapacitacionList}" var="centro" paginator="true" rows="10" emptyMessage="#{msg.noExistenDatos}"
+                                         sortBy="#{centro.id}">
+                                <p:column headerText="#{msg.acciones}" width="100" style="text-align: center">
+                                    <p:commandButton icon="fa fa-pencil" title="#{msg.editar}" action="#{centroCapacitacionBean.seleccionar(centro)}" update="formPrincipal:panelPrincipal" resetValues="true"/>
+                                    <p:commandButton icon="fa fa-trash-o" title="#{msg.eliminar}" action="#{centroCapacitacionBean.eliminar(centro)}" update="formPrincipal:panelPrincipal" disabled="#{centro.id == 1}">
+                                        <p:confirm header="#{msg.confirmacionTitulo}" message="#{msg.confirmacionMensaje}" />
+                                    </p:commandButton>
+                                </p:column>
+                                <p:column headerText="#{msg.nombre}">
+                                    <h:outputLabel value="#{centro.nombre}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.ciudad}" width="300">
+                                    <h:outputLabel value="#{centro.canton.cabeceraCantonal} (#{centro.canton.provincia.nombre})"/>
+                                </p:column>
+                                <p:column headerText="#{msg.direccion}" width="200">
+                                    <h:outputLabel value="#{centro.direccion}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.telefono}" width="80" style="text-align: center">
+                                    <h:outputLabel value="#{centro.telefono}"/>
+                                </p:column>
+                            </p:dataTable>
+
+                        </p:panel>
+
+
+
+                        <p:panel rendered="#{centroCapacitacionBean.centroCapacitacion !=null}">
+                            <f:facet name="header">
+                                <center class="titulo">
+                                    <h:outputLabel value="#{centroCapacitacionBean.centroCapacitacion.id ==null?msg.creacionCentroCapacitacion:msg.edicionCentroCapacitacion}"/>
+                                    <h:panelGrid columns="3" cellpadding="0" cellspacing="0">
+                                        <p:commandButton icon="fa fa-save" value="#{msg.grabar}" action="#{centroCapacitacionBean.grabar()}" update="panelPrincipal"/>
+                                        <p:commandButton icon="fa fa-reply"  value="#{msg.cancelar}" action="#{centroCapacitacionBean.cancelar()}" immediate="false" process="@this" update="panelPrincipal"/>
+                                    </h:panelGrid>
+                                </center>
+                            </f:facet>
+
+                            <p:messages closable="true"/>
+                            <h:panelGrid columns="2" columnClasses="col_1, col_2">
+                                <p:fieldset legend="#{msg.datosGenerales}">
+                                    <h:panelGrid columns="2" columnClasses="etiqueta etiquetaCentroCapacitacion" cellpadding="6" cellspacing="2">
+                                        <p:outputLabel id="lblNombre" for="txtNombre" value="#{msg.nombre}:"/>
+                                        <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                            <p:inputText id="txtNombre" value="#{centroCapacitacionBean.centroCapacitacion.nombre}" required="true" 
+                                                         maxlength="50" size="50" >
+                                                <p:ajax event="keyup" update="lblNombre, msgNombre"/>
+                                                <p:ajax event="change" update="@this"/>
+                                            </p:inputText>
+                                            <p:message id="msgNombre" for="txtNombre"/>
+                                        </h:panelGrid>
+
+                                        <p:outputLabel id="lblCiudad" for="selCiudad" value="#{msg.ciudad}:"/>
+                                        <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                            <p:selectOneMenu value="#{centroCapacitacionBean.centroCapacitacion.canton}" 
+                                                             id="selCiudad"
+                                                             style="width: 325px"
+                                                             required="true"
+                                                             filter="true"
+                                                             converter="omnifaces.SelectItemsConverter">
+                                                <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption=""/>
+                                                <f:selectItems value="#{cantonBean.cantonList}" var="can" itemLabel="#{can.cabeceraCantonal} (#{can.provincia.nombre})" itemValue="#{can}"/>
+                                                <p:ajax event="select" update="selCiudad, lblCiudad, msgCiudad"/>                                                
+                                            </p:selectOneMenu>
+                                            <p:message id="msgCiudad" for="selCiudad" />
+                                        </h:panelGrid>
+
+                                        <p:outputLabel id="lblDireccion" for="txtDireccion" value="#{msg.direccion}:"/>
+                                        <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                            <p:inputTextarea id="txtDireccion" value="#{centroCapacitacionBean.centroCapacitacion.direccion}" required="true" 
+                                                             maxlength="300" cols="50">
+                                                <p:ajax event="keyup" update="lblDireccion, msgDireccion"/>
+                                            </p:inputTextarea>
+                                            <p:message id="msgDireccion" for="txtDireccion"/>
+                                        </h:panelGrid>
+
+                                        <p:outputLabel id="lblTelefono" for="txtTelefono" value="#{msg.telefono}:"/>
+                                        <h:panelGrid columns="1" cellpadding="0" cellspacing="0">
+                                            <p:inputText id="txtTelefono"
+                                                         value="#{centroCapacitacionBean.centroCapacitacion.telefono}"
+                                                         required="true"
+                                                         size="16"
+                                                         validator="ValidadorNumero"
+                                                         maxlength="9">
+                                                <p:keyFilter regEx="/^[0-9]*$/" preventPaste="false"/>
+                                                <p:ajax event="keyup" update="lblTelefono, msgTelefono"/>
+                                                <p:ajax event="change" update="@this"/>
+                                            </p:inputText>
+                                            <p:message id="msgTelefono" for="txtTelefono"/>
+                                        </h:panelGrid>
+
+
+                                    </h:panelGrid>
+                                </p:fieldset>
+                                <p:fieldset legend="#{msg.administradorCentroCapacitación}">
+                                    <p:dataTable id="dtAdministradores" value="#{centroCapacitacionBean.centroCapacitacion.administradorList}" var="adm" emptyMessage="#{msg.noExistenDatos}">
+                                        <f:facet name="header">
+                                            <div style="text-align: left">
+                                                <p:commandButton icon="fa fa-plus-circle" value="#{msg.agregar}" 
+                                                                 oncomplete="PF('dlgUsuariosAdminCentro').show();" 
+                                                                 action="#{centroCapacitacionBean.nuevoAdministrador()}"
+                                                                 process="@this"
+                                                                 update="formPrincipal:dlgUsuariosAdminCentro"/>
+
+                                            </div>
+
+                                        </f:facet>
+
+                                        <p:column headerText="#{msg.nombre}">
+                                            <h:outputLabel value="#{adm.administrador.persona.nombresCompletos}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg.fechaInicio}" width="100" style="text-align: center">
+                                            <h:outputLabel value="#{adm.fechaAsignacion}">
+                                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                            </h:outputLabel>
+                                        </p:column>
+                                        <p:column headerText="#{msg.fechaFin}" width="100" style="text-align: center">
+                                            <h:outputLabel value="#{adm.fechaFin}">
+                                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                            </h:outputLabel>
+                                        </p:column>
+                                        <p:column headerText="#{msg.estado}" width="100" style="text-align: center">
+                                            <h:outputLabel value="#{adm.administradorActual?'Activo':'Inactivo'}"/>
+                                        </p:column>
+
+                                    </p:dataTable>
+
+                                </p:fieldset>
+                            </h:panelGrid>
+
+                        </p:panel>
+
+                        <p:dialog id="dlgUsuariosAdminCentro"  
+                                  widgetVar="dlgUsuariosAdminCentro"
+                                  closeOnEscape="true"
+                                  position="center top"
+                                  dynamic="true"
+                                  appendTo="@(body)"
+                                  modal="true"
+                                  header="#{msg.administradorCentroCapacitación}" 
+                                  width="500">
+                            <h:form>
+                                <p:outputPanel style="height:200px;overflow:auto">
+                                    <h:panelGrid columns="2" id="panelAdmin" columnClasses="etiqueta etiquetaAdministrador">
+                                        <p:outputLabel value="#{msg.fechaAsignacion}:"/>
+                                        <p:outputLabel value="#{centroCapacitacionBean.administradorCentroCapacitacion.fechaAsignacion}">
+                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                        </p:outputLabel>
+
+                                        <p:outputLabel value="#{msg.asignadoPor}:"/>
+                                        <p:outputLabel value="#{menuBar.usuario.persona.nombresCompletos}"/>
+
+                                        <p:outputLabel value="#{msg.administrador}:" for="selAdministrador"/>
+                                        <h:panelGrid columns="2">
+                                            <p:selectOneMenu id="selAdministrador"
+                                                             value="#{centroCapacitacionBean.administradorCentroCapacitacion.administrador}"
+                                                             converter="omnifaces.SelectItemsConverter" required="true">
+                                                <f:selectItem itemLabel="#{msg.seleccione}" noSelectionOption="true"/>
+                                                <f:selectItems value="#{centroCapacitacionBean.administradorCentroList}" var="usu" itemLabel="#{usu.persona.nombresCompletos}" itemValue="#{usu}"/>
+                                            </p:selectOneMenu>
+                                            <p:message for="selAdministrador"/>
+
+                                        </h:panelGrid>
+                                    </h:panelGrid>
+                                </p:outputPanel>          
+                                <p:outputPanel style="background-color: #c2c3c5">
+                                    <center>
+                                        <h:panelGrid columns="2" cellspacing="6">
+                                            <p:commandButton value="#{msg.aceptar}" 
+                                                             icon="ui-icon-check"
+                                                             action ="#{centroCapacitacionBean.aceptarAdministrador()}"  
+                                                             process="@this, panelAdmin"
+                                                             update="formPrincipal:dtAdministradores"/>
+                                            <p:commandButton value="#{msg.cancelar}"
+                                                             icon="ui-icon-close"
+                                                             onclick="PF('dlgUsuariosAdminCentro').hide();"
+                                                             />
+
+                                        </h:panelGrid>
+
+                                    </center>
+                                </p:outputPanel>
+
+
+
+
+
+                            </h:form>
+
+
+                        </p:dialog>
+
+                    </h:panelGrid>
+                </center>
+
+
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+
