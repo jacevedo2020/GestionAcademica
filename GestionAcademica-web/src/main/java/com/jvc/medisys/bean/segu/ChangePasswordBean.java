@@ -28,6 +28,8 @@ public class ChangePasswordBean implements Serializable {
     @PostConstruct
     private void init() {
         try {
+            //ssssssssssssss
+            ///aaaaa
             username = FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuarioChangePassword").toString();
         } catch (Exception e) {
         }
