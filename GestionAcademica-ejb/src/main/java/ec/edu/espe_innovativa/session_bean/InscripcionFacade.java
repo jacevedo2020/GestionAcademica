@@ -85,7 +85,8 @@ public class InscripcionFacade extends AbstractFacade<Inscripcion> implements In
 
     @Override
     public List<Inscripcion> findByIniciadas() {
-        Query q = em.createQuery("SELECT o FROM Inscripcion o WHERE o.cursoCentroCapacitacion.fechaInicio <= CURRENT_DATE");
+        //Query q = em.createQuery("SELECT o FROM Inscripcion o WHERE o.cursoCentroCapacitacion.fechaInicio <= CURRENT_DATE");
+        Query q = em.createQuery("SELECT o FROM Inscripcion o");
         return q.getResultList();
     }
 

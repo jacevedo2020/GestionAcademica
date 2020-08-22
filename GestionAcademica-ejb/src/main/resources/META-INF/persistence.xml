@@ -2,8 +2,36 @@
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
     <persistence-unit name="medisysPU" transaction-type="JTA">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-        <jta-data-source>jdbc/capacitacion_innovativa</jta-data-source>
-        <exclude-unlisted-classes>false</exclude-unlisted-classes>
+        <jta-data-source>java:/capacitacion_innovativa</jta-data-source>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+        <class>ec.edu.espe_innovativa.entity_bean.AdministradorCentroCapacitacion</class>
+        <class>ec.edu.espe_innovativa.entity_bean.Canton</class>
+        <class>ec.edu.espe_innovativa.entity_bean.CentroCapacitacion</class>
+        <class>ec.edu.espe_innovativa.entity_bean.Certificado</class>
+        <class>ec.edu.espe_innovativa.entity_bean.Curso</class>
+        <class>ec.edu.espe_innovativa.entity_bean.CursoCentroCapacitacion</class>
+        <class>ec.edu.espe_innovativa.entity_bean.EnvioCertificado</class>
+        <class>ec.edu.espe_innovativa.entity_bean.Estado</class>
+        <class>ec.edu.espe_innovativa.entity_bean.EstadoInscripcion</class>
+        <class>ec.edu.espe_innovativa.entity_bean.Evaluacion</class>
+        <class>ec.edu.espe_innovativa.entity_bean.Horario</class>
+        <class>ec.edu.espe_innovativa.entity_bean.ImpresionCertificado</class>
+        <class>ec.edu.espe_innovativa.entity_bean.Inscripcion</class>
+        <class>ec.edu.espe_innovativa.entity_bean.MensajeCorreo</class>
+        <class>ec.edu.espe_innovativa.entity_bean.Opcion</class>
+        <class>ec.edu.espe_innovativa.entity_bean.Parametro</class>
+        <class>ec.edu.espe_innovativa.entity_bean.Parroquia</class>
+        <class>ec.edu.espe_innovativa.entity_bean.Persona</class>
+        <class>ec.edu.espe_innovativa.entity_bean.PlantillaCertificado</class>
+        <class>ec.edu.espe_innovativa.entity_bean.Programa</class>
+        <class>ec.edu.espe_innovativa.entity_bean.Provincia</class>
+        <class>ec.edu.espe_innovativa.entity_bean.Proyecto</class>
+        <class>ec.edu.espe_innovativa.entity_bean.Rol</class>
+        <class>ec.edu.espe_innovativa.entity_bean.RolOpcion</class>
+        <class>ec.edu.espe_innovativa.entity_bean.TipoEstudiante</class>
+        <class>ec.edu.espe_innovativa.entity_bean.TipoIdentificacion</class>
+        <class>ec.edu.espe_innovativa.entity_bean.Usuario</class>
+        <class>ec.edu.espe_innovativa.entity_bean.UsuarioRol</class>
         <validation-mode>NONE</validation-mode>
         <properties>
             <property name="eclipselink.logging.level" value="FINE"/>
