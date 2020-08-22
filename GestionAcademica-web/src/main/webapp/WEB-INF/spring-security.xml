@@ -91,5 +91,10 @@ http://www.springframework.org/schema/util
         <beans:property name="defaultFailureUrl" value="/error.xhtml"/>
     </beans:bean>
     
-    
+    <beans:bean id="allowSemicolonHttpFirewall" 
+          class="org.springframework.security.web.firewall.StrictHttpFirewall"> 
+        <beans:property name="allowSemicolon" value="true"/> 
+    </beans:bean> 
+    <http-firewall ref="allowSemicolonHttpFirewall"/>
+
 </beans:beans>

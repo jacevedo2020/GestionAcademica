@@ -33,10 +33,10 @@
         <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
-    <servlet>
+    <!--servlet>
         <servlet-name>ServletLesiones</servlet-name>
         <servlet-class>com.jvc.medisys.controladores.ServletLesiones</servlet-class>
-    </servlet>
+    </servlet-->
     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>
         <url-pattern>*.xhtml</url-pattern>
@@ -58,10 +58,10 @@
         <filter-name>PrimeFaces FileUpload Filter</filter-name>
         <servlet-name>Faces Servlet</servlet-name>
     </filter-mapping>
-    <servlet-mapping>
+    <!--servlet-mapping>
         <servlet-name>ServletLesiones</servlet-name>
         <url-pattern>/ServletLesiones</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping-->
     <session-config>
         <session-timeout>
             90

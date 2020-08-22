@@ -31,7 +31,7 @@ import net.sf.jasperreports.export.SimpleXlsxReportConfiguration;
 @ApplicationScoped
 public class JasperReportUtil {
 
-    @Resource(lookup = "jdbc/capacitacion_innovativa")
+    @Resource(lookup = "java:/capacitacion_innovativa")
     private DataSource dataSource;
 
     public JasperReportUtil() {
