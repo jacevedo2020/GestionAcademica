@@ -28,7 +28,7 @@ public class Notificacion {
     @EJB
     private InscripcionFacadeLocal inscripcionFacadeLocal;
 
-    @Schedule(hour = "*", minute = "*", second = "0")
+    //@Schedule(hour = "*", minute = "*", second = "0")
     private void verificarInscripciones(Timer timer) {
         List<Inscripcion> inscripcionList = inscripcionFacadeLocal.findByIniciadas();
         for (Inscripcion i : inscripcionList) {
